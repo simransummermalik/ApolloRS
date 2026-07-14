@@ -1,0 +1,3 @@
+[submodule "historical/Apollo-11"]
+	path = historical/Apollo-11
+	url = https://github.com/chrislgarry/Apollo-11.git

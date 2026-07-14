@@ -1,0 +1,2376 @@
+{
+  "cross_program": {
+    "comanche_only_filenames": [
+      "AGC_BLOCK_TWO_SELF-CHECK.agc",
+      "ANGLFIND.agc",
+      "AUTOMATIC_MANEUVERS.agc",
+      "CM_BODY_ATTITUDE.agc",
+      "CM_ENTRY_DIGITAL_AUTOPILOT.agc",
+      "CONTRACT_AND_APPROVALS.agc",
+      "CSM_GEOMETRY.agc",
+      "DOWN-TELEMETRY_PROGRAM.agc",
+      "ENTRY_LEXICON.agc",
+      "IMU_CALIBRATION_AND_ALIGNMENT.agc",
+      "INTERPRETIVE_CONSTANTS.agc",
+      "JET_SELECTION_LOGIC.agc",
+      "LUNAR_LANDMARK_SELECTION_FOR_CM.agc",
+      "MYSUBS.agc",
+      "P11.agc",
+      "P30-P37.agc",
+      "P32-P33_P72-P73.agc",
+      "P37_P70.agc",
+      "P61-P67.agc",
+      "RCS-CSM_DAP_EXECUTIVE_PROGRAMS.agc",
+      "RCS-CSM_DIGITAL_AUTOPILOT.agc",
+      "REENTRY_CONTROL.agc",
+      "RT8_OP_CODES.agc",
+      "S-BAND_ANTENNA_FOR_CM.agc",
+      "SERVICER207.agc",
+      "STAR_TABLES.agc",
+      "SXTMARK.agc",
+      "TPI_SEARCH.agc",
+      "TVCDAPS.agc",
+      "TVCEXECUTIVE.agc",
+      "TVCINITIALIZE.agc",
+      "TVCMASSPROP.agc",
+      "TVCRESTARTS.agc",
+      "TVCROLLDAP.agc",
+      "TVCSTROKETEST.agc"
+    ],
+    "luminary_only_filenames": [
+      "AGC_BLOCK_TWO_SELF_CHECK.agc",
+      "AGS_INITIALIZATION.agc",
+      "AOSTASK_AND_AOSJOB.agc",
+      "AOTMARK.agc",
+      "ASCENT_GUIDANCE.agc",
+      "ATTITUDE_MANEUVER_ROUTINE.agc",
+      "BURN_BABY_BURN--MASTER_IGNITION_ROUTINE.agc",
+      "CONTROLLED_CONSTANTS.agc",
+      "DAPIDLER_PROGRAM.agc",
+      "DAP_INTERFACE_SUBROUTINES.agc",
+      "DOWN_TELEMETRY_PROGRAM.agc",
+      "FINDCDUW--GUIDAP_INTERFACE.agc",
+      "FLAGWORD_ASSIGNMENTS.agc",
+      "GENERAL_LAMBERT_AIMPOINT_GUIDANCE.agc",
+      "IMU_PERFORMANCE_TESTS_4.agc",
+      "IMU_PERFORMANCE_TEST_2.agc",
+      "INPUT_OUTPUT_CHANNEL_BIT_DESCRIPTIONS.agc",
+      "INTERPRETIVE_CONSTANT.agc",
+      "KALMAN_FILTER.agc",
+      "LANDING_ANALOG_DISPLAYS.agc",
+      "LEM_GEOMETRY.agc",
+      "LUNAR_LANDING_GUIDANCE_EQUATIONS.agc",
+      "P-AXIS_RCS_AUTOPILOT.agc",
+      "P12.agc",
+      "P30_P37.agc",
+      "P32-P35_P72-P75.agc",
+      "P70-P71.agc",
+      "Q_R-AXIS_RCS_AUTOPILOT.agc",
+      "R63.agc",
+      "RADAR_LEADIN_ROUTINES.agc",
+      "RCS_FAILURE_MONITOR.agc",
+      "RTB_OP_CODES.agc",
+      "S-BAND_ANTENNA_FOR_LM.agc",
+      "SERVICER.agc",
+      "SPS_BACK-UP_RCS_CONTROL.agc",
+      "T6-RUPT_PROGRAMS.agc",
+      "THE_LUNAR_LANDING.agc",
+      "THROTTLE_CONTROL_ROUTINES.agc",
+      "TJET_LAW.agc",
+      "TRIM_GIMBAL_CONTROL_SYSTEM.agc"
+    ],
+    "same_filename_modules": [
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/ALARM_AND_ABORT.agc",
+        "filename": "ALARM_AND_ABORT.agc",
+        "luminary_path": "Luminary099/ALARM_AND_ABORT.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/ASSEMBLY_AND_OPERATION_INFORMATION.agc",
+        "filename": "ASSEMBLY_AND_OPERATION_INFORMATION.agc",
+        "luminary_path": "Luminary099/ASSEMBLY_AND_OPERATION_INFORMATION.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/CONIC_SUBROUTINES.agc",
+        "filename": "CONIC_SUBROUTINES.agc",
+        "luminary_path": "Luminary099/CONIC_SUBROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/DISPLAY_INTERFACE_ROUTINES.agc",
+        "filename": "DISPLAY_INTERFACE_ROUTINES.agc",
+        "luminary_path": "Luminary099/DISPLAY_INTERFACE_ROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/DOWNLINK_LISTS.agc",
+        "filename": "DOWNLINK_LISTS.agc",
+        "luminary_path": "Luminary099/DOWNLINK_LISTS.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/ERASABLE_ASSIGNMENTS.agc",
+        "filename": "ERASABLE_ASSIGNMENTS.agc",
+        "luminary_path": "Luminary099/ERASABLE_ASSIGNMENTS.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/EXECUTIVE.agc",
+        "filename": "EXECUTIVE.agc",
+        "luminary_path": "Luminary099/EXECUTIVE.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/EXTENDED_VERBS.agc",
+        "filename": "EXTENDED_VERBS.agc",
+        "luminary_path": "Luminary099/EXTENDED_VERBS.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/FIXED_FIXED_CONSTANT_POOL.agc",
+        "filename": "FIXED_FIXED_CONSTANT_POOL.agc",
+        "luminary_path": "Luminary099/FIXED_FIXED_CONSTANT_POOL.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/FRESH_START_AND_RESTART.agc",
+        "filename": "FRESH_START_AND_RESTART.agc",
+        "luminary_path": "Luminary099/FRESH_START_AND_RESTART.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/GIMBAL_LOCK_AVOIDANCE.agc",
+        "filename": "GIMBAL_LOCK_AVOIDANCE.agc",
+        "luminary_path": "Luminary099/GIMBAL_LOCK_AVOIDANCE.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/GROUND_TRACKING_DETERMINATION_PROGRAM.agc",
+        "filename": "GROUND_TRACKING_DETERMINATION_PROGRAM.agc",
+        "luminary_path": "Luminary099/GROUND_TRACKING_DETERMINATION_PROGRAM.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/IMU_COMPENSATION_PACKAGE.agc",
+        "filename": "IMU_COMPENSATION_PACKAGE.agc",
+        "luminary_path": "Luminary099/IMU_COMPENSATION_PACKAGE.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/IMU_MODE_SWITCHING_ROUTINES.agc",
+        "filename": "IMU_MODE_SWITCHING_ROUTINES.agc",
+        "luminary_path": "Luminary099/IMU_MODE_SWITCHING_ROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/INFLIGHT_ALIGNMENT_ROUTINES.agc",
+        "filename": "INFLIGHT_ALIGNMENT_ROUTINES.agc",
+        "luminary_path": "Luminary099/INFLIGHT_ALIGNMENT_ROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/INTEGRATION_INITIALIZATION.agc",
+        "filename": "INTEGRATION_INITIALIZATION.agc",
+        "luminary_path": "Luminary099/INTEGRATION_INITIALIZATION.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/INTER-BANK_COMMUNICATION.agc",
+        "filename": "INTER-BANK_COMMUNICATION.agc",
+        "luminary_path": "Luminary099/INTER-BANK_COMMUNICATION.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/INTERPRETER.agc",
+        "filename": "INTERPRETER.agc",
+        "luminary_path": "Luminary099/INTERPRETER.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/INTERRUPT_LEAD_INS.agc",
+        "filename": "INTERRUPT_LEAD_INS.agc",
+        "luminary_path": "Luminary099/INTERRUPT_LEAD_INS.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/KALCMANU_STEERING.agc",
+        "filename": "KALCMANU_STEERING.agc",
+        "luminary_path": "Luminary099/KALCMANU_STEERING.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/KEYRUPT_UPRUPT.agc",
+        "filename": "KEYRUPT_UPRUPT.agc",
+        "luminary_path": "Luminary099/KEYRUPT_UPRUPT.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/LATITUDE_LONGITUDE_SUBROUTINES.agc",
+        "filename": "LATITUDE_LONGITUDE_SUBROUTINES.agc",
+        "luminary_path": "Luminary099/LATITUDE_LONGITUDE_SUBROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/LUNAR_AND_SOLAR_EPHEMERIDES_SUBROUTINES.agc",
+        "filename": "LUNAR_AND_SOLAR_EPHEMERIDES_SUBROUTINES.agc",
+        "luminary_path": "Luminary099/LUNAR_AND_SOLAR_EPHEMERIDES_SUBROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/MAIN.agc",
+        "filename": "MAIN.agc",
+        "luminary_path": "Luminary099/MAIN.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/MEASUREMENT_INCORPORATION.agc",
+        "filename": "MEASUREMENT_INCORPORATION.agc",
+        "luminary_path": "Luminary099/MEASUREMENT_INCORPORATION.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/ORBITAL_INTEGRATION.agc",
+        "filename": "ORBITAL_INTEGRATION.agc",
+        "luminary_path": "Luminary099/ORBITAL_INTEGRATION.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/P20-P25.agc",
+        "filename": "P20-P25.agc",
+        "luminary_path": "Luminary099/P20-P25.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/P34-35_P74-75.agc",
+        "filename": "P34-35_P74-75.agc",
+        "luminary_path": "Luminary099/P34-35_P74-75.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/P40-P47.agc",
+        "filename": "P40-P47.agc",
+        "luminary_path": "Luminary099/P40-P47.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/P51-P53.agc",
+        "filename": "P51-P53.agc",
+        "luminary_path": "Luminary099/P51-P53.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/P76.agc",
+        "filename": "P76.agc",
+        "luminary_path": "Luminary099/P76.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/PHASE_TABLE_MAINTENANCE.agc",
+        "filename": "PHASE_TABLE_MAINTENANCE.agc",
+        "luminary_path": "Luminary099/PHASE_TABLE_MAINTENANCE.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/PINBALL_GAME_BUTTONS_AND_LIGHTS.agc",
+        "filename": "PINBALL_GAME_BUTTONS_AND_LIGHTS.agc",
+        "luminary_path": "Luminary099/PINBALL_GAME_BUTTONS_AND_LIGHTS.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/PINBALL_NOUN_TABLES.agc",
+        "filename": "PINBALL_NOUN_TABLES.agc",
+        "luminary_path": "Luminary099/PINBALL_NOUN_TABLES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/PLANETARY_INERTIAL_ORIENTATION.agc",
+        "filename": "PLANETARY_INERTIAL_ORIENTATION.agc",
+        "luminary_path": "Luminary099/PLANETARY_INERTIAL_ORIENTATION.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/POWERED_FLIGHT_SUBROUTINES.agc",
+        "filename": "POWERED_FLIGHT_SUBROUTINES.agc",
+        "luminary_path": "Luminary099/POWERED_FLIGHT_SUBROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/R30.agc",
+        "filename": "R30.agc",
+        "luminary_path": "Luminary099/R30.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/R31.agc",
+        "filename": "R31.agc",
+        "luminary_path": "Luminary099/R31.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/R60_62.agc",
+        "filename": "R60_62.agc",
+        "luminary_path": "Luminary099/R60_62.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/RESTARTS_ROUTINE.agc",
+        "filename": "RESTARTS_ROUTINE.agc",
+        "luminary_path": "Luminary099/RESTARTS_ROUTINE.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/RESTART_TABLES.agc",
+        "filename": "RESTART_TABLES.agc",
+        "luminary_path": "Luminary099/RESTART_TABLES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/SERVICE_ROUTINES.agc",
+        "filename": "SERVICE_ROUTINES.agc",
+        "luminary_path": "Luminary099/SERVICE_ROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/SINGLE_PRECISION_SUBROUTINES.agc",
+        "filename": "SINGLE_PRECISION_SUBROUTINES.agc",
+        "luminary_path": "Luminary099/SINGLE_PRECISION_SUBROUTINES.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/STABLE_ORBIT.agc",
+        "filename": "STABLE_ORBIT.agc",
+        "luminary_path": "Luminary099/STABLE_ORBIT.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/SYSTEM_TEST_STANDARD_LEAD_INS.agc",
+        "filename": "SYSTEM_TEST_STANDARD_LEAD_INS.agc",
+        "luminary_path": "Luminary099/SYSTEM_TEST_STANDARD_LEAD_INS.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/T4RUPT_PROGRAM.agc",
+        "filename": "T4RUPT_PROGRAM.agc",
+        "luminary_path": "Luminary099/T4RUPT_PROGRAM.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/TAGS_FOR_RELATIVE_SETLOC.agc",
+        "filename": "TAGS_FOR_RELATIVE_SETLOC.agc",
+        "luminary_path": "Luminary099/TAGS_FOR_RELATIVE_SETLOC.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/TIME_OF_FREE_FALL.agc",
+        "filename": "TIME_OF_FREE_FALL.agc",
+        "luminary_path": "Luminary099/TIME_OF_FREE_FALL.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/UPDATE_PROGRAM.agc",
+        "filename": "UPDATE_PROGRAM.agc",
+        "luminary_path": "Luminary099/UPDATE_PROGRAM.agc"
+      },
+      {
+        "byte_identical": false,
+        "comanche_path": "Comanche055/WAITLIST.agc",
+        "filename": "WAITLIST.agc",
+        "luminary_path": "Luminary099/WAITLIST.agc"
+      }
+    ]
+  },
+  "programs": [
+    {
+      "file_count": 85,
+      "id": "Comanche055",
+      "include_count": 84,
+      "line_count": 65348,
+      "main": "Comanche055/MAIN.agc",
+      "modules": [
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "AGC_BLOCK_TWO_SELF-CHECK.agc",
+          "include_order": 75,
+          "included_from_main_exactly": true,
+          "lines": 513,
+          "path": "Comanche055/AGC_BLOCK_TWO_SELF-CHECK.agc",
+          "sha256": "f86f1a02856b29a2cd01186a1a807fe4455b576624f8c4cb5876408677c83868"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "ALARM_AND_ABORT.agc",
+          "include_order": 82,
+          "included_from_main_exactly": true,
+          "lines": 230,
+          "path": "Comanche055/ALARM_AND_ABORT.agc",
+          "sha256": "ffa2e17087ed8029c2d56018114c4c947d9c3d03e6b15b0b17b11c8fc24a2d0f"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "ANGLFIND.agc",
+          "include_order": 17,
+          "included_from_main_exactly": true,
+          "lines": 626,
+          "path": "Comanche055/ANGLFIND.agc",
+          "sha256": "827f457bf6dd722ed1432991623dcb6165e4ddc74dcf2c8ce531f5c2d21c5487"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "ASSEMBLY_AND_OPERATION_INFORMATION.agc",
+          "include_order": 2,
+          "included_from_main_exactly": true,
+          "lines": 1010,
+          "path": "Comanche055/ASSEMBLY_AND_OPERATION_INFORMATION.agc",
+          "sha256": "45d86ebb0dfd5bc5a49f3be7abb8876cb66da6823311446bac58a6795fc6c101"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "AUTOMATIC_MANEUVERS.agc",
+          "include_order": 53,
+          "included_from_main_exactly": true,
+          "lines": 504,
+          "path": "Comanche055/AUTOMATIC_MANEUVERS.agc",
+          "sha256": "b7803a69b1702f90b89d8ae1510d646569cee23876bb113db51aec9c315f990e"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "CM_BODY_ATTITUDE.agc",
+          "include_order": 40,
+          "included_from_main_exactly": true,
+          "lines": 301,
+          "path": "Comanche055/CM_BODY_ATTITUDE.agc",
+          "sha256": "187481b79cf3ff3c911b724c34084b0471ab62e06b52726fbde7d0d59786475c"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "CM_ENTRY_DIGITAL_AUTOPILOT.agc",
+          "include_order": 56,
+          "included_from_main_exactly": true,
+          "lines": 1273,
+          "path": "Comanche055/CM_ENTRY_DIGITAL_AUTOPILOT.agc",
+          "sha256": "14f76028ec691d72b326c551b4676da928c1c744eb3a2aff817b582d70df9e1d"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "CONIC_SUBROUTINES.agc",
+          "include_order": 68,
+          "included_from_main_exactly": true,
+          "lines": 1922,
+          "path": "Comanche055/CONIC_SUBROUTINES.agc",
+          "sha256": "b71ca76c2835831676ed58e7708132fe30a239fedffaf8a17decea177569d6af"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "CONTRACT_AND_APPROVALS.agc",
+          "include_order": 1,
+          "included_from_main_exactly": true,
+          "lines": 73,
+          "path": "Comanche055/CONTRACT_AND_APPROVALS.agc",
+          "sha256": "769c1db20e0a9cb511ee16987700db047996dbec46f1a57b3eec4919f81a321d"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "CSM_GEOMETRY.agc",
+          "include_order": 13,
+          "included_from_main_exactly": true,
+          "lines": 415,
+          "path": "Comanche055/CSM_GEOMETRY.agc",
+          "sha256": "93414cefa5c6ed833b4bc0610c5055a2ded393aea6938dc65d13cf2b717bc101"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "DISPLAY_INTERFACE_ROUTINES.agc",
+          "include_order": 80,
+          "included_from_main_exactly": true,
+          "lines": 1476,
+          "path": "Comanche055/DISPLAY_INTERFACE_ROUTINES.agc",
+          "sha256": "907f3b7502551a91de5b0aa772355038e3b39098670aab98fe31023e5f8fbd8a"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "DOWN-TELEMETRY_PROGRAM.agc",
+          "include_order": 57,
+          "included_from_main_exactly": true,
+          "lines": 441,
+          "path": "Comanche055/DOWN-TELEMETRY_PROGRAM.agc",
+          "sha256": "d8babb9b0e0677f441411eed3ab6919a70a6aa95cbb49388813731e6c2348e74"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "DOWNLINK_LISTS.agc",
+          "include_order": 7,
+          "included_from_main_exactly": true,
+          "lines": 411,
+          "path": "Comanche055/DOWNLINK_LISTS.agc",
+          "sha256": "1a9814350cf0d8cd9bf3e4c5e6da3adfa617754c4c6d6efe7f1986644eba0e32"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "ENTRY_LEXICON.agc",
+          "include_order": 38,
+          "included_from_main_exactly": true,
+          "lines": 299,
+          "path": "Comanche055/ENTRY_LEXICON.agc",
+          "sha256": "61dfe49679a2e60f45a737aeb1bbbc1114bbaee67d7ff30d47b9f35587f01e91"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "ERASABLE_ASSIGNMENTS.agc",
+          "include_order": 4,
+          "included_from_main_exactly": true,
+          "lines": 3785,
+          "path": "Comanche055/ERASABLE_ASSIGNMENTS.agc",
+          "sha256": "f62df826c0cd678f4788ca7275d8ffccec229f9859c02839f1d944359c01ee58"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "EXECUTIVE.agc",
+          "include_order": 63,
+          "included_from_main_exactly": true,
+          "lines": 496,
+          "path": "Comanche055/EXECUTIVE.agc",
+          "sha256": "d76a32a7fe3168d949dfa13af819695d019bfe3a86e1a4782003237ed146b14b"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "EXTENDED_VERBS.agc",
+          "include_order": 11,
+          "included_from_main_exactly": true,
+          "lines": 1315,
+          "path": "Comanche055/EXTENDED_VERBS.agc",
+          "sha256": "823f56eca59e7f5379a62b1c903b7bbc01a264aca420f9090a86e35c1f112195"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "FIXED_FIXED_CONSTANT_POOL.agc",
+          "include_order": 60,
+          "included_from_main_exactly": true,
+          "lines": 263,
+          "path": "Comanche055/FIXED_FIXED_CONSTANT_POOL.agc",
+          "sha256": "1e2f7706589fb469347fed55f294c867ffa7c7cb46f7873c0cb11deef5d48be8"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "FRESH_START_AND_RESTART.agc",
+          "include_order": 8,
+          "included_from_main_exactly": true,
+          "lines": 1480,
+          "path": "Comanche055/FRESH_START_AND_RESTART.agc",
+          "sha256": "d208d482531e01c2ffe48fca059117220d922c750b3936f0a046e9ea9499ae59"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "GIMBAL_LOCK_AVOIDANCE.agc",
+          "include_order": 18,
+          "included_from_main_exactly": true,
+          "lines": 98,
+          "path": "Comanche055/GIMBAL_LOCK_AVOIDANCE.agc",
+          "sha256": "f870ac2ba6f231a42d59459db8d027171f6b2a00e61e84f6da66e4b4856cd3f0"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "GROUND_TRACKING_DETERMINATION_PROGRAM.agc",
+          "include_order": 22,
+          "included_from_main_exactly": true,
+          "lines": 205,
+          "path": "Comanche055/GROUND_TRACKING_DETERMINATION_PROGRAM.agc",
+          "sha256": "78875ef9f79433fa096eb975dd9658709cd2e4ea09cff47e2165c74251489f1b"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry",
+            "guidance-and-navigation"
+          ],
+          "filename": "IMU_CALIBRATION_AND_ALIGNMENT.agc",
+          "include_order": 21,
+          "included_from_main_exactly": true,
+          "lines": 1406,
+          "path": "Comanche055/IMU_CALIBRATION_AND_ALIGNMENT.agc",
+          "sha256": "0f912428b5bde06a8bae27432f9c56679cfe5cfc2d1ee5eeadf80a37cf98185c"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "IMU_COMPENSATION_PACKAGE.agc",
+          "include_order": 14,
+          "included_from_main_exactly": true,
+          "lines": 368,
+          "path": "Comanche055/IMU_COMPENSATION_PACKAGE.agc",
+          "sha256": "fe2e800173b6c7e607d03c0b06a58b517b4faae2f8400e74b98b36b54e10cf19"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "IMU_MODE_SWITCHING_ROUTINES.agc",
+          "include_order": 78,
+          "included_from_main_exactly": true,
+          "lines": 1066,
+          "path": "Comanche055/IMU_MODE_SWITCHING_ROUTINES.agc",
+          "sha256": "bcc7f8e4819e191b159673ef27463c93ba3052fddcc14dba36d7a28e16b860eb"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "INFLIGHT_ALIGNMENT_ROUTINES.agc",
+          "include_order": 71,
+          "included_from_main_exactly": true,
+          "lines": 304,
+          "path": "Comanche055/INFLIGHT_ALIGNMENT_ROUTINES.agc",
+          "sha256": "91635bbc0cf874075cdeeb9c8f7da291f340f8114841c0f34c9d1067d250b440"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "INTEGRATION_INITIALIZATION.agc",
+          "include_order": 69,
+          "included_from_main_exactly": true,
+          "lines": 1174,
+          "path": "Comanche055/INTEGRATION_INITIALIZATION.agc",
+          "sha256": "b20c7f84fdc4a0748ad0a957a2b8f6d0e0a9296bad9c4dbec80f9962ebf13579"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "INTER-BANK_COMMUNICATION.agc",
+          "include_order": 58,
+          "included_from_main_exactly": true,
+          "lines": 183,
+          "path": "Comanche055/INTER-BANK_COMMUNICATION.agc",
+          "sha256": "42f815caec6cba78fa7a084186d25cbd5bd1a576e7b9e149e429cf3e886b0785"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "INTERPRETER.agc",
+          "include_order": 59,
+          "included_from_main_exactly": true,
+          "lines": 3063,
+          "path": "Comanche055/INTERPRETER.agc",
+          "sha256": "724087beda6d5b61ad6719d551b3a22262b32f61a121bef94343af5e0bb2005b"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "INTERPRETIVE_CONSTANTS.agc",
+          "include_order": 61,
+          "included_from_main_exactly": true,
+          "lines": 82,
+          "path": "Comanche055/INTERPRETIVE_CONSTANTS.agc",
+          "sha256": "494c6ae0e8fc59eb6d896e51f3af791aae13bb66fbf55a798cb6e2b3c807570f"
+        },
+        {
+          "candidate_subsystems": [
+            "interrupts-and-timing"
+          ],
+          "filename": "INTERRUPT_LEAD_INS.agc",
+          "include_order": 5,
+          "included_from_main_exactly": true,
+          "lines": 122,
+          "path": "Comanche055/INTERRUPT_LEAD_INS.agc",
+          "sha256": "14f01c6f85b23b46421a7d6dd98e731bd48c5a42a19baa5b6fed182a020860e0"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "JET_SELECTION_LOGIC.agc",
+          "include_order": 55,
+          "included_from_main_exactly": true,
+          "lines": 920,
+          "path": "Comanche055/JET_SELECTION_LOGIC.agc",
+          "sha256": "e626c5273e96df95e3e0f243842bd32005537910554475e3dde3e2f48bdffbd4"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "KALCMANU_STEERING.agc",
+          "include_order": 19,
+          "included_from_main_exactly": true,
+          "lines": 265,
+          "path": "Comanche055/KALCMANU_STEERING.agc",
+          "sha256": "06e71db5a48ba879b3cf730693a7a6e4db3f433a2ed95dcfceaf23dee11487fa"
+        },
+        {
+          "candidate_subsystems": [
+            "interrupts-and-timing"
+          ],
+          "filename": "KEYRUPT_UPRUPT.agc",
+          "include_order": 79,
+          "included_from_main_exactly": true,
+          "lines": 136,
+          "path": "Comanche055/KEYRUPT_UPRUPT.agc",
+          "sha256": "237b42cd68c12d5b5772371667db864ae4ebc21b0c5b0aee6d74788855802c4a"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "LATITUDE_LONGITUDE_SUBROUTINES.agc",
+          "include_order": 65,
+          "included_from_main_exactly": true,
+          "lines": 317,
+          "path": "Comanche055/LATITUDE_LONGITUDE_SUBROUTINES.agc",
+          "sha256": "4536be1087aa877bffde066a745cdd139e7a7edb5433647cff8a143923c143b2"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "LUNAR_AND_SOLAR_EPHEMERIDES_SUBROUTINES.agc",
+          "include_order": 35,
+          "included_from_main_exactly": true,
+          "lines": 198,
+          "path": "Comanche055/LUNAR_AND_SOLAR_EPHEMERIDES_SUBROUTINES.agc",
+          "sha256": "c82884ddf780b9c95baf68ba939a7cfedaaf081ecc12f004136ab3eb5ce91daa"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "LUNAR_LANDMARK_SELECTION_FOR_CM.agc",
+          "include_order": 43,
+          "included_from_main_exactly": true,
+          "lines": 35,
+          "path": "Comanche055/LUNAR_LANDMARK_SELECTION_FOR_CM.agc",
+          "sha256": "e8c35fcbdcaa3692cac397e54ab92271ef47df137bc6b939f9fe243162ddf515"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "MAIN.agc",
+          "include_order": null,
+          "included_from_main_exactly": false,
+          "lines": 99,
+          "path": "Comanche055/MAIN.agc",
+          "sha256": "99e7a79aafa8c68fc93131de7a698faf28a7d8cc2a8e7c0c4d3d79bc7ba674f6"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "MEASUREMENT_INCORPORATION.agc",
+          "include_order": 67,
+          "included_from_main_exactly": true,
+          "lines": 496,
+          "path": "Comanche055/MEASUREMENT_INCORPORATION.agc",
+          "sha256": "07939648f0f52a6b3dae03f6246acbbf28d66d36cf51c98936cc00b0d1e070a9"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "MYSUBS.agc",
+          "include_order": 51,
+          "included_from_main_exactly": true,
+          "lines": 93,
+          "path": "Comanche055/MYSUBS.agc",
+          "sha256": "eed144c40c1ea8d938c4cced7906f12662f2e9df6d11ba551a869f5a6a038c84"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "ORBITAL_INTEGRATION.agc",
+          "include_order": 70,
+          "included_from_main_exactly": true,
+          "lines": 944,
+          "path": "Comanche055/ORBITAL_INTEGRATION.agc",
+          "sha256": "51b8d71bb224528f35848d06cfbd552bb8da7874ed3ce87f3c023fbf9e05441b"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P11.agc",
+          "include_order": 28,
+          "included_from_main_exactly": true,
+          "lines": 928,
+          "path": "Comanche055/P11.agc",
+          "sha256": "6e4354e10fb62c7db74c60293ae3442136d6886fd6301c24966b974846985a99"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P20-P25.agc",
+          "include_order": 30,
+          "included_from_main_exactly": true,
+          "lines": 3529,
+          "path": "Comanche055/P20-P25.agc",
+          "sha256": "5820c39ddbaaf3537fdc6f35ce18e8591d0e3c535c0a9f18bd536b69bc2f50f5"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P30-P37.agc",
+          "include_order": 31,
+          "included_from_main_exactly": true,
+          "lines": 611,
+          "path": "Comanche055/P30-P37.agc",
+          "sha256": "e758ec3710c3f82e7e243a85552f20b8ea25028d621b6f62276b88326869fc8d"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P32-P33_P72-P73.agc",
+          "include_order": 32,
+          "included_from_main_exactly": true,
+          "lines": 1415,
+          "path": "Comanche055/P32-P33_P72-P73.agc",
+          "sha256": "60a18e541426e952deea775bd0ae625d2345c284ac9726a2647032ee9ce4ccc3"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P34-35_P74-75.agc",
+          "include_order": 23,
+          "included_from_main_exactly": true,
+          "lines": 1739,
+          "path": "Comanche055/P34-35_P74-75.agc",
+          "sha256": "d37b58d887c59bfaaca5506a13a9a7761d4e44ad7bcfeab34c8a59e47863f106"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P37_P70.agc",
+          "include_order": 41,
+          "included_from_main_exactly": true,
+          "lines": 1950,
+          "path": "Comanche055/P37_P70.agc",
+          "sha256": "c91e95ca3befe5cf49b39c78af6f38758b115726a5fc7a3c28a3006abcfccf86"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P40-P47.agc",
+          "include_order": 33,
+          "included_from_main_exactly": true,
+          "lines": 2429,
+          "path": "Comanche055/P40-P47.agc",
+          "sha256": "5861ed6fd0b6b773c6c0ee5ab0099fcf9509a8fa1263823609ad844ec263f834"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P51-P53.agc",
+          "include_order": 34,
+          "included_from_main_exactly": true,
+          "lines": 2213,
+          "path": "Comanche055/P51-P53.agc",
+          "sha256": "8ca37189556a5030fe1d42037a2c97a8e6b4163b185f8e1d663cad61ca234120"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P61-P67.agc",
+          "include_order": 36,
+          "included_from_main_exactly": true,
+          "lines": 1225,
+          "path": "Comanche055/P61-P67.agc",
+          "sha256": "49cc72bb29fceae82c5a40ffd2e8d1dd62264e9a55f920e81c8f3ae8d5d20172"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P76.agc",
+          "include_order": 25,
+          "included_from_main_exactly": true,
+          "lines": 162,
+          "path": "Comanche055/P76.agc",
+          "sha256": "7158438364f09c0e6a4788ab83a176ef0833760757df5dee27bbf4f4be43a68a"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "PHASE_TABLE_MAINTENANCE.agc",
+          "include_order": 76,
+          "included_from_main_exactly": true,
+          "lines": 416,
+          "path": "Comanche055/PHASE_TABLE_MAINTENANCE.agc",
+          "sha256": "6f7fb5f01f38d0162c481cb4180173c360f467b2c2f75c080f3675ed8c9e1966"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "PINBALL_GAME_BUTTONS_AND_LIGHTS.agc",
+          "include_order": 15,
+          "included_from_main_exactly": true,
+          "lines": 3809,
+          "path": "Comanche055/PINBALL_GAME_BUTTONS_AND_LIGHTS.agc",
+          "sha256": "21a920f64b0c4efa416d230cecc2d6a448e53a455402a079c0085f486c0645ac"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "PINBALL_NOUN_TABLES.agc",
+          "include_order": 12,
+          "included_from_main_exactly": true,
+          "lines": 861,
+          "path": "Comanche055/PINBALL_NOUN_TABLES.agc",
+          "sha256": "d90a466da20a0811690c812b2af0a0c9338a589d2b18c2e0ef1054e9ce563e7f"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "PLANETARY_INERTIAL_ORIENTATION.agc",
+          "include_order": 66,
+          "included_from_main_exactly": true,
+          "lines": 386,
+          "path": "Comanche055/PLANETARY_INERTIAL_ORIENTATION.agc",
+          "sha256": "cea7b46a08c28f155428fbdfbc22a378fecdabed1390b053fa883d145cdcfef7"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "POWERED_FLIGHT_SUBROUTINES.agc",
+          "include_order": 72,
+          "included_from_main_exactly": true,
+          "lines": 371,
+          "path": "Comanche055/POWERED_FLIGHT_SUBROUTINES.agc",
+          "sha256": "dbf2f3db7c28220733b86b30b994cfccf29f4cfce0c4e59084c13bdbeccc5766"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "R30.agc",
+          "include_order": 26,
+          "included_from_main_exactly": true,
+          "lines": 485,
+          "path": "Comanche055/R30.agc",
+          "sha256": "412fbc54a7f99ea193e85c3ea739319eaf8ab489558ba5165a6482d6c51c6d9b"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "R31.agc",
+          "include_order": 24,
+          "included_from_main_exactly": true,
+          "lines": 290,
+          "path": "Comanche055/R31.agc",
+          "sha256": "94af1db0793427cefee250133313bb00cdbf92274d01e67dafa7ae8b82d14118"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "R60_62.agc",
+          "include_order": 16,
+          "included_from_main_exactly": true,
+          "lines": 385,
+          "path": "Comanche055/R60_62.agc",
+          "sha256": "d3357adf3da2436167e2db289813ad0411b206623c0117ba8679b998b7c81c6f"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart",
+            "vehicle-control"
+          ],
+          "filename": "RCS-CSM_DAP_EXECUTIVE_PROGRAMS.agc",
+          "include_order": 54,
+          "included_from_main_exactly": true,
+          "lines": 85,
+          "path": "Comanche055/RCS-CSM_DAP_EXECUTIVE_PROGRAMS.agc",
+          "sha256": "b38c7eb94508538436094e2b8f1b7271a5cb733a80a6f1b522548a43695cd688"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "RCS-CSM_DIGITAL_AUTOPILOT.agc",
+          "include_order": 52,
+          "included_from_main_exactly": true,
+          "lines": 975,
+          "path": "Comanche055/RCS-CSM_DIGITAL_AUTOPILOT.agc",
+          "sha256": "9b4c9acb5836870ceb53a4203b8db334728e96b8ce2b1ea02da151d17b5f0966"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "REENTRY_CONTROL.agc",
+          "include_order": 39,
+          "included_from_main_exactly": true,
+          "lines": 1609,
+          "path": "Comanche055/REENTRY_CONTROL.agc",
+          "sha256": "47788f4f2139d31f9f87f63c33518b49b193ff762f9b3c1259d76f2074dcf408"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "RESTARTS_ROUTINE.agc",
+          "include_order": 77,
+          "included_from_main_exactly": true,
+          "lines": 337,
+          "path": "Comanche055/RESTARTS_ROUTINE.agc",
+          "sha256": "490811f02cb07b69e98d9c558ed156f82e95d8735f29827edf8fe2fd6366efcc"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "RESTART_TABLES.agc",
+          "include_order": 9,
+          "included_from_main_exactly": true,
+          "lines": 549,
+          "path": "Comanche055/RESTART_TABLES.agc",
+          "sha256": "4ed25b96c1e8582bf1656b433e0212eb6c9f5528348b40f5c7117a1964ab9994"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "RT8_OP_CODES.agc",
+          "include_order": 84,
+          "included_from_main_exactly": true,
+          "lines": 358,
+          "path": "Comanche055/RT8_OP_CODES.agc",
+          "sha256": "ca3b0388b70ca5e1f811f96912801e9feccf030ddafbd72970cceb69a9ae2988"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "S-BAND_ANTENNA_FOR_CM.agc",
+          "include_order": 42,
+          "included_from_main_exactly": true,
+          "lines": 128,
+          "path": "Comanche055/S-BAND_ANTENNA_FOR_CM.agc",
+          "sha256": "0941ac5d3aeb3f5788bc9a55e96a33e2cf7b58c16e4d0eef6a8c4134592de061"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "SERVICER207.agc",
+          "include_order": 37,
+          "included_from_main_exactly": true,
+          "lines": 824,
+          "path": "Comanche055/SERVICER207.agc",
+          "sha256": "35ca5c1acce244eabdca91039a121c13b7207a24433f860c0cb14878e8366fb2"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "SERVICE_ROUTINES.agc",
+          "include_order": 81,
+          "included_from_main_exactly": true,
+          "lines": 279,
+          "path": "Comanche055/SERVICE_ROUTINES.agc",
+          "sha256": "8e1230e91087a78e0e4728f8541f14bffce63854a7f8f61e712741dde83776bd"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "SINGLE_PRECISION_SUBROUTINES.agc",
+          "include_order": 62,
+          "included_from_main_exactly": true,
+          "lines": 67,
+          "path": "Comanche055/SINGLE_PRECISION_SUBROUTINES.agc",
+          "sha256": "768303431e1f6f0d83b63b8d68663755167e9dd4c869f79d364b0e82ef9aea64"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "STABLE_ORBIT.agc",
+          "include_order": 27,
+          "included_from_main_exactly": true,
+          "lines": 422,
+          "path": "Comanche055/STABLE_ORBIT.agc",
+          "sha256": "ced73fe04353aa9e58b875714fc8f4769e75b776622f7d6994e929b68374fc55"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "STAR_TABLES.agc",
+          "include_order": 74,
+          "included_from_main_exactly": true,
+          "lines": 193,
+          "path": "Comanche055/STAR_TABLES.agc",
+          "sha256": "855789b2d7726487248812224bbe2edd4f6f6b1503e28aeb57254bf261111742"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "SXTMARK.agc",
+          "include_order": 10,
+          "included_from_main_exactly": true,
+          "lines": 659,
+          "path": "Comanche055/SXTMARK.agc",
+          "sha256": "c66edb02d02b0528a761d21befb9ae0c95966291f4e25c34e17532c9e59e7540"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "SYSTEM_TEST_STANDARD_LEAD_INS.agc",
+          "include_order": 20,
+          "included_from_main_exactly": true,
+          "lines": 150,
+          "path": "Comanche055/SYSTEM_TEST_STANDARD_LEAD_INS.agc",
+          "sha256": "1cfc04b134e2f25a8039e0d210aa1e432147da9ef3c52e0a3d0dc301ba1b3cec"
+        },
+        {
+          "candidate_subsystems": [
+            "interrupts-and-timing"
+          ],
+          "filename": "T4RUPT_PROGRAM.agc",
+          "include_order": 6,
+          "included_from_main_exactly": true,
+          "lines": 1467,
+          "path": "Comanche055/T4RUPT_PROGRAM.agc",
+          "sha256": "20b52ef7120318816300f30101f8ddc45def0d87153991086a61dd8684e42401"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "TAGS_FOR_RELATIVE_SETLOC.agc",
+          "include_order": 3,
+          "included_from_main_exactly": true,
+          "lines": 435,
+          "path": "Comanche055/TAGS_FOR_RELATIVE_SETLOC.agc",
+          "sha256": "c62e691808a6cbaa72d4f7850df8c943d77dee33e78c002ed88c944de2c01054"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "TIME_OF_FREE_FALL.agc",
+          "include_order": 73,
+          "included_from_main_exactly": true,
+          "lines": 683,
+          "path": "Comanche055/TIME_OF_FREE_FALL.agc",
+          "sha256": "f33bb7ec69f9d83aa2af7dadefc8e474632e73315d91133e5d4ac8f7825f9ff5"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "TPI_SEARCH.agc",
+          "include_order": 29,
+          "included_from_main_exactly": true,
+          "lines": 552,
+          "path": "Comanche055/TPI_SEARCH.agc",
+          "sha256": "7e07913f963e312eb5145dfa71832012a2f9ab2d699ada4ddd397bde518e5ec2"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "TVCDAPS.agc",
+          "include_order": 48,
+          "included_from_main_exactly": true,
+          "lines": 784,
+          "path": "Comanche055/TVCDAPS.agc",
+          "sha256": "21d54203ecc6dae03f693943305486215212989ff907250f04e16d850b47c633"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart",
+            "vehicle-control"
+          ],
+          "filename": "TVCEXECUTIVE.agc",
+          "include_order": 45,
+          "included_from_main_exactly": true,
+          "lines": 276,
+          "path": "Comanche055/TVCEXECUTIVE.agc",
+          "sha256": "db23079b9f12369d550b9658a5fb9a9adf52b798735c17e408cd36ff1aed5594"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "TVCINITIALIZE.agc",
+          "include_order": 44,
+          "included_from_main_exactly": true,
+          "lines": 414,
+          "path": "Comanche055/TVCINITIALIZE.agc",
+          "sha256": "ddc0ee4a00a30a7145d4204350833182658aacfbd38dccf84171a22adc81aee8"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "TVCMASSPROP.agc",
+          "include_order": 46,
+          "included_from_main_exactly": true,
+          "lines": 245,
+          "path": "Comanche055/TVCMASSPROP.agc",
+          "sha256": "21b48d0bb13356fe66517c4210f3d45cdabb0a5e67c88ef6327de4b3e4da4b47"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart",
+            "vehicle-control"
+          ],
+          "filename": "TVCRESTARTS.agc",
+          "include_order": 47,
+          "included_from_main_exactly": true,
+          "lines": 256,
+          "path": "Comanche055/TVCRESTARTS.agc",
+          "sha256": "eb36e5be74c986022d1cb1adbab3da3de222d9e9675a13d75992f621e5738ac1"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "TVCROLLDAP.agc",
+          "include_order": 50,
+          "included_from_main_exactly": true,
+          "lines": 619,
+          "path": "Comanche055/TVCROLLDAP.agc",
+          "sha256": "e428b4f8811ab77ba4088c91dd170effb016b3dc9f46998ba59bb3ff48cf14c9"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "TVCSTROKETEST.agc",
+          "include_order": 49,
+          "included_from_main_exactly": true,
+          "lines": 260,
+          "path": "Comanche055/TVCSTROKETEST.agc",
+          "sha256": "7e604c406a0d05af10a021e2862384c15a23b95accaa04ce06c08426345703f1"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "UPDATE_PROGRAM.agc",
+          "include_order": 83,
+          "included_from_main_exactly": true,
+          "lines": 555,
+          "path": "Comanche055/UPDATE_PROGRAM.agc",
+          "sha256": "d41dbe2cafed15061ac3744bd6fabc0da30aee43d0210c7d2011a0f07f75fe6d"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "WAITLIST.agc",
+          "include_order": 64,
+          "included_from_main_exactly": true,
+          "lines": 556,
+          "path": "Comanche055/WAITLIST.agc",
+          "sha256": "a92a9cc370ce6a6bc22febbcc03e342392e899bad06f7e649839b597e1c8edd3"
+        }
+      ],
+      "unresolved_include_count": 0,
+      "unresolved_includes": [],
+      "vehicle": "Command Module"
+    },
+    {
+      "file_count": 90,
+      "id": "Luminary099",
+      "include_count": 89,
+      "line_count": 64838,
+      "main": "Luminary099/MAIN.agc",
+      "modules": [
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "AGC_BLOCK_TWO_SELF_CHECK.agc",
+          "include_order": 70,
+          "included_from_main_exactly": true,
+          "lines": 513,
+          "path": "Luminary099/AGC_BLOCK_TWO_SELF_CHECK.agc",
+          "sha256": "fce563bb8f9c943a3c90242491f002f2b2ebd0b7610d47105ecb669312fcaa9c"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "AGS_INITIALIZATION.agc",
+          "include_order": 11,
+          "included_from_main_exactly": true,
+          "lines": 228,
+          "path": "Luminary099/AGS_INITIALIZATION.agc",
+          "sha256": "658648f1bdac76929efdfe98fc23676e467d167645310c685bf1479c97da77fa"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "ALARM_AND_ABORT.agc",
+          "include_order": 77,
+          "included_from_main_exactly": true,
+          "lines": 251,
+          "path": "Luminary099/ALARM_AND_ABORT.agc",
+          "sha256": "74236d3b94048b14efb776d7fff5ae66acac2f950e5bc03ca375d4b90b4484a8"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "AOSTASK_AND_AOSJOB.agc",
+          "include_order": 88,
+          "included_from_main_exactly": true,
+          "lines": 1069,
+          "path": "Luminary099/AOSTASK_AND_AOSJOB.agc",
+          "sha256": "f6bf6c63faf9895681da9fecc7a0c8531644140cb71e15c331ff8a990e6bacbe"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "AOTMARK.agc",
+          "include_order": 14,
+          "included_from_main_exactly": true,
+          "lines": 695,
+          "path": "Luminary099/AOTMARK.agc",
+          "sha256": "2feea8e6e449cd1eb814a482dcdb75f4b0ff4364058095f28efd7ce1df5db25a"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "ASCENT_GUIDANCE.agc",
+          "include_order": 47,
+          "included_from_main_exactly": true,
+          "lines": 647,
+          "path": "Luminary099/ASCENT_GUIDANCE.agc",
+          "sha256": "bfcd1300884bc8ab69748562fe287178f56bdfe9b7f13460b6ae73a1db3406a2"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "ASSEMBLY_AND_OPERATION_INFORMATION.agc",
+          "include_order": 1,
+          "included_from_main_exactly": true,
+          "lines": 1069,
+          "path": "Luminary099/ASSEMBLY_AND_OPERATION_INFORMATION.agc",
+          "sha256": "b184fc58454158b607b9c5132ed88431603fe2617d2c56f80c22af49236eb0d6"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "ATTITUDE_MANEUVER_ROUTINE.agc",
+          "include_order": 20,
+          "included_from_main_exactly": true,
+          "lines": 1027,
+          "path": "Luminary099/ATTITUDE_MANEUVER_ROUTINE.agc",
+          "sha256": "ce059a77e621dc2b0df032410206e3da672d88d065114b533fa3e74a997f0443"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "BURN_BABY_BURN--MASTER_IGNITION_ROUTINE.agc",
+          "include_order": 40,
+          "included_from_main_exactly": true,
+          "lines": 1059,
+          "path": "Luminary099/BURN_BABY_BURN--MASTER_IGNITION_ROUTINE.agc",
+          "sha256": "7ed744d09332db172eaad0ca8432c243479d6d293ed387ee83eb0dd67c77f041"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "CONIC_SUBROUTINES.agc",
+          "include_order": 64,
+          "included_from_main_exactly": true,
+          "lines": 1864,
+          "path": "Luminary099/CONIC_SUBROUTINES.agc",
+          "sha256": "26409d71cdac421bef8dd11aa336abb0abda64f5ebf994c825eecfa866640581"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "CONTROLLED_CONSTANTS.agc",
+          "include_order": 3,
+          "included_from_main_exactly": true,
+          "lines": 558,
+          "path": "Luminary099/CONTROLLED_CONSTANTS.agc",
+          "sha256": "3aa13edd517b8bd47a88678b9c999566b9badc65686096aeb58301023422e8dc"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "DAPIDLER_PROGRAM.agc",
+          "include_order": 82,
+          "included_from_main_exactly": true,
+          "lines": 494,
+          "path": "Luminary099/DAPIDLER_PROGRAM.agc",
+          "sha256": "f86c480485f55088649ec83f35d950a5e8d95233ee480edc35fb5c4e8277b7e3"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "DAP_INTERFACE_SUBROUTINES.agc",
+          "include_order": 81,
+          "included_from_main_exactly": true,
+          "lines": 176,
+          "path": "Luminary099/DAP_INTERFACE_SUBROUTINES.agc",
+          "sha256": "1156271d55ea1f47bf20602da2cefa9388a908b3dca5231650cc7f10895db776"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "DISPLAY_INTERFACE_ROUTINES.agc",
+          "include_order": 75,
+          "included_from_main_exactly": true,
+          "lines": 1459,
+          "path": "Luminary099/DISPLAY_INTERFACE_ROUTINES.agc",
+          "sha256": "f4157c31239c14410fe9b74d416a08bf2f1f66f3fabe5a9c8a479e95fbe192da"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "DOWNLINK_LISTS.agc",
+          "include_order": 10,
+          "included_from_main_exactly": true,
+          "lines": 430,
+          "path": "Luminary099/DOWNLINK_LISTS.agc",
+          "sha256": "def08f047f1c2930f7067fe9b8cf480eb7d5783f47de7850c623836380c93e63"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "DOWN_TELEMETRY_PROGRAM.agc",
+          "include_order": 53,
+          "included_from_main_exactly": true,
+          "lines": 455,
+          "path": "Luminary099/DOWN_TELEMETRY_PROGRAM.agc",
+          "sha256": "34ee428bb987e1826148083af7c6879c33ed577a0eb415ae08ce4a7ad0453d9b"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "ERASABLE_ASSIGNMENTS.agc",
+          "include_order": 6,
+          "included_from_main_exactly": true,
+          "lines": 2635,
+          "path": "Luminary099/ERASABLE_ASSIGNMENTS.agc",
+          "sha256": "29d4d6d4c16b3ea2c00f6d29bc77ee6dbd7a236eaefb5d4384a0168ba0196139"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "EXECUTIVE.agc",
+          "include_order": 59,
+          "included_from_main_exactly": true,
+          "lines": 503,
+          "path": "Luminary099/EXECUTIVE.agc",
+          "sha256": "c0d9b157f4e517f949001f25e9f77887d1c6497cff7718f3d5b80ab7c1823f8d"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "EXTENDED_VERBS.agc",
+          "include_order": 15,
+          "included_from_main_exactly": true,
+          "lines": 1681,
+          "path": "Luminary099/EXTENDED_VERBS.agc",
+          "sha256": "d6b54c7353ec90f84c467146d99e7da536ba7bea54fc31947031a97780b51eb4"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "FINDCDUW--GUIDAP_INTERFACE.agc",
+          "include_order": 50,
+          "included_from_main_exactly": true,
+          "lines": 743,
+          "path": "Luminary099/FINDCDUW--GUIDAP_INTERFACE.agc",
+          "sha256": "d749732ada1c3221d526fadcabf062a652dfb1d01e22bf6bab55bd02b8937d7f"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "FIXED_FIXED_CONSTANT_POOL.agc",
+          "include_order": 56,
+          "included_from_main_exactly": true,
+          "lines": 264,
+          "path": "Luminary099/FIXED_FIXED_CONSTANT_POOL.agc",
+          "sha256": "7f139c2b553ce60f8c0ab8cf6242abef390c6a28858e45a4f1d80f0ff2c646b7"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "FLAGWORD_ASSIGNMENTS.agc",
+          "include_order": 5,
+          "included_from_main_exactly": true,
+          "lines": 1269,
+          "path": "Luminary099/FLAGWORD_ASSIGNMENTS.agc",
+          "sha256": "a863fbb2aebd05b98dd15773ad24f370a8efd7ace6a3e8f44ee35300e3613332"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "FRESH_START_AND_RESTART.agc",
+          "include_order": 12,
+          "included_from_main_exactly": true,
+          "lines": 1242,
+          "path": "Luminary099/FRESH_START_AND_RESTART.agc",
+          "sha256": "bc2d69173e60be4618ce39a1ab7e6f908d427c7edea1e79e09070d0931c55d9a"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "GENERAL_LAMBERT_AIMPOINT_GUIDANCE.agc",
+          "include_order": null,
+          "included_from_main_exactly": false,
+          "lines": 168,
+          "path": "Luminary099/GENERAL_LAMBERT_AIMPOINT_GUIDANCE.agc",
+          "sha256": "6e440a29d56167c2f48b7bc58c0d53491d596c61e8e7137dc3b349ad90c1dc10"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "GIMBAL_LOCK_AVOIDANCE.agc",
+          "include_order": 21,
+          "included_from_main_exactly": true,
+          "lines": 76,
+          "path": "Luminary099/GIMBAL_LOCK_AVOIDANCE.agc",
+          "sha256": "5013aab57862f7f29ec2518223d61b879dfa7a2f87f4deb9e70385d69f3044b3"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "GROUND_TRACKING_DETERMINATION_PROGRAM.agc",
+          "include_order": 34,
+          "included_from_main_exactly": true,
+          "lines": 208,
+          "path": "Luminary099/GROUND_TRACKING_DETERMINATION_PROGRAM.agc",
+          "sha256": "97cba32a43d7de44db0db00e5785f2d9c4bebbc4a6d7f058c0c3c13113855140"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "IMU_COMPENSATION_PACKAGE.agc",
+          "include_order": 18,
+          "included_from_main_exactly": true,
+          "lines": 417,
+          "path": "Luminary099/IMU_COMPENSATION_PACKAGE.agc",
+          "sha256": "0b5c62e140514e58767ef3950fc3f3f381d607166f198f11348c3765c07f4ae8"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "IMU_MODE_SWITCHING_ROUTINES.agc",
+          "include_order": 73,
+          "included_from_main_exactly": true,
+          "lines": 1067,
+          "path": "Luminary099/IMU_MODE_SWITCHING_ROUTINES.agc",
+          "sha256": "351bc32a2cd12f8b74b4b47f2e77791f02d39b94fe16c891a8249be2af4295eb"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "IMU_PERFORMANCE_TESTS_4.agc",
+          "include_order": 25,
+          "included_from_main_exactly": true,
+          "lines": 362,
+          "path": "Luminary099/IMU_PERFORMANCE_TESTS_4.agc",
+          "sha256": "5fb543ce6aebfbc6d2e83f576b78b1d61ece37e88a2229b734d5c094aef6ea56"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "IMU_PERFORMANCE_TEST_2.agc",
+          "include_order": 24,
+          "included_from_main_exactly": true,
+          "lines": 421,
+          "path": "Luminary099/IMU_PERFORMANCE_TEST_2.agc",
+          "sha256": "80d973122d8212c2a0d6dbedfc061b0b91b44467422abe8a487b85137fa4c490"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "INFLIGHT_ALIGNMENT_ROUTINES.agc",
+          "include_order": 67,
+          "included_from_main_exactly": true,
+          "lines": 300,
+          "path": "Luminary099/INFLIGHT_ALIGNMENT_ROUTINES.agc",
+          "sha256": "9d5e5d467f4eeedd9aee8a2f068e646a5d43ba3ec93a83cec565554b0c3fa52c"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "INPUT_OUTPUT_CHANNEL_BIT_DESCRIPTIONS.agc",
+          "include_order": 4,
+          "included_from_main_exactly": true,
+          "lines": 223,
+          "path": "Luminary099/INPUT_OUTPUT_CHANNEL_BIT_DESCRIPTIONS.agc",
+          "sha256": "3b7a410d9af5de25e1aed779dd499bb63e199c63be815970e8902a2a575b6ad7"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "INTEGRATION_INITIALIZATION.agc",
+          "include_order": 65,
+          "included_from_main_exactly": true,
+          "lines": 1102,
+          "path": "Luminary099/INTEGRATION_INITIALIZATION.agc",
+          "sha256": "9e5db19ec31d6ea0eae45b34a98e500430ece23e546de8bcd83d0cd7275195fe"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "INTER-BANK_COMMUNICATION.agc",
+          "include_order": 54,
+          "included_from_main_exactly": true,
+          "lines": 177,
+          "path": "Luminary099/INTER-BANK_COMMUNICATION.agc",
+          "sha256": "2b97deaee6af861b72af9f00043e15b38c0901e16574fb9e2e97ef6a647e0ced"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "INTERPRETER.agc",
+          "include_order": 55,
+          "included_from_main_exactly": true,
+          "lines": 3075,
+          "path": "Luminary099/INTERPRETER.agc",
+          "sha256": "26c5741b10fcab167d9fd795995b4c2969a0bb6bfa81d7d55f85e4a3cdfc0a5e"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "INTERPRETIVE_CONSTANT.agc",
+          "include_order": 57,
+          "included_from_main_exactly": true,
+          "lines": 81,
+          "path": "Luminary099/INTERPRETIVE_CONSTANT.agc",
+          "sha256": "30f22813f6d6f33f8202b65fa5895ebf535232e0437aaa9d02aec5b81e08d627"
+        },
+        {
+          "candidate_subsystems": [
+            "interrupts-and-timing"
+          ],
+          "filename": "INTERRUPT_LEAD_INS.agc",
+          "include_order": 7,
+          "included_from_main_exactly": true,
+          "lines": 117,
+          "path": "Luminary099/INTERRUPT_LEAD_INS.agc",
+          "sha256": "ed6f44b59b2e16743ff53c6c9ed72661040a83d846a61054a31e5c61957290c3"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "KALCMANU_STEERING.agc",
+          "include_order": 22,
+          "included_from_main_exactly": true,
+          "lines": 221,
+          "path": "Luminary099/KALCMANU_STEERING.agc",
+          "sha256": "6a330bb23cb8f6c15cd50ffe8550ffd7599d19fcd9b9c03f0b2fbe8f081c21da"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "KALMAN_FILTER.agc",
+          "include_order": 86,
+          "included_from_main_exactly": true,
+          "lines": 101,
+          "path": "Luminary099/KALMAN_FILTER.agc",
+          "sha256": "f5f4df8e50c47d5fa54c7e51b756303ad484cb7b0aaa54fefa2e05b395588c8e"
+        },
+        {
+          "candidate_subsystems": [
+            "interrupts-and-timing"
+          ],
+          "filename": "KEYRUPT_UPRUPT.agc",
+          "include_order": 74,
+          "included_from_main_exactly": true,
+          "lines": 130,
+          "path": "Luminary099/KEYRUPT_UPRUPT.agc",
+          "sha256": "e7e1633ff1305e689451634bf6cba496219b63a4a12f3ae028c74e3b65d840c1"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "LANDING_ANALOG_DISPLAYS.agc",
+          "include_order": 49,
+          "included_from_main_exactly": true,
+          "lines": 533,
+          "path": "Luminary099/LANDING_ANALOG_DISPLAYS.agc",
+          "sha256": "c07d1ef6d1a83375b0aa0f7be87ef4d496d396621501298932aa46466d2db34c"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "LATITUDE_LONGITUDE_SUBROUTINES.agc",
+          "include_order": 61,
+          "included_from_main_exactly": true,
+          "lines": 306,
+          "path": "Luminary099/LATITUDE_LONGITUDE_SUBROUTINES.agc",
+          "sha256": "5781f21292603392fc38aec45edbf8905ac7471c17c51c6dfe77593ba695bd46"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "LEM_GEOMETRY.agc",
+          "include_order": 17,
+          "included_from_main_exactly": true,
+          "lines": 206,
+          "path": "Luminary099/LEM_GEOMETRY.agc",
+          "sha256": "6793dddb22af8b0ae7f73d735fabbc4336a0f6743c5d1965e5dab3350c1ce6d6"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "LUNAR_AND_SOLAR_EPHEMERIDES_SUBROUTINES.agc",
+          "include_order": 52,
+          "included_from_main_exactly": true,
+          "lines": 183,
+          "path": "Luminary099/LUNAR_AND_SOLAR_EPHEMERIDES_SUBROUTINES.agc",
+          "sha256": "2c1a3e5b406457704b18c503c2882b2a16f05fa29fe647682ac19a255f7638a6"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "LUNAR_LANDING_GUIDANCE_EQUATIONS.agc",
+          "include_order": 44,
+          "included_from_main_exactly": true,
+          "lines": 1474,
+          "path": "Luminary099/LUNAR_LANDING_GUIDANCE_EQUATIONS.agc",
+          "sha256": "90485ec45c9d2cf835888fc0d252e9f1502bd92c74820f492d3cb337ffd1b1d2"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "MAIN.agc",
+          "include_order": null,
+          "included_from_main_exactly": false,
+          "lines": 91,
+          "path": "Luminary099/MAIN.agc",
+          "sha256": "2e7d98ca917aa9d3b82024070e2fdbd2b9da5d478ca2c93d6113ab3b365f2d1c"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "MEASUREMENT_INCORPORATION.agc",
+          "include_order": 63,
+          "included_from_main_exactly": true,
+          "lines": 495,
+          "path": "Luminary099/MEASUREMENT_INCORPORATION.agc",
+          "sha256": "735aebaba4df4159e83d48b4cbe509479a9d29fb66ce05adf4bcb79076302fdc"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "ORBITAL_INTEGRATION.agc",
+          "include_order": 66,
+          "included_from_main_exactly": true,
+          "lines": 977,
+          "path": "Luminary099/ORBITAL_INTEGRATION.agc",
+          "sha256": "5fc234cd27586bf25918a05692b3e6849a433e0b62bfb1327c96ae06e2231b14"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "P-AXIS_RCS_AUTOPILOT.agc",
+          "include_order": 83,
+          "included_from_main_exactly": true,
+          "lines": 1056,
+          "path": "Luminary099/P-AXIS_RCS_AUTOPILOT.agc",
+          "sha256": "6aa46513dcd7f1b77b41cbf847ce98dcdaec5a95bf4327d0a7c2df8adf937775"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P12.agc",
+          "include_order": 46,
+          "included_from_main_exactly": true,
+          "lines": 243,
+          "path": "Luminary099/P12.agc",
+          "sha256": "92061c017abffeac794f349bee080dcb01186b1188d95679ace07fecf6bc85de"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P20-P25.agc",
+          "include_order": 30,
+          "included_from_main_exactly": true,
+          "lines": 5182,
+          "path": "Luminary099/P20-P25.agc",
+          "sha256": "6dc2a57a2294158f6f4097c2dfec2d3fab4a600025f0d7d4652967e080aec11f"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P30_P37.agc",
+          "include_order": 31,
+          "included_from_main_exactly": true,
+          "lines": 185,
+          "path": "Luminary099/P30_P37.agc",
+          "sha256": "2ea604772395dcae064d0a23f4f475845cef39b3528d62d4adeac8e3aab9b573"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P32-P35_P72-P75.agc",
+          "include_order": 32,
+          "included_from_main_exactly": true,
+          "lines": 1394,
+          "path": "Luminary099/P32-P35_P72-P75.agc",
+          "sha256": "0fc78a6c5bcfd461bf1e9e7ffd11e5e4f93950595daf275bb2df2a9a08f149ec"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P34-35_P74-75.agc",
+          "include_order": 35,
+          "included_from_main_exactly": true,
+          "lines": 1764,
+          "path": "Luminary099/P34-35_P74-75.agc",
+          "sha256": "72a77c305a1cf2787dee65cab48896017e14143111680c6aa0f3e78e372433ed"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P40-P47.agc",
+          "include_order": 41,
+          "included_from_main_exactly": true,
+          "lines": 1471,
+          "path": "Luminary099/P40-P47.agc",
+          "sha256": "a030d323c75c05e3492e81522ab2a5c2ac493f7bc25c44686e6cb1c492c4540b"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P51-P53.agc",
+          "include_order": 51,
+          "included_from_main_exactly": true,
+          "lines": 2341,
+          "path": "Luminary099/P51-P53.agc",
+          "sha256": "becc16af5767c23bc14bcce9f89456f3f93fe7c81a0e00455cd5ca757ca4b0c2"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P70-P71.agc",
+          "include_order": 45,
+          "included_from_main_exactly": true,
+          "lines": 439,
+          "path": "Luminary099/P70-P71.agc",
+          "sha256": "1b272b7f53446243cb55591a0fac77888b38b2c97525cfe97fc5a8452a26427a"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "P76.agc",
+          "include_order": 37,
+          "included_from_main_exactly": true,
+          "lines": 161,
+          "path": "Luminary099/P76.agc",
+          "sha256": "b94d0907e3d64318a3fd225ac8d0106109182d40646e3dcbdcffa354e3f08925"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "PHASE_TABLE_MAINTENANCE.agc",
+          "include_order": 71,
+          "included_from_main_exactly": true,
+          "lines": 411,
+          "path": "Luminary099/PHASE_TABLE_MAINTENANCE.agc",
+          "sha256": "2cd8a2fd825e4cb350d1b69f6d36cd6ac24bdfe4c495c02b7a5ef8f1c5757293"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "PINBALL_GAME_BUTTONS_AND_LIGHTS.agc",
+          "include_order": 26,
+          "included_from_main_exactly": true,
+          "lines": 3798,
+          "path": "Luminary099/PINBALL_GAME_BUTTONS_AND_LIGHTS.agc",
+          "sha256": "6fa52bb043446b2c4401ac68f41d780059b2cbe5d868cc08bb794eb0a9598729"
+        },
+        {
+          "candidate_subsystems": [
+            "dsky-and-crew-interface"
+          ],
+          "filename": "PINBALL_NOUN_TABLES.agc",
+          "include_order": 16,
+          "included_from_main_exactly": true,
+          "lines": 906,
+          "path": "Luminary099/PINBALL_NOUN_TABLES.agc",
+          "sha256": "ec5e14a2647763b0136fc012d2648803183737e1e386daba1548158905c9b2b3"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "PLANETARY_INERTIAL_ORIENTATION.agc",
+          "include_order": 62,
+          "included_from_main_exactly": true,
+          "lines": 385,
+          "path": "Luminary099/PLANETARY_INERTIAL_ORIENTATION.agc",
+          "sha256": "a107b96fddaa1ea7fbbee375705d071ab1800f40e02803aeda39b89e895a1128"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "POWERED_FLIGHT_SUBROUTINES.agc",
+          "include_order": 68,
+          "included_from_main_exactly": true,
+          "lines": 447,
+          "path": "Luminary099/POWERED_FLIGHT_SUBROUTINES.agc",
+          "sha256": "379505fe1429c8b0d6ef20d85bad9d8fb991083fd7202dc89c46e584f0ba92b1"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "Q_R-AXIS_RCS_AUTOPILOT.agc",
+          "include_order": 84,
+          "included_from_main_exactly": true,
+          "lines": 860,
+          "path": "Luminary099/Q_R-AXIS_RCS_AUTOPILOT.agc",
+          "sha256": "c79584213ddacc0bdf6ceebb0b9bfe84c85eac69c124e28c5554a5585e5cdf3f"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "R30.agc",
+          "include_order": 38,
+          "included_from_main_exactly": true,
+          "lines": 464,
+          "path": "Luminary099/R30.agc",
+          "sha256": "76b904d389476022d9c6dcef6788737385a4603cff81d1c9af1fd17d82dc76bd"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "R31.agc",
+          "include_order": 36,
+          "included_from_main_exactly": true,
+          "lines": 266,
+          "path": "Luminary099/R31.agc",
+          "sha256": "cf6d473c416217944c5868907c26bdb1fa970b8020a3198cb0cbc991c0c0926f"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "R60_62.agc",
+          "include_order": 27,
+          "included_from_main_exactly": true,
+          "lines": 577,
+          "path": "Luminary099/R60_62.agc",
+          "sha256": "23cf6099c20b0dacdb54b377db1208214f8fb9fee1fb09a6e1ae0337d14c83f6"
+        },
+        {
+          "candidate_subsystems": [
+            "mission-programs-and-routines"
+          ],
+          "filename": "R63.agc",
+          "include_order": 19,
+          "included_from_main_exactly": true,
+          "lines": 156,
+          "path": "Luminary099/R63.agc",
+          "sha256": "e67df75ca6b4ad422e875f2b7924266d09a675172c1fd626555455f5a6fd62c6"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "RADAR_LEADIN_ROUTINES.agc",
+          "include_order": 29,
+          "included_from_main_exactly": true,
+          "lines": 103,
+          "path": "Luminary099/RADAR_LEADIN_ROUTINES.agc",
+          "sha256": "f27f4f9372e56e41ad44a810945ce6247e1f931bfa4d3b5d114089732d80e0ad"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "RCS_FAILURE_MONITOR.agc",
+          "include_order": 9,
+          "included_from_main_exactly": true,
+          "lines": 173,
+          "path": "Luminary099/RCS_FAILURE_MONITOR.agc",
+          "sha256": "67c4190e4110b0dbdc476c1325fe0cbb9ae1b9d97b87d294d05ab4e6344231fc"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "RESTARTS_ROUTINE.agc",
+          "include_order": 72,
+          "included_from_main_exactly": true,
+          "lines": 323,
+          "path": "Luminary099/RESTARTS_ROUTINE.agc",
+          "sha256": "42f22e578939222d5b0645e85d4c89b578b5200fb998db7dd95938feeb20eb61"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "RESTART_TABLES.agc",
+          "include_order": 13,
+          "included_from_main_exactly": true,
+          "lines": 293,
+          "path": "Luminary099/RESTART_TABLES.agc",
+          "sha256": "1993b5da5ab382eaba5647a0dd07c09e52e25c36f624418ed125159c1eac7d59"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "RTB_OP_CODES.agc",
+          "include_order": 79,
+          "included_from_main_exactly": true,
+          "lines": 236,
+          "path": "Luminary099/RTB_OP_CODES.agc",
+          "sha256": "0fab4ae2bc5c894160c9edc3ca5e61857db57a8e38b7ca005e3d55b38cc0446d"
+        },
+        {
+          "candidate_subsystems": [
+            "communications-sensors-and-telemetry"
+          ],
+          "filename": "S-BAND_ANTENNA_FOR_LM.agc",
+          "include_order": 28,
+          "included_from_main_exactly": true,
+          "lines": 200,
+          "path": "Luminary099/S-BAND_ANTENNA_FOR_LM.agc",
+          "sha256": "db15cd65a127318e4a5df1cf3d3fb733d5f95c02566b1da28afd632b96307ab2"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "SERVICER.agc",
+          "include_order": 48,
+          "included_from_main_exactly": true,
+          "lines": 1715,
+          "path": "Luminary099/SERVICER.agc",
+          "sha256": "4e3798d5dabcc7ecca813d762824f7dfc41ad352a9869a7526565fc3a05f4415"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "SERVICE_ROUTINES.agc",
+          "include_order": 76,
+          "included_from_main_exactly": true,
+          "lines": 221,
+          "path": "Luminary099/SERVICE_ROUTINES.agc",
+          "sha256": "85369055c5261d1d778fbeba4463941a45aed96ef199adea707fe330bdb4d0ef"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "SINGLE_PRECISION_SUBROUTINES.agc",
+          "include_order": 58,
+          "included_from_main_exactly": true,
+          "lines": 69,
+          "path": "Luminary099/SINGLE_PRECISION_SUBROUTINES.agc",
+          "sha256": "bebe6cbf186bed7fcc35f9aad8a392ccbe3cb31154ad8267d01a4926cc0dd3e4"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "SPS_BACK-UP_RCS_CONTROL.agc",
+          "include_order": 89,
+          "included_from_main_exactly": true,
+          "lines": 196,
+          "path": "Luminary099/SPS_BACK-UP_RCS_CONTROL.agc",
+          "sha256": "9f690baf2347c8ac3d35e48cd66aca755341d0f1058cab36889781b170e1231d"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "STABLE_ORBIT.agc",
+          "include_order": 39,
+          "included_from_main_exactly": true,
+          "lines": 436,
+          "path": "Luminary099/STABLE_ORBIT.agc",
+          "sha256": "d86512d6a5532e71b6ce9138aa1555dc6c8c367c7fa3726f4fdee3a4554e12d9"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "SYSTEM_TEST_STANDARD_LEAD_INS.agc",
+          "include_order": 23,
+          "included_from_main_exactly": true,
+          "lines": 125,
+          "path": "Luminary099/SYSTEM_TEST_STANDARD_LEAD_INS.agc",
+          "sha256": "6984a991e8adcb1f48e9de6e2f6018b8f7494b51b8a5f2f96b98026ed3e844e8"
+        },
+        {
+          "candidate_subsystems": [
+            "interrupts-and-timing"
+          ],
+          "filename": "T4RUPT_PROGRAM.agc",
+          "include_order": 8,
+          "included_from_main_exactly": true,
+          "lines": 1354,
+          "path": "Luminary099/T4RUPT_PROGRAM.agc",
+          "sha256": "122257791bb0d692e1e7a3a8aeae826272cbb2f250444497e4077de7cb8fbd49"
+        },
+        {
+          "candidate_subsystems": [
+            "interrupts-and-timing"
+          ],
+          "filename": "T6-RUPT_PROGRAMS.agc",
+          "include_order": 80,
+          "included_from_main_exactly": true,
+          "lines": 163,
+          "path": "Luminary099/T6-RUPT_PROGRAMS.agc",
+          "sha256": "76f234ba5ac0e8e3516f935e674761cb4bba455b07543cd10e16c9d1f5caaa87"
+        },
+        {
+          "candidate_subsystems": [
+            "source-and-memory-layout"
+          ],
+          "filename": "TAGS_FOR_RELATIVE_SETLOC.agc",
+          "include_order": 2,
+          "included_from_main_exactly": true,
+          "lines": 347,
+          "path": "Luminary099/TAGS_FOR_RELATIVE_SETLOC.agc",
+          "sha256": "cbffb67643bfefe4b19f5d9f7e800ec9a60bf3cf9dce9ce096e2f4effe641f5d"
+        },
+        {
+          "candidate_subsystems": [
+            "guidance-and-navigation"
+          ],
+          "filename": "THE_LUNAR_LANDING.agc",
+          "include_order": 42,
+          "included_from_main_exactly": true,
+          "lines": 335,
+          "path": "Luminary099/THE_LUNAR_LANDING.agc",
+          "sha256": "8c5c8b125bad79fdce8838bea3871481942d9b75694dc538bd032d54e63e952f"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "THROTTLE_CONTROL_ROUTINES.agc",
+          "include_order": 43,
+          "included_from_main_exactly": true,
+          "lines": 224,
+          "path": "Luminary099/THROTTLE_CONTROL_ROUTINES.agc",
+          "sha256": "68a812f18e678248d64ea62a56284e6a8a415925ea41ab8e35293f94a0c22efe"
+        },
+        {
+          "candidate_subsystems": [
+            "interpreter-and-numerics"
+          ],
+          "filename": "TIME_OF_FREE_FALL.agc",
+          "include_order": 69,
+          "included_from_main_exactly": true,
+          "lines": 721,
+          "path": "Luminary099/TIME_OF_FREE_FALL.agc",
+          "sha256": "e49235d5d0b1de4082524112a7dd7ac1df1d99e5ba9ee86e9e607ad54b15fa67"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "TJET_LAW.agc",
+          "include_order": 85,
+          "included_from_main_exactly": true,
+          "lines": 519,
+          "path": "Luminary099/TJET_LAW.agc",
+          "sha256": "10c99519ea474da9b969dd64652ea6a2a6f739be0cc3fdb6a30e3bb619b80e2c"
+        },
+        {
+          "candidate_subsystems": [
+            "vehicle-control"
+          ],
+          "filename": "TRIM_GIMBAL_CONTROL_SYSTEM.agc",
+          "include_order": null,
+          "included_from_main_exactly": false,
+          "lines": 617,
+          "path": "Luminary099/TRIM_GIMBAL_CONTROL_SYSTEM.agc",
+          "sha256": "13da16e475f7d0610ee90d73b5676d2ff0704fb8b79f7651c97e0a32e16b256a"
+        },
+        {
+          "candidate_subsystems": [
+            "unclassified"
+          ],
+          "filename": "UPDATE_PROGRAM.agc",
+          "include_order": 78,
+          "included_from_main_exactly": true,
+          "lines": 556,
+          "path": "Luminary099/UPDATE_PROGRAM.agc",
+          "sha256": "5f54e9c63cf0af039a8a435aa3ba86ad933e3b921366388ee115460da5c9f7f6"
+        },
+        {
+          "candidate_subsystems": [
+            "executive-waitlist-restart"
+          ],
+          "filename": "WAITLIST.agc",
+          "include_order": 60,
+          "included_from_main_exactly": true,
+          "lines": 564,
+          "path": "Luminary099/WAITLIST.agc",
+          "sha256": "ca0092971efa3cafcdd8f7dad06a0980f999993f9dbc2e1c68cc764c41f7f0f0"
+        }
+      ],
+      "unresolved_include_count": 2,
+      "unresolved_includes": [
+        {
+          "candidate_matches": [
+            "GENERAL_LAMBERT_AIMPOINT_GUIDANCE.agc"
+          ],
+          "line": 34,
+          "listing_pages": "pp. 651-653",
+          "order": 33,
+          "resolution_status": "unresolved",
+          "token": "LAMBERT_AIMPOINT_GUIDANCE.agc"
+        },
+        {
+          "candidate_matches": [
+            "TRIM_GIMBAL_CONTROL_SYSTEM.agc"
+          ],
+          "line": 88,
+          "listing_pages": "pp. 1472-1484",
+          "order": 87,
+          "resolution_status": "unresolved",
+          "token": "TRIM_GIMBAL_CNTROL_SYSTEM.agc"
+        }
+      ],
+      "vehicle": "Lunar Module"
+    }
+  ],
+  "schema_version": 1,
+  "scope": "lexical Phase 0 repository inventory; not a semantic call graph",
+  "source": {
+    "branch": "master",
+    "commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
+    "dirty": false,
+    "repository": "https://github.com/chrislgarry/Apollo-11.git"
+  },
+  "totals": {
+    "agc_files": 175,
+    "agc_lines": 130186,
+    "byte_identical_same_filename_modules": 0,
+    "programs": 2,
+    "same_filename_modules": 50
+  }
+}
