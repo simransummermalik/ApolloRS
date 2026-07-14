@@ -82,7 +82,40 @@ impl MissionScenario {
             instruction_limit: 1_000_000,
             frame_interval: 5_000,
             inputs,
-            guidance_variables: Vec::new(),
+            guidance_variables: vec![
+                GuidanceVariable {
+                    name: "MPAC".to_owned(),
+                    address: 0o154,
+                },
+                GuidanceVariable {
+                    name: "DSPCOUNT".to_owned(),
+                    address: 0o777,
+                },
+                GuidanceVariable {
+                    name: "DECBRNCH".to_owned(),
+                    address: 0o1000,
+                },
+                GuidanceVariable {
+                    name: "VERBREG".to_owned(),
+                    address: 0o1001,
+                },
+                GuidanceVariable {
+                    name: "NOUNREG".to_owned(),
+                    address: 0o1002,
+                },
+                GuidanceVariable {
+                    name: "MODREG".to_owned(),
+                    address: 0o1011,
+                },
+                GuidanceVariable {
+                    name: "DSPLOCK".to_owned(),
+                    address: 0o1012,
+                },
+                GuidanceVariable {
+                    name: "CADRSTOR".to_owned(),
+                    address: 0o1042,
+                },
+            ],
             observer: FlightSoftwareObserver::default(),
         }
     }
@@ -240,7 +273,11 @@ impl MissionController {
             }
             let outcome = self.faults.step(&mut self.runtime)?;
             self.dsky.consume_trace(&outcome.trace);
-            if self.runtime.cpu().instructions() % scenario.frame_interval == 0 {
+            if self.runtime.cpu().instructions() % scenario.frame_interval == 0
+                && frames.last().is_none_or(|frame: &MissionFrame| {
+                    frame.instruction != self.runtime.cpu().instructions()
+                })
+            {
                 frames.push(self.frame(scenario)?);
             }
         }
@@ -320,7 +357,9 @@ mod tests {
     fn mission_frames_are_sampled_from_executed_cpu_state() {
         let mut rope = vec![AgcWord::POSITIVE_ZERO; FIXED_BANKS * FIXED_WORDS_PER_BANK];
         rope[2 * 1024] = encode(Mnemonic::Tcf, 0o4000).unwrap();
-        let runtime = Runtime::new(Cpu::new(Memory::with_rope(rope).unwrap()));
+        let mut cpu = Cpu::new(Memory::with_rope(rope).unwrap());
+        cpu.cancel_interrupt(agc_cpu::Interrupt::Downrupt);
+        let runtime = Runtime::new(cpu);
         let mut controller = MissionController::from_runtime(runtime);
         let scenario = MissionScenario {
             name: "loop".to_owned(),

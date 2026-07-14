@@ -8,7 +8,18 @@ use std::io::{self, BufRead, Write};
 use thiserror::Error;
 
 /// Trace schema version written into every event.
-pub const TRACE_SCHEMA_VERSION: u32 = 1;
+pub const TRACE_SCHEMA_VERSION: u32 = 2;
+
+/// Kind of architectural transition represented by a trace event.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum MachineEventKind {
+    /// A decoded instruction was executed and committed.
+    #[default]
+    Instruction,
+    /// An interrupt was accepted, filling ZRUPT and BRUPT and changing Z.
+    InterruptEntry,
+}
 
 /// Architectural register snapshot around an instruction.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
@@ -78,8 +89,10 @@ pub enum InterruptEvent {
 pub struct TraceEvent {
     /// Trace format version.
     pub schema_version: u32,
-    /// Monotonic instruction sequence.
+    /// Monotonic machine-event sequence.
     pub sequence: u64,
+    /// Kind of architectural transition.
+    pub kind: MachineEventKind,
     /// Machine cycle at instruction start.
     pub cycle_start: u64,
     /// Machine cycle after commit.
@@ -112,6 +125,7 @@ impl TraceEvent {
         Self {
             schema_version: TRACE_SCHEMA_VERSION,
             sequence,
+            kind: MachineEventKind::Instruction,
             cycle_start,
             cycle_end: cycle_start,
             pc,

@@ -427,7 +427,6 @@ impl Runtime {
                     word1,
                     word2,
                 });
-                self.cpu.request_interrupt(Interrupt::Downrupt);
             }
         }
     }

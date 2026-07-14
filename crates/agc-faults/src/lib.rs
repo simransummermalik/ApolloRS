@@ -164,7 +164,8 @@ impl FaultEngine {
 
     /// Runs an instruction budget while preserving every applied-fault record.
     pub fn run(&mut self, runtime: &mut Runtime, instructions: u64) -> Result<(), FaultError> {
-        for _ in 0..instructions {
+        let start = runtime.cpu().instructions();
+        while runtime.cpu().instructions() - start < instructions {
             self.step(runtime)?;
         }
         Ok(())

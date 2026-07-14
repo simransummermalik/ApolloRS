@@ -4,7 +4,8 @@
 use agc_isa::{DecodedInstruction, Mnemonic, decode};
 use agc_memory::{AccessKind, Memory, MemoryAccess, MemoryError, PhysicalAddress, register};
 use agc_trace::{
-    InterruptEvent, IoEvent, MemoryEvent, RegisterSnapshot, TraceError, TraceEvent, TraceLog,
+    InterruptEvent, IoEvent, MachineEventKind, MemoryEvent, RegisterSnapshot, TraceError,
+    TraceEvent, TraceLog,
 };
 use agc_word::{AgcDoubleWord, AgcRegister, AgcWord, ChannelAddress, SignClass};
 use serde::{Deserialize, Serialize};
@@ -56,11 +57,25 @@ pub enum StopReason {
     Watchpoint(u16),
 }
 
-/// Result of one committed CPU step.
+/// Kind of transition committed by one CPU step.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum StepKind {
+    /// One decoded instruction executed.
+    Instruction(DecodedInstruction),
+    /// An interrupt was accepted before the fetched instruction executed.
+    InterruptEntry {
+        /// Hardware request accepted, or `None` for EDRUPT's vector-zero fallback.
+        interrupt: Option<Interrupt>,
+        /// Address selected by the interrupt hardware.
+        vector: u16,
+    },
+}
+
+/// Result of one committed architectural transition.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct StepOutcome {
-    /// Decoded operation.
-    pub instruction: DecodedInstruction,
+    /// Instruction or interrupt-entry transition that committed.
+    pub kind: StepKind,
     /// Committed trace event.
     pub trace: TraceEvent,
     /// Watched address written during the step.
@@ -108,8 +123,14 @@ pub struct Cpu {
     watchpoints: BTreeSet<u16>,
     trace: TraceLog,
     scaler_mcts: u16,
-    scaler: u32,
-    downrupt_mcts: u32,
+    scaler: u16,
+    downlink_words: u8,
+    schedule_downrupt: bool,
+    downrupt_due: Option<u64>,
+    trace_sequence: u64,
+    trap_31a: bool,
+    trap_31b: bool,
+    trap_32: bool,
 }
 
 impl Cpu {
@@ -123,7 +144,7 @@ impl Cpu {
             substitute_instruction: false,
             interrupt_enabled: true,
             in_interrupt: false,
-            pending_interrupts: BTreeSet::new(),
+            pending_interrupts: BTreeSet::from([Interrupt::Downrupt]),
             cycles: 0,
             sequence: 0,
             breakpoints: BTreeSet::new(),
@@ -131,7 +152,13 @@ impl Cpu {
             trace: TraceLog::default(),
             scaler_mcts: 0,
             scaler: 0,
-            downrupt_mcts: 0,
+            downlink_words: 0,
+            schedule_downrupt: false,
+            downrupt_due: None,
+            trace_sequence: 0,
+            trap_31a: false,
+            trap_31b: false,
+            trap_32: false,
         };
         cpu.set_z(0o4000);
         cpu
@@ -237,54 +264,90 @@ impl Cpu {
         self.substitute_instruction = false;
         self.interrupt_enabled = true;
         self.in_interrupt = false;
-        self.pending_interrupts.clear();
+        self.pending_interrupts = BTreeSet::from([Interrupt::Downrupt]);
         self.cycles = 0;
         self.sequence = 0;
         self.trace.events.clear();
         self.scaler_mcts = 0;
         self.scaler = 0;
-        self.downrupt_mcts = 0;
+        self.downlink_words = 0;
+        self.schedule_downrupt = false;
+        self.downrupt_due = None;
+        self.trace_sequence = 0;
+        self.trap_31a = false;
+        self.trap_31b = false;
+        self.trap_32 = false;
         self.set_z(0o4000);
     }
 
-    /// Executes one instruction and commits a complete trace event.
+    /// Commits one instruction or interrupt-entry transition.
     pub fn step(&mut self) -> Result<StepOutcome, CpuError> {
-        let mut interrupt_events = Vec::new();
-        self.enter_pending_interrupt(&mut interrupt_events)?;
         let pc = self.program_counter();
         let before = self.snapshot();
-        let fetch_address = if std::mem::take(&mut self.substitute_instruction) {
+        let fetch_address = if self.substitute_instruction {
             register::BRUPT
         } else {
             pc
         };
         let fetch = self.memory.read(fetch_address, AccessKind::Fetch)?;
         let fetched_word = fetch.value;
-        self.set_z(pc.wrapping_add(1) & 0o7777);
         let actual_word = self
             .indexed
-            .take()
-            .map_or(fetched_word, |index| fetched_word.wrapping_add(index));
+            .as_ref()
+            .map_or(fetched_word, |index| fetched_word.wrapping_add(*index));
         let used_extended = self.extended;
-        self.extended = false;
         let instruction = decode(actual_word, used_extended);
-        let mut event = TraceEvent::new(self.sequence, self.cycles, pc, actual_word);
+        let mut event = TraceEvent::new(self.trace_sequence, self.cycles, pc, actual_word);
         event.before = before;
+        event.memory.push(memory_event(fetch));
+        self.advance_to_ready_mct(&mut event)?;
+
+        if let Some((interrupt, vector)) = self.accept_interrupt(instruction, pc)? {
+            event.kind = MachineEventKind::InterruptEntry;
+            event.mnemonic = "INTERRUPT".to_owned();
+            event.operand = vector;
+            event.extended = used_extended;
+            event.interrupts.push(InterruptEvent::Entered {
+                number: interrupt.map_or(0, |interrupt| interrupt as u8),
+                vector,
+            });
+            // Filling BRUPT/ZRUPT takes the acceptance MCT above and one
+            // following MCT during which normal scaler service is deferred.
+            self.clock_deferred_mct(&mut event);
+            event.cycle_end = self.cycles;
+            event.after = self.snapshot();
+            self.trace.push(event.clone())?;
+            self.trace_sequence += 1;
+            return Ok(StepOutcome {
+                kind: StepKind::InterruptEntry { interrupt, vector },
+                trace: event,
+                watchpoint: None,
+            });
+        }
+
+        if instruction.cycles > 1 {
+            for _ in 0..instruction.cycles - 2 {
+                self.clock_deferred_mct(&mut event);
+            }
+            self.advance_to_ready_mct(&mut event)?;
+        }
+        self.substitute_instruction = false;
+        self.indexed = None;
+        self.extended = false;
+        self.set_z(pc.wrapping_add(1) & 0o7777);
         event.mnemonic = instruction.mnemonic.to_string();
         event.operand = instruction.operand;
         event.extended = instruction.extended;
-        event.memory.push(memory_event(fetch));
-        event.interrupts = interrupt_events;
         let mut watchpoint = None;
         self.execute(instruction, &mut event, &mut watchpoint)?;
-        self.cycles += u64::from(instruction.cycles);
-        self.tick_timers(instruction.cycles, &mut event)?;
+        self.schedule_completed_downrupt();
         event.cycle_end = self.cycles;
         event.after = self.snapshot();
         self.trace.push(event.clone())?;
         self.sequence += 1;
+        self.trace_sequence += 1;
         Ok(StepOutcome {
-            instruction,
+            kind: StepKind::Instruction(instruction),
             trace: event,
             watchpoint,
         })
@@ -327,7 +390,7 @@ impl Cpu {
         let k = instruction.operand;
         match instruction.mnemonic {
             Mnemonic::Ad => {
-                let value = self.read_register_operand(k, event)?;
+                let value = self.read_register_operand_and_edit(k, event)?;
                 self.add_register_to_a(value);
             }
             Mnemonic::Ads => {
@@ -356,12 +419,12 @@ impl Cpu {
                 }
             }
             Mnemonic::Ca => {
-                let value = self.read_register_operand(k, event)?;
+                let value = self.read_register_operand_and_edit(k, event)?;
                 self.set_a_register(value);
             }
             Mnemonic::Ccs => self.ccs(k, event)?,
             Mnemonic::Cs => {
-                let value = self.read_register_operand(k, event)?;
+                let value = self.read_register_operand_and_edit(k, event)?;
                 self.set_a_raw(!value.raw());
             }
             Mnemonic::Das => self.das(k, event, watchpoint)?,
@@ -385,10 +448,7 @@ impl Cpu {
             }
             Mnemonic::Dv => self.divide(k, event)?,
             Mnemonic::Dxch => self.double_exchange(k, event, watchpoint)?,
-            Mnemonic::EdrupT => {
-                self.interrupt_enabled = false;
-                self.software_interrupt(event)?;
-            }
+            Mnemonic::EdrupT => unreachable!("EDRUPT is committed as interrupt entry"),
             Mnemonic::Extend => self.extended = true,
             Mnemonic::Incr => {
                 let value = self.read_register_operand(k, event)?;
@@ -407,15 +467,19 @@ impl Cpu {
             Mnemonic::Qxch => self.exchange_register(k, register::Q, event, watchpoint)?,
             Mnemonic::Rand => self.channel_logic(k, ChannelLogic::AndRead, event)?,
             Mnemonic::Read => {
-                let value = self.read_channel(k, event)?;
-                self.set_a_word(value);
+                if matches!(k, register::L | register::Q) {
+                    self.set_a_register(self.memory.central_register(k)?);
+                } else {
+                    let value = self.read_channel(k, event)?;
+                    self.set_a_word(value);
+                }
             }
             Mnemonic::Relint => self.interrupt_enabled = true,
             Mnemonic::Resume => self.resume(event)?,
             Mnemonic::Ror => self.channel_logic(k, ChannelLogic::OrRead, event)?,
             Mnemonic::Rxor => self.channel_logic(k, ChannelLogic::XorRead, event)?,
             Mnemonic::Su => {
-                let value = self.read_register_operand(k, event)?;
+                let value = self.read_register_operand_and_edit(k, event)?;
                 self.add_register_to_a(register_from_raw(!value.raw()));
             }
             Mnemonic::Tc => {
@@ -430,8 +494,12 @@ impl Cpu {
             Mnemonic::Wand => self.channel_logic(k, ChannelLogic::AndWrite, event)?,
             Mnemonic::Wor => self.channel_logic(k, ChannelLogic::OrWrite, event)?,
             Mnemonic::Write => {
-                let value = self.a_word();
-                self.write_channel(k, value, event)?;
+                if matches!(k, register::L | register::Q) {
+                    self.set_central_register(k, self.a_register());
+                } else {
+                    let value = self.a_word();
+                    self.write_channel(k, value, event)?;
+                }
             }
             Mnemonic::Xch => self.exchange_register(k, register::A, event, watchpoint)?,
         }
@@ -439,12 +507,12 @@ impl Cpu {
     }
 
     fn ccs(&mut self, k: u16, event: &mut TraceEvent) -> Result<(), CpuError> {
-        let value = self.read_register_operand(k, event)?;
+        let value = self.read_register_operand_and_edit(k, event)?;
         let raw = value.raw();
         let magnitude = if raw & 0o100000 == 0 { raw } else { !raw };
         self.set_a_raw(if magnitude > 1 { magnitude - 1 } else { 0 });
 
-        if k < 0o20 {
+        if k < register::EB {
             match raw & 0o140000 {
                 0o040000 => return Ok(()),
                 0o100000 => {
@@ -561,8 +629,8 @@ impl Cpu {
             return Ok(());
         }
 
-        let low = self.read_register_operand(k, event)?;
-        let high = self.read_register_operand(k.saturating_sub(1), event)?;
+        let low = self.read_register_operand_and_edit(k, event)?;
+        let high = self.read_register_operand_and_edit(k.saturating_sub(1), event)?;
         let low = if complement {
             register_from_raw(!low.raw())
         } else {
@@ -624,7 +692,7 @@ impl Cpu {
     }
 
     fn mask(&mut self, k: u16, event: &mut TraceEvent) -> Result<(), CpuError> {
-        if k < 0o20 {
+        if k < register::EB {
             let rhs = self.read_register_operand(k, event)?.raw();
             self.set_a_raw(self.a_raw() & rhs);
         } else {
@@ -653,38 +721,108 @@ impl Cpu {
     }
 
     fn divide(&mut self, k: u16, event: &mut TraceEvent) -> Result<(), CpuError> {
-        let divisor_word = self.read_word(k, event)?;
-        let divisor = i64::from(divisor_word.to_i32_lossy_zero());
-        if divisor == 0 {
-            return Err(CpuError::Arithmetic("DV divisor is signed zero".to_owned()));
-        }
-        let dividend = AgcDoubleWord {
-            high: self.a_word(),
-            low: self.l_word(),
-        }
-        .to_i64_lossy_zero();
-        let quotient = dividend / divisor;
-        let remainder = dividend % divisor;
-        if !(-i64::from(agc_word::MAX_MAGNITUDE)..=i64::from(agc_word::MAX_MAGNITUDE))
-            .contains(&quotient)
+        let divisor_access = self.memory.read(k, AccessKind::Read)?;
+        let divisor_word = divisor_access.value;
+        event.memory.push(memory_event(divisor_access));
+
+        let a_raw = self.a_raw();
+        let l_raw = self.l_register().raw();
+        let (normalized_high, normalized_low, decent) = normalize_double(a_raw, l_raw);
+        let abs_a = absolute_sp(normalized_high);
+        let abs_l = absolute_sp(normalized_low);
+
+        let mut divisor = match k {
+            register::A => {
+                let mut value = a_raw;
+                if value & 0o100000 == 0 {
+                    value = !value;
+                }
+                value & 0o177777
+            }
+            register::L => {
+                let mut value = l_raw;
+                let dividend_negative = if abs_a == 0 {
+                    l_raw & 0o100000 != 0
+                } else {
+                    a_raw & 0o100000 != 0
+                };
+                if dividend_negative {
+                    value = !value;
+                }
+                overflow_correct_raw(add_sp16(value, 0o40000))
+                    .sign_extend()
+                    .raw()
+            }
+            register::Z => {
+                let mut value = self.program_counter();
+                let dividend_negative = if abs_a == 0 {
+                    l_raw & 0o100000 != 0
+                } else {
+                    a_raw & 0o100000 != 0
+                };
+                if dividend_negative {
+                    value |= 0o100000;
+                }
+                value
+            }
+            address if address < register::EB => self.memory.central_register(address)?.raw(),
+            _ => divisor_word.sign_extend().raw(),
+        };
+        divisor &= 0o177777;
+        let divisor_word = overflow_correct_raw(divisor);
+        let abs_k = absolute_sp(divisor_word.raw());
+
+        if abs_a > abs_k
+            || (abs_a == abs_k && abs_l != 0)
+            || register_from_raw(divisor).has_overflow()
         {
-            return Err(CpuError::Arithmetic(format!(
-                "DV quotient {quotient} exceeds a single AGC word"
-            )));
+            let (a, l) = simulate_divide(a_raw, l_raw, divisor);
+            self.set_a_raw(a);
+            self.set_l_register(register_from_raw(l));
+        } else if abs_a == 0 && abs_l == 0 {
+            let same_sign = normalized_low & 0o40000 == divisor_word.raw() & 0o40000;
+            let quotient = match (same_sign, abs_k == 0) {
+                (true, true) => AgcWord::MAX,
+                (true, false) => AgcWord::POSITIVE_ZERO,
+                (false, true) => AgcWord::MIN,
+                (false, false) => AgcWord::NEGATIVE_ZERO,
+            };
+            self.set_a_word(quotient);
+        } else if abs_a == abs_k && abs_l == 0 {
+            let quotient = if normalized_high == divisor_word.raw() {
+                AgcWord::MAX
+            } else {
+                AgcWord::MIN
+            };
+            self.set_l_word(AgcWord::from_raw_truncate(normalized_high));
+            self.set_a_word(quotient);
+        } else {
+            let dividend = agc_double_to_i64(decent);
+            let divisor = i64::from(divisor_word.to_i32_lossy_zero());
+            let quotient = dividend / divisor;
+            let remainder = dividend % divisor;
+            self.set_a_word(
+                AgcWord::from_i32(quotient as i32)
+                    .map_err(|error| CpuError::Arithmetic(error.to_string()))?,
+            );
+            if remainder == 0 {
+                self.set_l_word(if dividend < 0 {
+                    AgcWord::NEGATIVE_ZERO
+                } else {
+                    AgcWord::POSITIVE_ZERO
+                });
+            } else {
+                self.set_l_word(
+                    AgcWord::from_i32(remainder as i32)
+                        .map_err(|error| CpuError::Arithmetic(error.to_string()))?,
+                );
+            }
         }
-        self.set_a_word(
-            AgcWord::from_i32(quotient as i32)
-                .map_err(|error| CpuError::Arithmetic(error.to_string()))?,
-        );
-        self.set_l_word(
-            AgcWord::from_i32(remainder as i32)
-                .map_err(|error| CpuError::Arithmetic(error.to_string()))?,
-        );
         Ok(())
     }
 
     fn modular_subtract(&mut self, k: u16, event: &mut TraceEvent) -> Result<(), CpuError> {
-        let rhs = self.read_word(k, event)?.raw();
+        let rhs = self.read_word_and_edit(k, event)?.raw();
         let lhs = self.a_word().raw();
         let twos = lhs.wrapping_sub(rhs) & 0o77777;
         let ones = if twos & 0o40000 != 0 {
@@ -702,6 +840,24 @@ impl Cpu {
         operation: ChannelLogic,
         event: &mut TraceEvent,
     ) -> Result<(), CpuError> {
+        if matches!(channel, register::L | register::Q) {
+            let current = self.memory.central_register(channel)?;
+            let accumulator = self.a_register();
+            let result = match operation {
+                ChannelLogic::AndRead | ChannelLogic::AndWrite => {
+                    register_from_raw(accumulator.raw() & current.raw())
+                }
+                ChannelLogic::OrRead | ChannelLogic::OrWrite => {
+                    register_from_raw(accumulator.raw() | current.raw())
+                }
+                ChannelLogic::XorRead => register_from_raw(accumulator.raw() ^ current.raw()),
+            };
+            self.set_a_register(result);
+            if matches!(operation, ChannelLogic::AndWrite | ChannelLogic::OrWrite) {
+                self.set_central_register(channel, result);
+            }
+            return Ok(());
+        }
         let current = self.read_channel(channel, event)?;
         let a = self.a_word();
         let result = match operation {
@@ -720,18 +876,6 @@ impl Cpu {
         Ok(())
     }
 
-    fn software_interrupt(&mut self, event: &mut TraceEvent) -> Result<(), CpuError> {
-        let zrupt = self.program_counter();
-        self.memory
-            .set_central_register(register::ZRUPT, register_from_raw(zrupt))?;
-        self.memory
-            .set_central_register(register::BRUPT, event.instruction.sign_extend())?;
-        self.set_z(0);
-        self.indexed = None;
-        self.in_interrupt = true;
-        Ok(())
-    }
-
     fn resume(&mut self, event: &mut TraceEvent) -> Result<(), CpuError> {
         // The interrupt routine restores A, L, Q, and BB in software.  RESUME
         // backs up to the interrupted address and substitutes BRUPT once.
@@ -744,118 +888,145 @@ impl Cpu {
         Ok(())
     }
 
-    fn enter_pending_interrupt(
+    fn accept_interrupt(
         &mut self,
-        events: &mut Vec<InterruptEvent>,
-    ) -> Result<(), CpuError> {
-        if !self.interrupt_enabled
-            || self.in_interrupt
-            || self.extended
-            || self.a_register().has_overflow()
-        {
-            return Ok(());
+        instruction: DecodedInstruction,
+        pc: u16,
+    ) -> Result<Option<(Option<Interrupt>, u16)>, CpuError> {
+        let edrupt = instruction.mnemonic == Mnemonic::EdrupT;
+        let maskable = self.interrupt_enabled
+            && !self.in_interrupt
+            && !self.extended
+            && !self.a_register().has_overflow()
+            // RELINT, INHINT, and EXTEND are protected from interrupt entry.
+            && !matches!(instruction.raw.raw(), 3 | 4 | 6);
+        if !edrupt && !maskable {
+            return Ok(None);
         }
-        let pc = self.program_counter();
-        let fetched = if self.substitute_instruction {
-            self.memory
-                .central_register(register::BRUPT)?
-                .overflow_correct()
-        } else {
-            self.memory.read(pc, AccessKind::Read)?.value
-        };
-        let interrupted = self
-            .indexed
-            .map_or(fetched, |index| fetched.wrapping_add(index));
-        // RELINT, INHINT, and EXTEND are protected from interrupt entry.
-        if matches!(interrupted.raw(), 3 | 4 | 6) {
-            return Ok(());
+        let interrupt = self.pending_interrupts.pop_first();
+        if interrupt.is_none() && !edrupt {
+            return Ok(None);
         }
-        let Some(interrupt) = self.pending_interrupts.pop_first() else {
-            return Ok(());
-        };
+        let vector = interrupt.map_or(0, Interrupt::vector);
         let zrupt = pc.wrapping_add(1) & 0o7777;
         self.memory
             .set_central_register(register::ZRUPT, register_from_raw(zrupt))?;
         self.memory
-            .set_central_register(register::BRUPT, interrupted.sign_extend())?;
-        self.set_z(interrupt.vector());
-        self.interrupt_enabled = false;
+            .set_central_register(register::BRUPT, instruction.raw.sign_extend())?;
+        self.set_z(vector);
         self.in_interrupt = true;
         self.indexed = None;
         self.substitute_instruction = false;
         self.extended = false;
-        events.push(InterruptEvent::Entered {
-            number: interrupt as u8,
-            vector: interrupt.vector(),
-        });
-        Ok(())
+        Ok(Some((interrupt, vector)))
     }
 
-    fn tick_timers(&mut self, cycles: u8, event: &mut TraceEvent) -> Result<(), CpuError> {
-        self.downrupt_mcts += u32::from(cycles);
-        while self.downrupt_mcts >= 1706 {
-            self.downrupt_mcts -= 1706;
-            self.pending_interrupts.insert(Interrupt::Downrupt);
-            event.interrupts.push(InterruptEvent::Requested {
-                number: Interrupt::Downrupt as u8,
-            });
+    fn advance_to_ready_mct(&mut self, event: &mut TraceEvent) -> Result<(), CpuError> {
+        loop {
+            self.clock_deferred_mct(event);
+            let delay = self.service_scaler(event)?;
+            if delay == 0 {
+                return Ok(());
+            }
+            for _ in 1..delay {
+                self.clock_deferred_mct(event);
+            }
         }
+    }
 
-        self.scaler_mcts += u16::from(cycles) * 3;
+    fn clock_deferred_mct(&mut self, event: &mut TraceEvent) {
+        self.service_downrupt_due(event);
+        self.cycles += 1;
+        self.scaler_mcts += 3;
+    }
+
+    fn service_scaler(&mut self, event: &mut TraceEvent) -> Result<u16, CpuError> {
+        let mut delay = 0;
         while self.scaler_mcts >= 80 {
             self.scaler_mcts -= 80;
-            self.scaler = self.scaler.wrapping_add(1);
-            match self.scaler & 0o37 {
-                0 => self.increment_timer(0o30, Interrupt::Time5, event)?,
-                8 => self.increment_timer(0o27, Interrupt::Time4, event)?,
-                16 => {
-                    self.increment_time1(event)?;
-                    self.increment_timer(0o26, Interrupt::Time3, event)?;
-                }
-                _ => {}
+            self.scaler = self.scaler.wrapping_add(1) & 0o37777;
+            self.memory.write_channel(
+                ChannelAddress::new(0o4).expect("SCALER1 channel is valid"),
+                AgcWord::from_raw_truncate(self.scaler),
+            );
+            if self.scaler == 0 {
+                let scaler2_address = ChannelAddress::new(0o3).expect("SCALER2 channel is valid");
+                let scaler2 = self.memory.read_channel(scaler2_address);
+                self.memory.write_channel(
+                    scaler2_address,
+                    AgcWord::from_raw_truncate(scaler2.raw().wrapping_add(1)),
+                );
             }
-            let channel13 = self
-                .memory
-                .read_channel(ChannelAddress::new(0o13).expect("channel 13 is valid"));
-            if self.scaler & 1 == 0 && channel13.raw() & 0o40000 != 0 {
+
+            delay += match self.scaler & 0o37 {
+                0 => {
+                    self.increment_timer(0o30, Interrupt::Time5, event)?;
+                    1
+                }
+                8 => {
+                    self.increment_timer(0o27, Interrupt::Time4, event)?;
+                    1
+                }
+                16 => {
+                    self.increment_time1(event)? + {
+                        self.increment_timer(0o26, Interrupt::Time3, event)?;
+                        1
+                    }
+                }
+                _ => 0,
+            };
+
+            let channel13_address = ChannelAddress::new(0o13).expect("channel 13 is valid");
+            let channel13 = self.memory.read_channel(channel13_address);
+            if self.scaler & 1 == 1 && channel13.raw() & 0o40000 != 0 {
+                delay += 1;
                 let time6 = self.memory.read(0o31, AccessKind::Read)?.value;
                 if time6.is_zero() {
-                    self.pending_interrupts.insert(Interrupt::Time6);
-                    event.interrupts.push(InterruptEvent::Requested {
-                        number: Interrupt::Time6 as u8,
+                    self.request_interrupt_event(Interrupt::Time6, event);
+                    let cleared = AgcWord::from_raw_truncate(channel13.raw() & !0o40000);
+                    self.memory.write_channel(channel13_address, cleared);
+                    event.io.push(IoEvent {
+                        write: true,
+                        channel: 0o13,
+                        value: cleared,
                     });
-                    self.memory.write_channel(
-                        ChannelAddress::new(0o13).expect("channel 13 is valid"),
-                        AgcWord::from_raw_truncate(channel13.raw() & !0o40000),
-                    );
                 } else {
-                    let next = if time6.is_negative() {
-                        AgcWord::from_raw_truncate(time6.raw() + 1)
+                    let delta = if time6.is_negative() {
+                        AgcWord::from_raw_truncate(1)
                     } else {
-                        AgcWord::from_raw_truncate(time6.raw() - 1)
+                        AgcWord::from_raw_truncate(0o77776)
                     };
+                    let next = time6.wrapping_add(delta);
                     let access = self.memory.write(0o31, next)?;
                     event.memory.push(memory_event(access));
                 }
             }
+            self.service_handrupt_traps(event);
         }
-        Ok(())
+        Ok(delay)
     }
 
-    fn increment_time1(&mut self, event: &mut TraceEvent) -> Result<(), CpuError> {
+    fn schedule_completed_downrupt(&mut self) {
+        if self.schedule_downrupt {
+            self.downrupt_due = Some(self.cycles + 1_706);
+            self.schedule_downrupt = false;
+        }
+    }
+
+    fn increment_time1(&mut self, event: &mut TraceEvent) -> Result<u16, CpuError> {
         let time1 = self.memory.read(0o25, AccessKind::Read)?.value;
-        let incremented = AgcWord::from_raw_truncate((time1.raw() + 1) & 0o37777);
+        let (incremented, overflow) = counter_pinc(time1);
         let access = self.memory.write(0o25, incremented)?;
         event.memory.push(memory_event(access));
-        if incremented.is_positive_zero() {
+        let mut cycles = 1;
+        if overflow {
             let time2 = self.memory.read(0o24, AccessKind::Read)?.value;
-            let access = self.memory.write(
-                0o24,
-                AgcWord::from_raw_truncate((time2.raw() + 1) & 0o37777),
-            )?;
+            let (time2, _) = counter_pinc(time2);
+            let access = self.memory.write(0o24, time2)?;
             event.memory.push(memory_event(access));
+            cycles += 1;
         }
-        Ok(())
+        Ok(cycles)
     }
 
     fn increment_timer(
@@ -865,21 +1036,73 @@ impl Cpu {
         event: &mut TraceEvent,
     ) -> Result<(), CpuError> {
         let current = self.memory.read(address, AccessKind::Read)?.value;
-        let mut next = AgcWord::from_raw_truncate(current.raw().wrapping_add(1));
-        if next.raw() == 0o40000 {
-            next = AgcWord::POSITIVE_ZERO;
-            self.pending_interrupts.insert(interrupt);
-            event.interrupts.push(InterruptEvent::Requested {
-                number: interrupt as u8,
-            });
+        let (next, overflow) = counter_pinc(current);
+        if overflow {
+            self.request_interrupt_event(interrupt, event);
         }
         let access = self.memory.write(address, next)?;
         event.memory.push(memory_event(access));
         Ok(())
     }
 
+    fn request_interrupt_event(&mut self, interrupt: Interrupt, event: &mut TraceEvent) {
+        if self.pending_interrupts.insert(interrupt) {
+            event.interrupts.push(InterruptEvent::Requested {
+                number: interrupt as u8,
+            });
+        }
+    }
+
+    fn service_downrupt_due(&mut self, event: &mut TraceEvent) {
+        if self
+            .downrupt_due
+            .is_some_and(|downrupt_due| self.cycles >= downrupt_due)
+        {
+            self.downrupt_due = None;
+            self.request_interrupt_event(Interrupt::Downrupt, event);
+        }
+    }
+
+    fn service_handrupt_traps(&mut self, event: &mut TraceEvent) {
+        let channel31 = self
+            .memory
+            .read_channel(ChannelAddress::new(0o31).expect("channel 31 is valid"))
+            .raw();
+        let channel32 = self
+            .memory
+            .read_channel(ChannelAddress::new(0o32).expect("channel 32 is valid"))
+            .raw();
+        let mut triggered = false;
+        if self.trap_31a && channel31 & 0o000077 != 0o000077 {
+            self.trap_31a = false;
+            triggered = true;
+        }
+        if self.trap_31b && channel31 & 0o007700 != 0o007700 {
+            self.trap_31b = false;
+            triggered = true;
+        }
+        if self.trap_32 && channel32 & 0o001777 != 0o001777 {
+            self.trap_32 = false;
+            triggered = true;
+        }
+        if triggered {
+            self.request_interrupt_event(Interrupt::Handrupt, event);
+        }
+    }
+
     fn read_word(&mut self, address: u16, event: &mut TraceEvent) -> Result<AgcWord, CpuError> {
         let access = self.memory.read(address, AccessKind::Read)?;
+        let value = access.value;
+        event.memory.push(memory_event(access));
+        Ok(value)
+    }
+
+    fn read_word_and_edit(
+        &mut self,
+        address: u16,
+        event: &mut TraceEvent,
+    ) -> Result<AgcWord, CpuError> {
+        let access = self.memory.read_and_edit(address, AccessKind::Read)?;
         let value = access.value;
         event.memory.push(memory_event(access));
         Ok(value)
@@ -891,7 +1114,22 @@ impl Cpu {
         event: &mut TraceEvent,
     ) -> Result<AgcRegister, CpuError> {
         let access = self.memory.read(address, AccessKind::Read)?;
-        let value = if address < 0o20 {
+        let value = if address < register::EB {
+            self.memory.central_register(address)?
+        } else {
+            access.value.sign_extend()
+        };
+        event.memory.push(memory_event(access));
+        Ok(value)
+    }
+
+    fn read_register_operand_and_edit(
+        &mut self,
+        address: u16,
+        event: &mut TraceEvent,
+    ) -> Result<AgcRegister, CpuError> {
+        let access = self.memory.read_and_edit(address, AccessKind::Read)?;
+        let value = if address < register::EB {
             self.memory.central_register(address)?
         } else {
             access.value.sign_extend()
@@ -922,7 +1160,7 @@ impl Cpu {
         event: &mut TraceEvent,
         watchpoint: &mut Option<u16>,
     ) -> Result<(), CpuError> {
-        if address < 0o20 {
+        if address < register::EB {
             self.memory.set_central_register(address, value)?;
             let mut access = self.memory.read(address, AccessKind::Read)?;
             access.kind = AccessKind::Write;
@@ -952,17 +1190,40 @@ impl Cpu {
     fn write_channel(
         &mut self,
         channel: u16,
-        value: AgcWord,
+        mut value: AgcWord,
         event: &mut TraceEvent,
     ) -> Result<(), CpuError> {
         let channel_address =
             ChannelAddress::new(channel).map_err(|_| MemoryError::AddressOutOfRange(channel))?;
+        match channel {
+            0o13 => {
+                self.trap_31a |= value.raw() & 0o004000 != 0;
+                self.trap_31b |= value.raw() & 0o010000 != 0;
+                self.trap_32 |= value.raw() & 0o020000 != 0;
+                value = AgcWord::from_raw_truncate(value.raw() & 0o043777);
+            }
+            0o33 => {
+                let current = self.memory.read_channel(channel_address);
+                value = AgcWord::from_raw_truncate(current.raw() | 0o076000);
+            }
+            0o77 => value = AgcWord::POSITIVE_ZERO,
+            _ => {}
+        }
         self.memory.write_channel(channel_address, value);
         event.io.push(IoEvent {
             write: true,
             channel,
             value,
         });
+        match channel {
+            0o34 => self.downlink_words |= 1,
+            0o35 => self.downlink_words |= 2,
+            _ => {}
+        }
+        if self.downlink_words == 3 {
+            self.downlink_words = 0;
+            self.schedule_downrupt = true;
+        }
         Ok(())
     }
 
@@ -1002,13 +1263,6 @@ impl Cpu {
         self.memory
             .central_register(register::L)
             .expect("L register exists")
-    }
-
-    fn l_word(&self) -> AgcWord {
-        self.memory
-            .central_register(register::L)
-            .expect("L register exists")
-            .overflow_correct()
     }
 
     fn set_a_raw(&mut self, raw: u16) {
@@ -1106,6 +1360,143 @@ fn add_double_precision_carry(high: AgcRegister, low: AgcRegister) -> AgcRegiste
     }
 }
 
+fn counter_pinc(value: AgcWord) -> (AgcWord, bool) {
+    match value.raw() {
+        0o37777 => (AgcWord::POSITIVE_ZERO, true),
+        0o77777 => (AgcWord::from_raw_truncate(1), false),
+        raw => (AgcWord::from_raw_truncate(raw.wrapping_add(1)), false),
+    }
+}
+
+fn overflow_correct_raw(value: u16) -> AgcWord {
+    AgcWord::from_raw_truncate((value & 0o37777) | ((value >> 1) & 0o40000))
+}
+
+fn sign_extend_raw(value: u16) -> u16 {
+    let word = value & 0o77777;
+    word | ((word << 1) & 0o100000)
+}
+
+fn add_sp16(lhs: u16, rhs: u16) -> u16 {
+    let mut sum = u32::from(lhs) + u32::from(rhs);
+    if sum & 0o200000 != 0 {
+        sum = (sum + 1) & 0o177777;
+    }
+    sum as u16
+}
+
+fn absolute_sp(value: u16) -> u16 {
+    if value & 0o40000 != 0 {
+        !value & 0o77777
+    } else {
+        value & 0o77777
+    }
+}
+
+fn normalize_double(a_raw: u16, l_raw: u16) -> (u16, u16, u32) {
+    let decent = sp_to_decent(overflow_correct_raw(a_raw).raw(), l_raw);
+    let sign = decent & 0o4_000_000_000 != 0;
+    let low = (decent as u16 & 0o37777) | if sign { 0o40000 } else { 0 };
+    let high = overflow_correct_raw(((decent >> 14) as u16) & 0o177777).raw();
+    (high, low, decent)
+}
+
+fn sp_to_decent(mut high: u16, mut low: u16) -> u32 {
+    if matches!(high, 0 | 0o77777) {
+        let mut value = u32::from(sign_extend_raw(low));
+        if value & 0o100000 != 0 {
+            value |= !0o177777_u32;
+        }
+        return value & 0o7_777_777_777;
+    }
+    if low & 0o40000 != high & 0o40000 {
+        if matches!(low, 0 | 0o77777) {
+            low = if high & 0o40000 == 0 { 0 } else { 0o77777 };
+        } else {
+            let complement = high & 0o40000 != 0;
+            if complement {
+                high = !high & 0o77777;
+                low = !low & 0o77777;
+            }
+            high = high.wrapping_sub(1);
+            low = low.wrapping_add(0o40001) & 0o77777;
+            if complement {
+                high = !high & 0o77777;
+                low = !low & 0o77777;
+            }
+        }
+    }
+    let mut value = (0o3_777_740_000 & (u32::from(high) << 14)) | u32::from(low & 0o37777);
+    if value & 0o2_000_000_000 != 0 {
+        value |= 0o4_000_000_000;
+    }
+    value
+}
+
+fn agc_double_to_i64(value: u32) -> i64 {
+    if value & 0o2_000_000_000 != 0 {
+        -i64::from((!value) & 0o1_777_777_777)
+    } else {
+        i64::from(value & 0o1_777_777_777)
+    }
+}
+
+fn simulate_divide(a_raw: u16, l_raw: u16, mut divisor: u16) -> (u16, u16) {
+    let mut a = a_raw;
+    let mut l = l_raw;
+    let mut dividend_sign = a & 0o100000;
+    if dividend_sign == 0 {
+        a = !a;
+    }
+    if a == 0o177777 {
+        dividend_sign = l & 0o100000;
+    }
+    if dividend_sign != 0 {
+        l = !l;
+    }
+    l = add_sp16(l, 0o40000);
+    if register_overflow_sign(l) != 1 {
+        a = add_sp16(a, 1);
+    }
+    let mut remainder = a;
+
+    let divisor_sign = divisor & 0o100000;
+    if divisor_sign != 0 {
+        divisor = !divisor;
+    }
+    let quotient_sign = l & 0o100000;
+    let mut quotient = quotient_sign | ((l & 0o37777) << 1) | (quotient_sign >> 15);
+    for _ in 0..14 {
+        quotient = quotient.wrapping_shl(1);
+        let remainder_sign = remainder & 0o100000;
+        remainder = remainder_sign | ((remainder & 0o37777) << 1);
+        if quotient & 0o100000 == 0 {
+            remainder |= remainder_sign >> 15;
+        }
+        let sum = add_sp16(remainder, divisor);
+        if sum & 0o100000 != 0 {
+            quotient |= 1;
+            remainder = sum;
+        }
+    }
+    a = quotient_sign | (quotient & 0o77777);
+    let a = if dividend_sign != divisor_sign { !a } else { a };
+    let l = if dividend_sign != 0 {
+        remainder
+    } else {
+        !remainder
+    };
+    (a, l)
+}
+
+fn register_overflow_sign(value: u16) -> i8 {
+    match value & 0o140000 {
+        0o040000 => 1,
+        0o100000 => -1,
+        _ => 0,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1116,7 +1507,9 @@ mod tests {
         for (offset, &(mnemonic, operand)) in program.iter().enumerate() {
             rope[2 * 1024 + offset] = encode(mnemonic, operand).unwrap();
         }
-        Cpu::new(Memory::with_rope(rope).unwrap())
+        let mut cpu = Cpu::new(Memory::with_rope(rope).unwrap());
+        cpu.cancel_interrupt(Interrupt::Downrupt);
+        cpu
     }
 
     #[test]
@@ -1153,8 +1546,21 @@ mod tests {
         cpu.step().unwrap();
         cpu.request_interrupt(Interrupt::Time6);
         let outcome = cpu.step().unwrap();
-        assert_eq!(outcome.trace.pc, Interrupt::Time6.vector());
+        assert_eq!(outcome.trace.pc, 0o4001);
+        assert_eq!(outcome.trace.operand, Interrupt::Time6.vector());
+        assert_eq!(outcome.trace.kind, MachineEventKind::InterruptEntry);
+        assert_eq!(
+            outcome.kind,
+            StepKind::InterruptEntry {
+                interrupt: Some(Interrupt::Time6),
+                vector: Interrupt::Time6.vector(),
+            }
+        );
+        assert_eq!(cpu.program_counter(), Interrupt::Time6.vector());
+        assert_eq!(cpu.instructions(), 1);
+        assert_eq!(cpu.cycles(), 3);
         assert!(cpu.in_interrupt());
+        assert!(cpu.interrupt_enabled());
     }
 
     #[test]
@@ -1168,7 +1574,10 @@ mod tests {
             .unwrap();
         cpu.run(2).unwrap();
         assert_eq!(cpu.a_word(), AgcWord::from_i32(12).unwrap());
-        assert_eq!(cpu.l_word(), AgcWord::from_i32(-7).unwrap());
+        assert_eq!(
+            cpu.l_register().overflow_correct(),
+            AgcWord::from_i32(-7).unwrap()
+        );
     }
 
     #[test]
@@ -1184,7 +1593,10 @@ mod tests {
             .unwrap();
         cpu.step().unwrap();
         assert_eq!(cpu.a_word(), AgcWord::from_i32(8).unwrap());
-        assert_eq!(cpu.l_word(), AgcWord::from_i32(9).unwrap());
+        assert_eq!(
+            cpu.l_register().overflow_correct(),
+            AgcWord::from_i32(9).unwrap()
+        );
         assert_eq!(
             cpu.memory().read(0o77, AccessKind::Read).unwrap().value,
             AgcWord::from_i32(3).unwrap()
@@ -1213,6 +1625,7 @@ mod tests {
         rope[2 * 1024 + 1] = encode(Mnemonic::Tcf, 0o4001).unwrap();
         rope[2 * 1024 + 4] = encode(Mnemonic::Resume, 0).unwrap();
         let mut cpu = Cpu::new(Memory::with_rope(rope).unwrap());
+        cpu.cancel_interrupt(Interrupt::Downrupt);
         cpu.step().unwrap();
         cpu.request_interrupt(Interrupt::Time6);
         cpu.memory_mut()
@@ -1223,10 +1636,18 @@ mod tests {
             .unwrap();
         cpu.step().unwrap();
         assert_eq!(cpu.central_register(register::Q).unwrap().raw(), 0o4321);
+        let handler = cpu.step().unwrap();
+        assert_eq!(
+            handler.kind,
+            StepKind::Instruction(decode(encode(Mnemonic::Resume, 0).unwrap(), false,))
+        );
         let resumed = cpu.step().unwrap();
         assert_eq!(resumed.trace.pc, 0o4001);
         assert_eq!(resumed.trace.memory[0].logical, register::BRUPT);
-        assert_eq!(resumed.instruction.mnemonic, Mnemonic::Tcf);
+        assert_eq!(
+            resumed.kind,
+            StepKind::Instruction(decode(encode(Mnemonic::Tcf, 0o4001).unwrap(), false,))
+        );
         assert_eq!(cpu.program_counter(), 0o4001);
         assert_eq!(cpu.central_register(register::Q).unwrap().raw(), 0o4321);
     }
@@ -1264,11 +1685,24 @@ mod tests {
         cpu.request_interrupt(Interrupt::Downrupt);
         cpu.step().unwrap();
         cpu.step().unwrap();
+        cpu.step().unwrap();
+        let entry = cpu.step().unwrap();
+        assert_eq!(entry.trace.pc, 0o4001);
+        assert_eq!(entry.trace.memory[0].logical, register::BRUPT);
+        assert_eq!(
+            entry.kind,
+            StepKind::InterruptEntry {
+                interrupt: Some(Interrupt::Downrupt),
+                vector: Interrupt::Downrupt.vector(),
+            }
+        );
         let nested = cpu.step().unwrap();
         assert_eq!(nested.trace.pc, Interrupt::Downrupt.vector());
         assert_eq!(nested.trace.memory[0].logical, Interrupt::Downrupt.vector());
-        assert_eq!(nested.instruction.mnemonic, Mnemonic::Tcf);
-        assert_eq!(nested.instruction.operand, 0o4321);
+        assert_eq!(
+            nested.kind,
+            StepKind::Instruction(decode(encode(Mnemonic::Tcf, 0o4321).unwrap(), false,))
+        );
         assert_eq!(
             cpu.central_register(register::BRUPT)
                 .unwrap()

@@ -154,6 +154,9 @@ enum Command {
         /// Optional output JSON.
         #[arg(long)]
         output: Option<PathBuf>,
+        /// Optional JSON-lines architectural trace.
+        #[arg(long)]
+        trace: Option<PathBuf>,
         /// Optional rope fault as BANK:OFFSET:MASK in octal.
         #[arg(long)]
         rope_fault: Option<String>,
@@ -412,6 +415,7 @@ fn run(cli: Cli) -> Result<()> {
             format,
             instructions,
             output,
+            trace,
             rope_fault,
         } => run_mission(
             &resolve_from(&repository, &rope),
@@ -420,6 +424,7 @@ fn run(cli: Cli) -> Result<()> {
             output
                 .as_deref()
                 .map(|path| resolve_from(&repository, path)),
+            trace.as_deref().map(|path| resolve_from(&repository, path)),
             rope_fault.as_deref(),
         ),
         Command::Dsky {
@@ -591,6 +596,7 @@ fn run_mission(
     format: RopeFormat,
     instructions: Option<u64>,
     output: Option<PathBuf>,
+    trace: Option<PathBuf>,
     rope_fault: Option<&str>,
 ) -> Result<()> {
     let image = load_file(rope, format)?;
@@ -611,6 +617,14 @@ fn run_mission(
         scenario.instruction_limit = instructions;
     }
     let run = controller.run(&scenario)?;
+    if let Some(path) = trace {
+        ensure_parent(&path)?;
+        let file = fs::File::create(&path).with_context(|| format!("create {}", path.display()))?;
+        controller
+            .runtime()
+            .trace()
+            .write_json_lines(BufWriter::new(file))?;
+    }
     println!("{}", run.final_dsky.render_text());
     println!(
         "mission {}: {} instructions, {} cycles, {} real-state frames, {} faults",

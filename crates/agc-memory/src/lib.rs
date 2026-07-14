@@ -218,19 +218,7 @@ impl Memory {
     /// Reads a logical word and returns the resolved access record.
     pub fn read(&self, logical: u16, kind: AccessKind) -> Result<MemoryAccess, MemoryError> {
         let physical = self.translate(logical)?;
-        let value = match physical {
-            PhysicalAddress::Register { index } => self.read_special(index),
-            PhysicalAddress::Erasable { bank, offset } => {
-                self.erasable[usize::from(bank) * ERASABLE_WORDS_PER_BANK + usize::from(offset)]
-            }
-            PhysicalAddress::Fixed { bank, offset } => {
-                let bank = usize::from(bank);
-                if bank >= FIXED_BANKS {
-                    return Err(MemoryError::FixedBankUnavailable(bank as u8));
-                }
-                self.fixed[bank * FIXED_WORDS_PER_BANK + usize::from(offset)]
-            }
-        };
+        let value = self.read_physical(physical)?;
         Ok(MemoryAccess {
             kind,
             logical,
@@ -239,11 +227,36 @@ impl Memory {
         })
     }
 
+    /// Performs a CPU operand read, including the read-and-rewrite cycle of
+    /// the four editing registers. The returned access contains the value
+    /// before the edit; subsequent reads observe the transformed value.
+    pub fn read_and_edit(
+        &mut self,
+        logical: u16,
+        kind: AccessKind,
+    ) -> Result<MemoryAccess, MemoryError> {
+        let access = self.read(logical, kind)?;
+        let edit_index = match access.physical {
+            PhysicalAddress::Register { index } if (0o20..=0o23).contains(&index) => Some(index),
+            PhysicalAddress::Erasable { bank: 0, offset } if (0o20..=0o23).contains(&offset) => {
+                Some(offset)
+            }
+            _ => None,
+        };
+        if let Some(index) = edit_index {
+            self.write_special(index, access.value);
+        }
+        Ok(access)
+    }
+
     /// Writes a logical erasable word and returns the resolved access record.
     pub fn write(&mut self, logical: u16, value: AgcWord) -> Result<MemoryAccess, MemoryError> {
         let physical = self.translate(logical)?;
         match physical {
             PhysicalAddress::Register { index } => self.write_special(index, value),
+            PhysicalAddress::Erasable { bank: 0, offset } if offset <= 0o60 => {
+                self.write_special(offset, value);
+            }
             PhysicalAddress::Erasable { bank, offset } => {
                 self.erasable[usize::from(bank) * ERASABLE_WORDS_PER_BANK + usize::from(offset)] =
                     value;
@@ -254,7 +267,7 @@ impl Memory {
             kind: AccessKind::Write,
             logical,
             physical,
-            value: self.read(logical, AccessKind::Read)?.value,
+            value: self.read_physical(physical)?,
         })
     }
 
@@ -328,9 +341,14 @@ impl Memory {
 
     /// Reads physical erasable memory for diagnostics and fault injection.
     pub fn read_erasable_physical(&self, bank: u8, offset: u16) -> Option<AgcWord> {
-        (usize::from(bank) < ERASABLE_BANKS && usize::from(offset) < ERASABLE_WORDS_PER_BANK).then(
-            || self.erasable[usize::from(bank) * ERASABLE_WORDS_PER_BANK + usize::from(offset)],
-        )
+        if usize::from(bank) >= ERASABLE_BANKS || usize::from(offset) >= ERASABLE_WORDS_PER_BANK {
+            return None;
+        }
+        Some(if bank == 0 && offset <= 0o60 {
+            self.read_special(offset)
+        } else {
+            self.erasable[usize::from(bank) * ERASABLE_WORDS_PER_BANK + usize::from(offset)]
+        })
     }
 
     /// Writes physical erasable memory for deterministic initialization.
@@ -345,7 +363,12 @@ impl Memory {
                 (u16::from(bank) << 8) | offset,
             ));
         }
-        self.erasable[usize::from(bank) * ERASABLE_WORDS_PER_BANK + usize::from(offset)] = value;
+        if bank == 0 && offset <= 0o60 {
+            self.write_special(offset, value);
+        } else {
+            self.erasable[usize::from(bank) * ERASABLE_WORDS_PER_BANK + usize::from(offset)] =
+                value;
+        }
         Ok(())
     }
 
@@ -374,6 +397,25 @@ impl Memory {
         }
     }
 
+    fn read_physical(&self, physical: PhysicalAddress) -> Result<AgcWord, MemoryError> {
+        match physical {
+            PhysicalAddress::Register { index } => Ok(self.read_special(index)),
+            PhysicalAddress::Erasable { bank: 0, offset } if offset <= 0o60 => {
+                Ok(self.read_special(offset))
+            }
+            PhysicalAddress::Erasable { bank, offset } => Ok(
+                self.erasable[usize::from(bank) * ERASABLE_WORDS_PER_BANK + usize::from(offset)]
+            ),
+            PhysicalAddress::Fixed { bank, offset } => {
+                let bank_index = usize::from(bank);
+                if bank_index >= FIXED_BANKS {
+                    return Err(MemoryError::FixedBankUnavailable(bank));
+                }
+                Ok(self.fixed[bank_index * FIXED_WORDS_PER_BANK + usize::from(offset)])
+            }
+        }
+    }
+
     fn read_special(&self, index: u16) -> AgcWord {
         match index {
             register::A | register::L | register::Q => {
@@ -395,7 +437,10 @@ impl Memory {
             0o23 => self.central[index as usize] = (value.raw() >> 7) & 0o177,
             0o24..=0o60 => self.central[index as usize] = value.raw(),
             register::ZERO => {}
-            index if index < 16 => self.write_central_raw(index, value.sign_extend().raw()),
+            register::A | register::L | register::Q => {
+                self.write_central_raw(index, value.sign_extend().raw());
+            }
+            index if index < 0o20 => self.write_central_raw(index, value.raw()),
             _ => self.central[index as usize] = value.raw(),
         }
     }
@@ -502,6 +547,42 @@ mod tests {
     }
 
     #[test]
+    fn editing_registers_transform_again_on_operand_read() {
+        let mut memory = Memory::blank();
+        memory
+            .write(0o20, AgcWord::try_from_raw(0o152).unwrap())
+            .unwrap();
+        assert_eq!(
+            memory.read(0o20, AccessKind::Read).unwrap().value.raw(),
+            0o65
+        );
+
+        let access = memory.read_and_edit(0o20, AccessKind::Read).unwrap();
+
+        assert_eq!(access.value.raw(), 0o65);
+        assert_eq!(
+            memory.read(0o20, AccessKind::Read).unwrap().value.raw(),
+            0o40032
+        );
+    }
+
+    #[test]
+    fn bank_zero_edit_register_alias_transforms_on_operand_read() {
+        let mut memory = Memory::blank();
+        memory
+            .write(0o20, AgcWord::try_from_raw(0o152).unwrap())
+            .unwrap();
+
+        let access = memory.read_and_edit(0o1420, AccessKind::Read).unwrap();
+
+        assert_eq!(access.value.raw(), 0o65);
+        assert_eq!(
+            memory.read(0o20, AccessKind::Read).unwrap().value.raw(),
+            0o40032
+        );
+    }
+
+    #[test]
     fn l_register_preserves_sign_extension() {
         let mut memory = Memory::blank();
         let negative = AgcWord::from_i32(-7).unwrap();
@@ -526,6 +607,83 @@ mod tests {
         assert_eq!(
             memory.central_register(register::L).unwrap(),
             negative.sign_extend()
+        );
+    }
+
+    #[test]
+    fn bank_zero_window_aliases_central_and_timer_registers() {
+        let mut memory = Memory::blank();
+        let first = AgcWord::try_from_raw(0o151).unwrap();
+        let second = AgcWord::try_from_raw(0o252).unwrap();
+
+        memory.write(0o25, first).unwrap();
+        let window_read = memory.read(0o1425, AccessKind::Read).unwrap();
+        assert_eq!(
+            window_read.physical,
+            PhysicalAddress::Erasable {
+                bank: 0,
+                offset: 0o25
+            }
+        );
+        assert_eq!(window_read.value, first);
+
+        memory.write(0o1425, second).unwrap();
+        assert_eq!(memory.read(0o25, AccessKind::Read).unwrap().value, second);
+        assert_eq!(memory.read_erasable_physical(0, 0o25), Some(second));
+    }
+
+    #[test]
+    fn physical_bank_zero_writes_alias_special_registers() {
+        let mut memory = Memory::blank();
+        let value = AgcWord::try_from_raw(0o321).unwrap();
+
+        memory.write_erasable_physical(0, 0o25, value).unwrap();
+
+        assert_eq!(memory.read(0o25, AccessKind::Read).unwrap().value, value);
+        assert_eq!(memory.read(0o1425, AccessKind::Read).unwrap().value, value);
+    }
+
+    #[test]
+    fn nonzero_erasable_banks_do_not_alias_central_registers() {
+        let mut memory = Memory::blank();
+        let central = AgcWord::try_from_raw(0o151).unwrap();
+        let banked = AgcWord::try_from_raw(0o252).unwrap();
+        memory.write(0o25, central).unwrap();
+        memory
+            .write(register::EB, AgcWord::try_from_raw(0o400).unwrap())
+            .unwrap();
+
+        memory.write(0o1425, banked).unwrap();
+
+        assert_eq!(memory.read(0o25, AccessKind::Read).unwrap().value, central);
+        assert_eq!(memory.read_erasable_physical(1, 0o25), Some(banked));
+    }
+
+    #[test]
+    fn bank_zero_alias_write_reports_original_physical_location() {
+        let mut memory = Memory::blank();
+        let access = memory
+            .write(0o1403, AgcWord::try_from_raw(0o1400).unwrap())
+            .unwrap();
+
+        assert_eq!(
+            access.physical,
+            PhysicalAddress::Erasable { bank: 0, offset: 3 }
+        );
+        assert_eq!(access.value.raw(), 0o1400);
+        assert_eq!(memory.ebank(), 3);
+    }
+
+    #[test]
+    fn ordinary_shadow_register_writes_remain_fifteen_bit() {
+        let mut memory = Memory::blank();
+        let negative = AgcWord::from_i32(-7).unwrap();
+
+        memory.write(register::ARUPT, negative).unwrap();
+
+        assert_eq!(
+            memory.central_register(register::ARUPT).unwrap().raw(),
+            negative.raw()
         );
     }
 
