@@ -92,6 +92,16 @@ cargo run --release -p apollors-cli -- --repository . mission \
   --trace /tmp/apollors-p63-trace.jsonl
 ```
 
+Run the paired nominal/faulted P63 experiment:
+
+```sh
+cargo run --release -p apollors-cli -- --repository . fault-campaign \
+  --rope artifacts/generated/luminary099-reference.bin \
+  --at-instruction 145715 --rope-fault 32:0776:00001 \
+  --instructions 180000 \
+  --output artifacts/generated/luminary099-p63-rope-fault.json
+```
+
 The independent trace procedure and exact VirtualAGC patch are documented in
 [`docs/validation/yaagc-reference.md`](docs/validation/yaagc-reference.md).
 
@@ -102,6 +112,8 @@ The independent trace procedure and exact VirtualAGC patch are documented in
 - `artifacts/generated/comanche055-reference-build.json` — binsource bank checks.
 - `artifacts/generated/luminary099-p63-run.json` — P63 entry evidence and frames.
 - `artifacts/generated/luminary099-p63-vs-yaagc.json` — exact matched-prefix report.
+- `artifacts/generated/luminary099-p63-rope-fault.json` — paired P63-entry
+  rope-fault campaign with exact divergence and bounded non-recovery evidence.
 - `docs/research/reference-and-originality.md` — inspected projects, commits,
   licenses, adaptation boundary, and original ApolloRS work.
 - `paper/README.md` — concise manuscript with measured results and limitations.

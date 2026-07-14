@@ -8,6 +8,7 @@ use petgraph::algo::kosaraju_scc;
 use petgraph::graph::{DiGraph, NodeIndex};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use std::fmt::Write as _;
 
 /// Serializable directed graph with stable node and edge order.
 #[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
@@ -23,10 +24,10 @@ impl GraphArtifact {
     pub fn to_dot(&self, name: &str) -> String {
         let mut output = format!("digraph \"{}\" {{\n", escape(name));
         for (index, node) in self.nodes.iter().enumerate() {
-            output.push_str(&format!("  n{index} [label=\"{}\"];\n", escape(node)));
+            let _ = writeln!(output, "  n{index} [label=\"{}\"];", escape(node));
         }
         for (from, to) in &self.edges {
-            output.push_str(&format!("  n{from} -> n{to};\n"));
+            let _ = writeln!(output, "  n{from} -> n{to};");
         }
         output.push_str("}\n");
         output
@@ -81,18 +82,16 @@ pub fn call_graph(ir: &ProgramIr, symbols: &SymbolTable) -> GraphArtifact {
     let mut current_label = None;
     let mut edges = Vec::new();
     for record in &ir.records {
-        if let Some(label) = &record.label {
-            if indices.contains_key(label) {
-                current_label = Some(label.as_str());
-            }
+        if let Some(label) = &record.label
+            && indices.contains_key(label)
+        {
+            current_label = Some(label.as_str());
         }
-        if matches!(record.operation.as_str(), "TC" | "TCR" | "CALL" | "CCALL") {
-            if let (Some(from), Operand::Symbol { name: to, .. }) = (current_label, &record.operand)
-            {
-                if let (Some(&from), Some(&to)) = (indices.get(from), indices.get(to)) {
-                    edges.push((from, to));
-                }
-            }
+        if matches!(record.operation.as_str(), "TC" | "TCR" | "CALL" | "CCALL")
+            && let (Some(from), Operand::Symbol { name: to, .. }) = (current_label, &record.operand)
+            && let (Some(&from), Some(&to)) = (indices.get(from), indices.get(to))
+        {
+            edges.push((from, to));
         }
     }
     edges.sort_unstable();

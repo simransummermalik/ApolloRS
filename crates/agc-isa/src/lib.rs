@@ -323,6 +323,7 @@ pub fn encode(mnemonic: Mnemonic, operand: u16) -> Result<AgcWord, EncodeError> 
 
 /// Encodes an instruction with explicit extended context. This distinction is
 /// required for `INDEX`, whose extended form has a wider K field.
+#[allow(clippy::match_same_arms)]
 pub fn encode_with_context(
     mnemonic: Mnemonic,
     operand: u16,

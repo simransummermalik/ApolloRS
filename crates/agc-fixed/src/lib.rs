@@ -86,13 +86,13 @@ mod tests {
     fn scale_is_type_checked_and_zero_is_preserved() {
         let minus_zero = Fraction::from_word(AgcWord::NEGATIVE_ZERO).unwrap();
         assert!(minus_zero.word().is_negative_zero());
-        assert_eq!(minus_zero.to_f64(), 0.0);
+        assert!(minus_zero.to_f64().abs() < f64::EPSILON);
         assert!(AgcFixed::<15>::from_word(AgcWord::POSITIVE_ZERO).is_err());
     }
 
     #[test]
     fn fixed_addition_uses_agc_arithmetic() {
         let quarter = Fraction::from_scaled_integer(0o10_000).unwrap();
-        assert_eq!(quarter.wrapping_add(quarter).to_f64(), 0.5);
+        assert!((quarter.wrapping_add(quarter).to_f64() - 0.5).abs() < f64::EPSILON);
     }
 }

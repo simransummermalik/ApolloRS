@@ -4,7 +4,7 @@
   "provenance": {
     "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
     "reference_toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff; yaYUL 20260713",
-    "apollors_commit": "e5b520896d2544933273ac54415b79b29b5a7b61-dirty",
+    "apollors_commit": "69519363cdb26e1475e20455752c87fb4bbe1299-dirty",
     "input_hashes": [
       "Comanche055/AGC_BLOCK_TWO_SELF-CHECK.agc=f86f1a02856b29a2cd01186a1a807fe4455b576624f8c4cb5876408677c83868",
       "Comanche055/ALARM_AND_ABORT.agc=ffa2e17087ed8029c2d56018114c4c947d9c3d03e6b15b0b17b11c8fc24a2d0f",
@@ -184,8 +184,8 @@
       "apollors_trace=4e7f0f29abf8d55a979e04faad8fb6454fa2f235d2e89c92e9c4693fc3604853",
       "yaagc_reference_trace=6b429c0eee39ea2286910c974766d8555f283f873bef9c6d6c5f000604594e07"
     ],
-    "generation_command": "cargo run -p apollors-cli -- validate-reference --apollors /tmp/apollors-p63-lm5-padload-trace.jsonl --reference /tmp/yaagc-exact-trace.tsv --allow-prefix",
-    "generated_at": "2026-07-14T08:04:15Z",
+    "generation_command": "cargo run -p apollors-cli -- validate-reference --apollors /tmp/apollors-p63-lm5-padload-trace.jsonl --reference /tmp/yaagc-exact-trace.tsv --allow-prefix --output /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-p63-vs-yaagc.json",
+    "generated_at": "2026-07-14T17:49:46Z",
     "known_limitations": [
       "The exact yaAGC instrumentation observes instruction/interrupt kind, cycle, PC, instruction, A/L/Q, EB/FB/BB, and interrupt vector/number; it does not compare every peripheral or memory cell.",
       "A qualified common-prefix result means every event in the shorter stream matched; it does not claim that the longer stream was exhausted."

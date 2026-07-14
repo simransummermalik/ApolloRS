@@ -11,6 +11,7 @@ use chrono::{DateTime, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
+use std::fmt::Write as _;
 use std::fs;
 use std::io::{self, Read};
 use std::path::{Path, PathBuf};
@@ -27,7 +28,7 @@ pub struct Provenance {
     pub historical_commit: String,
     /// Pinned external reference identifier.
     pub reference_toolchain: String,
-    /// ApolloRS commit or explicit dirty-worktree marker.
+    /// `ApolloRS` commit or explicit dirty-worktree marker.
     pub apollors_commit: String,
     /// Sorted input `path=sha256` records.
     pub input_hashes: Vec<String>,
@@ -241,7 +242,7 @@ pub fn file_sha256(path: impl AsRef<Path>) -> Result<String, ReportError> {
         source,
     })?;
     let mut digest = Sha256::new();
-    let mut buffer = [0_u8; 64 * 1024];
+    let mut buffer = vec![0_u8; 64 * 1024].into_boxed_slice();
     loop {
         let bytes = file.read(&mut buffer).map_err(|source| ReportError::Io {
             path: path.to_path_buf(),
@@ -306,8 +307,9 @@ pub fn render_evaluation_markdown(rows: &[EvaluationRow]) -> String {
          |---|---:|---:|---:|---:|:---:|---:|\n",
     );
     for row in rows {
-        output.push_str(&format!(
-            "| {} | {} | {} | {} | {} | {} | {} |\n",
+        let _ = writeln!(
+            output,
+            "| {} | {} | {} | {} | {} | {} | {} |",
             row.scenario.replace('|', "\\|"),
             row.instructions,
             row.cycles,
@@ -317,7 +319,7 @@ pub fn render_evaluation_markdown(rows: &[EvaluationRow]) -> String {
                 .map_or("not run".to_owned(), |value| value.to_string()),
             row.first_divergence
                 .map_or("—".to_owned(), |value| value.to_string())
-        ));
+        );
     }
     output
 }
@@ -413,8 +415,10 @@ fn repository_revision(root: &Path) -> String {
         .output()
         .ok()
         .filter(|output| output.status.success())
-        .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_owned())
-        .unwrap_or_else(|| "unversioned".to_owned());
+        .map_or_else(
+            || "unversioned".to_owned(),
+            |output| String::from_utf8_lossy(&output.stdout).trim().to_owned(),
+        );
     let dirty = Command::new("git")
         .args([
             "-C",

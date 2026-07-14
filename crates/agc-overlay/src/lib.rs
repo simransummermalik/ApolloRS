@@ -305,10 +305,11 @@ impl Overlay {
             output.push_str(ending);
         }
         if matched.len() != edits.len() {
-            let missing = edits
-                .keys()
-                .find(|line| !matched.contains(line))
-                .expect("edit count differs only when a line is missing");
+            let Some(missing) = edits.keys().find(|line| !matched.contains(line)) else {
+                return Err(OverlayError::Invalid(format!(
+                    "source edit accounting failed for {relative_path}"
+                )));
+            };
             return Err(OverlayError::Invalid(format!(
                 "source edit {relative_path}:{missing} lies beyond end of file"
             )));

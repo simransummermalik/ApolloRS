@@ -45,21 +45,13 @@ impl SymbolValue {
             Self::Fixed { bank: 3, offset } => Some(0o6000 | offset),
             Self::Fixed { offset, .. } => Some(0o2000 | offset),
             Self::Erasable {
-                bank: 0..=2,
+                bank: bank @ 0..=2,
                 offset,
-            } => Some((self.erasable_bank().unwrap() as u16) << 8 | offset),
+            } => Some((bank as u16) << 8 | offset),
             Self::Erasable { offset, .. } => Some(0o1400 | offset),
             Self::Constant { value } => Some(value.raw() & 0o7777),
             Self::Absolute { value } if value >= 0 && value <= 0o7777 => Some(value as u16),
-            _ => None,
-        }
-    }
-
-    const fn erasable_bank(&self) -> Option<u8> {
-        if let Self::Erasable { bank, .. } = *self {
-            Some(bank)
-        } else {
-            None
+            Self::Absolute { .. } => None,
         }
     }
 }

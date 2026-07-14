@@ -53,6 +53,13 @@ and rope both selected decimal program 63. At `P63LM`, the rope initialized
 and order as the typed Rust model. Subsequent writes included TPIP, LAND, TTF/8,
 VGU, and RGU state.
 
+A paired fault experiment flips bit 0 of the `P63LM` rope word at physical
+`F32:0776` immediately before fetch. The first mismatch is a decode divergence
+at event 145,942 (`05353` versus `05352`). The nominal arm begins landing
+guidance; the faulted arm does not, and their registers have not reconverged at
+the shared 180,000-instruction horizon. This is bounded detection and
+non-recovery evidence, not a hardware fault-rate or general recovery claim.
+
 The exact comparison covers event kind, normalized cycle, PC, instruction,
 A/L/Q, EB/FB/BB, and interrupt vector/number. The result is a common-prefix
 claim because the reference was intentionally run longer.

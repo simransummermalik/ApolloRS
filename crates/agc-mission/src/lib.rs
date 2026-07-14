@@ -2,8 +2,8 @@
 //! Real-execution mission scenarios, synchronized DSKY state, and visualization frames.
 
 use agc_cpu::{Cpu, CpuError};
-use agc_dsky::{DskyState, Key, V37ProgramChange};
-use agc_faults::{Fault, FaultEngine, FaultError};
+use agc_dsky::{DskyState, V37ProgramChange};
+use agc_faults::{AppliedFault, Fault, FaultEngine, FaultError};
 use agc_interpreter::State as InterpreterState;
 use agc_loader::RopeImage;
 use agc_memory::MemoryError;
@@ -99,16 +99,12 @@ impl MissionScenario {
     /// Keypresses are separated so KEYRUPT and Pinball consume each one. The
     /// profile contains no scripted display or trajectory output; every frame
     /// comes from the loaded Luminary rope.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a source-transcribed pad-load word no longer fits the AGC's
+    /// 15-bit word width, which indicates a defect in this built-in fixture.
     pub fn luminary_p63_landing() -> Self {
-        let keys = [
-            Key::Verb,
-            Key::Digit(3),
-            Key::Digit(7),
-            Key::Enter,
-            Key::Digit(6),
-            Key::Digit(3),
-            Key::Enter,
-        ];
         Self {
             name: "apollo11-lm5-padload-p63-entry".to_owned(),
             instruction_limit: 1_000_000,
@@ -118,10 +114,8 @@ impl MissionScenario {
             dsky_sequence: Some(DskySequence {
                 start_cycle: 40_000,
                 minimum_gap_cycles: 32_768,
-                keys: keys
-                    .into_iter()
-                    .map(|key| key.code().expect("built-in DSKY key is valid"))
-                    .collect(),
+                // VERB 37 ENTER 63 ENTER, in channel-015 keyboard encoding.
+                keys: vec![0o21, 3, 7, 0o34, 6, 3, 0o34],
             }),
             guidance_variables: luminary_p63_variables(),
             observer: FlightSoftwareObserver::default(),
@@ -160,6 +154,7 @@ impl MissionScenario {
     }
 }
 
+#[allow(clippy::items_after_statements)]
 fn apollo11_lm5_p63_initialization() -> Vec<ErasableInitialization> {
     let mut words = Vec::new();
     words.push(ErasableInitialization {
@@ -525,6 +520,7 @@ pub struct AppliedInitialization {
 }
 
 /// Evidence required before calling a run a verified P63 request.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 pub struct MissionEvidence {
     /// Explicit pre-execution state changes; empty means no hidden setup.
@@ -577,6 +573,8 @@ pub struct MissionRun {
     pub cycles: u64,
     /// Fault audit trail length.
     pub faults_applied: usize,
+    /// Exact faults applied at runtime boundaries and their resulting words.
+    pub applied_faults: Vec<AppliedFault>,
     /// Trace-backed mission acceptance evidence.
     pub evidence: MissionEvidence,
 }
@@ -721,7 +719,7 @@ impl MissionController {
                     });
                 }
                 self.runtime
-                    .schedule(self.runtime.cpu().cycles(), input.event.clone());
+                    .schedule(self.runtime.cpu().cycles(), input.event);
                 input_index += 1;
             }
             if let Some(sequence) = &scenario.dsky_sequence
@@ -754,7 +752,11 @@ impl MissionController {
                 &mut p63_entry_values,
                 pinball_reconstruction.as_mut(),
             )?;
-            if self.runtime.cpu().instructions() % scenario.frame_interval == 0
+            if self
+                .runtime
+                .cpu()
+                .instructions()
+                .is_multiple_of(scenario.frame_interval)
                 && frames.last().is_none_or(|frame: &MissionFrame| {
                     frame.instruction != self.runtime.cpu().instructions()
                 })
@@ -822,6 +824,7 @@ impl MissionController {
             instructions: self.runtime.cpu().instructions(),
             cycles: self.runtime.cpu().cycles(),
             faults_applied: self.faults.applied.len(),
+            applied_faults: self.faults.applied.clone(),
             evidence,
         })
     }
@@ -869,7 +872,7 @@ impl MissionController {
 
         if evidence.program_63_selected.is_none()
             && self.runtime.cpu().memory().read_erasable_physical(2, 0o011)
-                == Some(AgcWord::try_from_raw(63).expect("63 is an AGC word"))
+                == Some(AgcWord::from_raw_truncate(63))
         {
             evidence.program_63_selected = Some(self.milestone("MODREG=63", trace));
         }
@@ -968,7 +971,7 @@ impl MissionController {
             self.runtime
                 .cpu()
                 .central_register(index)
-                .map(|value| value.raw())
+                .map(agc_word::AgcRegister::raw)
         };
         let guidance = self.guidance_values(scenario)?;
         Ok(MissionFrame {

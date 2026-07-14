@@ -111,6 +111,9 @@ pub enum MemoryError {
     /// A physical bank is not installed.
     #[error("fixed bank {0:#o} is not installed")]
     FixedBankUnavailable(u8),
+    /// A physical fixed-bank offset lies outside its 1024-word bank.
+    #[error("fixed-bank offset {0:#o} is outside a 1024-word bank")]
+    FixedOffsetOutOfRange(u16),
     /// Rope memory is read-only during execution.
     #[error("attempted write to fixed memory at logical address {0:#o}")]
     FixedWrite(u16),
@@ -381,8 +384,11 @@ impl Memory {
         offset: u16,
         mask: u16,
     ) -> Result<AgcWord, MemoryError> {
-        if usize::from(bank) >= FIXED_BANKS || usize::from(offset) >= FIXED_WORDS_PER_BANK {
+        if usize::from(bank) >= FIXED_BANKS {
             return Err(MemoryError::FixedBankUnavailable(bank));
+        }
+        if usize::from(offset) >= FIXED_WORDS_PER_BANK {
+            return Err(MemoryError::FixedOffsetOutOfRange(offset));
         }
         let index = usize::from(bank) * FIXED_WORDS_PER_BANK + usize::from(offset);
         self.fixed[index] = AgcWord::from_raw_truncate(self.fixed[index].raw() ^ mask);
@@ -692,7 +698,7 @@ mod tests {
     fn central_register_reads_overflow_correct_l() {
         let mut memory = Memory::blank();
         memory
-            .set_central_register(register::L, AgcRegister::try_from_raw(0o040000).unwrap())
+            .set_central_register(register::L, AgcRegister::try_from_raw(0o040_000).unwrap())
             .unwrap();
         assert_eq!(
             memory.read(register::L, AccessKind::Read).unwrap().value,
@@ -736,5 +742,18 @@ mod tests {
             0o100
         );
         assert!(memory.superbank());
+    }
+
+    #[test]
+    fn fixed_fault_reports_bank_and_offset_errors_separately() {
+        let mut memory = Memory::blank();
+        assert_eq!(
+            memory.inject_fixed_bit_flip(0o44, 0, 1),
+            Err(MemoryError::FixedBankUnavailable(0o44))
+        );
+        assert_eq!(
+            memory.inject_fixed_bit_flip(0o32, 0o2000, 1),
+            Err(MemoryError::FixedOffsetOutOfRange(0o2000))
+        );
     }
 }

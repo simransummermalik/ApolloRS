@@ -69,7 +69,7 @@ pub struct ValidationReport {
     pub equivalent: bool,
 }
 
-/// Event kind emitted by ApolloRS's pinned yaAGC instrumentation patch.
+/// Event kind emitted by `ApolloRS`'s pinned yaAGC instrumentation patch.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum YaAgcEventKind {
@@ -219,14 +219,14 @@ pub enum ReferenceTraceError {
     },
 }
 
-/// Auditable result of comparing ApolloRS against the yaAGC oracle subset.
+/// Auditable result of comparing `ApolloRS` against the yaAGC oracle subset.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ReferenceValidationReport {
     /// Report schema.
     pub schema_version: u32,
     /// Qualified external implementation.
     pub oracle: String,
-    /// ApolloRS events available.
+    /// `ApolloRS` events available.
     pub apollors_events: usize,
     /// yaAGC events available.
     pub reference_events: usize,
@@ -244,7 +244,7 @@ pub struct ReferenceValidationReport {
     pub timing_normalization: String,
 }
 
-/// Compares ApolloRS events with the exact yaAGC architectural TSV.
+/// Compares `ApolloRS` events with the exact yaAGC architectural TSV.
 ///
 /// If `allow_stream_prefix` is true, either shorter stream is accepted when
 /// every available event matches. The report remains explicitly incomplete.
@@ -353,8 +353,8 @@ pub fn differential_run(
     instructions: u64,
 ) -> Result<ValidationReport, ValidationError> {
     for (cycle, event) in events {
-        left.schedule(*cycle, event.clone());
-        right.schedule(*cycle, event.clone());
+        left.schedule(*cycle, *event);
+        right.schedule(*cycle, *event);
     }
     left.run(instructions)?;
     right.run(instructions)?;

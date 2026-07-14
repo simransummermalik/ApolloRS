@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-//! ApolloRS command-line research, execution, validation, and DSKY interface.
+//! `ApolloRS` command-line research, execution, validation, and DSKY interface.
 
 use agc_assembler::{
     AssemblyError, ReferenceAssemblerConfig, assemble, assemble_binsource_reference,
@@ -7,9 +7,9 @@ use agc_assembler::{
 };
 use agc_cpu::Cpu;
 use agc_dsky::{DskyState, Key};
-use agc_faults::Fault;
+use agc_faults::{Fault, compare_recovery};
 use agc_loader::{RopeFormat, load_file};
-use agc_mission::{MissionController, MissionScenario};
+use agc_mission::{MissionController, MissionRun, MissionScenario, compare_missions};
 use agc_overlay::Overlay;
 use agc_reports::{
     Envelope, Provenance, file_sha256, graph_envelope, inventory_corpus, memory_map, trace_summary,
@@ -92,13 +92,13 @@ enum Command {
         /// Pinned yaYUL executable; enables strict reference integration.
         #[arg(long, conflicts_with = "reference_binsource")]
         reference_yayul: Option<PathBuf>,
-        /// Independently proofed VirtualAGC octal listing, parsed and checked in Rust.
+        /// Independently proofed `VirtualAGC` octal listing, parsed and checked in Rust.
         #[arg(long, conflicts_with = "reference_yayul")]
         reference_binsource: Option<PathBuf>,
         /// Exact reference toolchain commit/version recorded in the report.
         #[arg(long)]
         reference_toolchain: Option<String>,
-        /// Ask yaYUL to emit despite its internal errors; ApolloRS still rejects them.
+        /// Ask yaYUL to emit despite its internal errors; `ApolloRS` still rejects them.
         #[arg(long, requires = "reference_yayul")]
         force_reference: bool,
         /// Output standard yaYUL-order rope image.
@@ -119,7 +119,7 @@ enum Command {
         #[arg(long)]
         trace: Option<PathBuf>,
     },
-    /// Compare two ApolloRS JSON-lines traces under the complete trace schema.
+    /// Compare two `ApolloRS` JSON-lines traces under the complete trace schema.
     Validate {
         #[arg(long)]
         left: PathBuf,
@@ -128,9 +128,9 @@ enum Command {
         #[arg(long)]
         output: Option<PathBuf>,
     },
-    /// Compare an ApolloRS JSON-lines trace with pinned yaAGC exact-trace TSV.
+    /// Compare an `ApolloRS` JSON-lines trace with pinned yaAGC exact-trace TSV.
     ValidateReference {
-        /// ApolloRS architectural JSON-lines trace.
+        /// `ApolloRS` architectural JSON-lines trace.
         #[arg(long)]
         apollors: PathBuf,
         /// Twelve-column exact yaAGC TSV from the documented instrumentation.
@@ -177,6 +177,25 @@ enum Command {
         /// Optional rope fault as BANK:OFFSET:MASK in octal.
         #[arg(long)]
         rope_fault: Option<String>,
+    },
+    /// Run paired nominal/faulted P63 scenarios and report exact divergence.
+    FaultCampaign {
+        #[arg(long)]
+        rope: PathBuf,
+        #[arg(long, value_enum, default_value = "yayul")]
+        format: FormatArg,
+        /// Instruction boundary at which the rope bit flip is applied.
+        #[arg(long)]
+        at_instruction: u64,
+        /// Rope fault as BANK:OFFSET:MASK in octal.
+        #[arg(long)]
+        rope_fault: String,
+        /// Shared mission instruction limit.
+        #[arg(long, default_value_t = 300_000)]
+        instructions: u64,
+        /// Provenance-bearing paired campaign report.
+        #[arg(long)]
+        output: PathBuf,
     },
     /// Run an interactive terminal DSKY/debugger against a real rope.
     Dsky {
@@ -245,6 +264,17 @@ impl From<FormatArg> for RopeFormat {
     }
 }
 
+impl FormatArg {
+    const fn as_str(self) -> &'static str {
+        match self {
+            Self::Yayul => "yayul",
+            Self::YayulParity => "yayul-parity",
+            Self::Hardware => "hardware",
+            Self::Physical => "physical",
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, ValueEnum)]
 enum StyleArg {
     Faithful,
@@ -257,6 +287,22 @@ impl From<StyleArg> for Style {
             StyleArg::Faithful => Self::Faithful,
             StyleArg::Structured => Self::Structured,
         }
+    }
+}
+
+impl StyleArg {
+    const fn as_str(self) -> &'static str {
+        match self {
+            Self::Faithful => "faithful",
+            Self::Structured => "structured",
+        }
+    }
+}
+
+const fn program_cli_name(program: Program) -> &'static str {
+    match program {
+        Program::Comanche055 => "comanche055",
+        Program::Luminary099 => "luminary099",
     }
 }
 
@@ -306,7 +352,7 @@ fn run(cli: Cli) -> Result<()> {
                     &corpus,
                     format!(
                         "cargo run -p apollors-cli -- parse {} --entry {} --output {}",
-                        program.directory(),
+                        program_cli_name(program),
                         entry,
                         path.display()
                     ),
@@ -352,24 +398,26 @@ fn run(cli: Cli) -> Result<()> {
                 let assembly =
                     assemble_reference(&corpus, program, &entry, overlay.as_ref(), &config)?;
                 write_bytes(&output, &assembly.rope)?;
-                let report = report
-                    .map(|path| resolve_from(&repository, &path))
-                    .unwrap_or_else(|| output.with_extension("build.json"));
+                let report = report.map_or_else(
+                    || output.with_extension("build.json"),
+                    |path| resolve_from(&repository, &path),
+                );
                 let mut provenance = capture_provenance(
                     &repository,
                     &corpus,
                     format!(
-                        "cargo run -p apollors-cli -- assemble {} --entry {} --reference-yayul {} --output {}",
-                        program.directory(),
+                        "cargo run -p apollors-cli -- assemble {} --entry {} --reference-yayul {} --output {} --report {}",
+                        program_cli_name(program),
                         entry,
                         config.executable.display(),
-                        output.display()
+                        output.display(),
+                        report.display()
                     ),
                     vec![
                         "This is an isolated external-reference build, not evidence that ApolloRS's native assembler emits the same rope.".to_owned(),
                     ],
                 )?;
-                provenance.reference_toolchain = config.toolchain.clone();
+                provenance.reference_toolchain.clone_from(&config.toolchain);
                 provenance.record_input_file("reference_yayul_executable", &config.executable)?;
                 write_json(
                     &report,
@@ -405,17 +453,19 @@ fn run(cli: Cli) -> Result<()> {
                 let assembly =
                     assemble_binsource_reference(&corpus, program, &binsource, &toolchain)?;
                 write_bytes(&output, &assembly.rope)?;
-                let report = report
-                    .map(|path| resolve_from(&repository, &path))
-                    .unwrap_or_else(|| output.with_extension("build.json"));
+                let report = report.map_or_else(
+                    || output.with_extension("build.json"),
+                    |path| resolve_from(&repository, &path),
+                );
                 let mut provenance = capture_provenance(
                     &repository,
                     &corpus,
                     format!(
-                        "cargo run -p apollors-cli -- assemble {} --reference-binsource {} --output {}",
-                        program.directory(),
+                        "cargo run -p apollors-cli -- assemble {} --reference-binsource {} --output {} --report {}",
+                        program_cli_name(program),
                         binsource.display(),
-                        output.display()
+                        output.display(),
+                        report.display()
                     ),
                     vec![
                         "This rope is imported from an independently proofed octal binsource after Rust-native bank/checksum validation; it is not a native assembly of the historical .agc transcription.".to_owned(),
@@ -459,7 +509,7 @@ fn run(cli: Cli) -> Result<()> {
                     &corpus,
                     format!(
                         "cargo run -p apollors-cli -- assemble {} --entry {} --output {}",
-                        program.directory(),
+                        program_cli_name(program),
                         entry,
                         output.display()
                     ),
@@ -467,7 +517,7 @@ fn run(cli: Cli) -> Result<()> {
                         "Native assembly support is corpus-driven; equivalence to yaYUL must be established separately for this exact output.".to_owned(),
                     ],
                 )?;
-                provenance.reference_toolchain = "ApolloRS native assembler".to_owned();
+                "ApolloRS native assembler".clone_into(&mut provenance.reference_toolchain);
                 write_file_sidecar(
                     &output,
                     "native-rope-image",
@@ -503,8 +553,9 @@ fn run(cli: Cli) -> Result<()> {
                         &repository,
                         &corpus,
                         format!(
-                            "cargo run -p apollors-cli -- execute --rope {} --instructions {} --trace {}",
+                            "cargo run -p apollors-cli -- execute --rope {} --format {} --instructions {} --trace {}",
                             rope.display(),
+                            format.as_str(),
                             instructions,
                             trace.display()
                         ),
@@ -532,9 +583,12 @@ fn run(cli: Cli) -> Result<()> {
                 &repository,
                 &corpus,
                 format!(
-                    "cargo run -p apollors-cli -- validate --left {} --right {}",
+                    "cargo run -p apollors-cli -- validate --left {} --right {}{}",
                     left.display(),
-                    right.display()
+                    right.display(),
+                    output
+                        .as_ref()
+                        .map_or(String::new(), |path| format!(" --output {}", path.display()))
                 ),
                 vec![
                     "This compares ApolloRS traces under the ApolloRS schema; it is not an independent implementation oracle.".to_owned(),
@@ -559,10 +613,13 @@ fn run(cli: Cli) -> Result<()> {
                 &repository,
                 &corpus,
                 format!(
-                    "cargo run -p apollors-cli -- validate-reference --apollors {} --reference {}{}",
+                    "cargo run -p apollors-cli -- validate-reference --apollors {} --reference {}{}{}",
                     apollors.display(),
                     reference.display(),
-                    if allow_prefix { " --allow-prefix" } else { "" }
+                    if allow_prefix { " --allow-prefix" } else { "" },
+                    output
+                        .as_ref()
+                        .map_or(String::new(), |path| format!(" --output {}", path.display()))
                 ),
                 vec![
                     "The exact yaAGC instrumentation observes instruction/interrupt kind, cycle, PC, instruction, A/L/Q, EB/FB/BB, and interrupt vector/number; it does not compare every peripheral or memory cell.".to_owned(),
@@ -601,9 +658,10 @@ fn run(cli: Cli) -> Result<()> {
                 &repository,
                 &corpus,
                 format!(
-                    "cargo run -p apollors-cli -- transpile {} --entry {} --output {}",
-                    program.directory(),
+                    "cargo run -p apollors-cli -- transpile {} --entry {} --style {} --output {}",
+                    program_cli_name(program),
                     entry,
+                    style.as_str(),
                     output.display()
                 ),
                 vec![
@@ -611,8 +669,8 @@ fn run(cli: Cli) -> Result<()> {
                     "The readable typed Pinball V37 model is maintained and tested in agc-dsky rather than generated by this whole-program instruction dispatcher.".to_owned(),
                 ],
             )?;
-            provenance.reference_toolchain =
-                "ApolloRS native parser/assembler/transpiler".to_owned();
+            "ApolloRS native parser/assembler/transpiler"
+                .clone_into(&mut provenance.reference_toolchain);
             write_file_sidecar(
                 &output,
                 "generated-rust-source",
@@ -648,11 +706,13 @@ fn run(cli: Cli) -> Result<()> {
                 &repository,
                 &corpus,
                 format!(
-                    "cargo run -p apollors-cli -- mission --rope {}{}{}{}",
+                    "cargo run -p apollors-cli -- mission --rope {} --format {}{}{}{}{}",
                     rope.display(),
+                    format.as_str(),
                     instructions.map_or(String::new(), |value| format!(" --instructions {value}")),
                     output.as_ref().map_or(String::new(), |path| format!(" --output {}", path.display())),
-                    trace.as_ref().map_or(String::new(), |path| format!(" --trace {}", path.display()))
+                    trace.as_ref().map_or(String::new(), |path| format!(" --trace {}", path.display())),
+                    rope_fault.as_ref().map_or(String::new(), |fault| format!(" --rope-fault {fault}"))
                 ),
                 vec![
                     "The Apollo 11 LM-5 pad-load document explicitly excludes mission-time computed quantities such as state vectors; this scenario applies a documented P63-relevant subset, not a complete mission erasable load.".to_owned(),
@@ -668,6 +728,45 @@ fn run(cli: Cli) -> Result<()> {
                 output,
                 trace,
                 rope_fault.as_deref(),
+                provenance,
+            )
+        }
+        Command::FaultCampaign {
+            rope,
+            format,
+            at_instruction,
+            rope_fault,
+            instructions,
+            output,
+        } => {
+            let rope = resolve_from(&repository, &rope);
+            let output = resolve_from(&repository, &output);
+            let mut provenance = capture_provenance(
+                &repository,
+                &corpus,
+                format!(
+                    "cargo run -p apollors-cli -- fault-campaign --rope {} --format {} --at-instruction {} --rope-fault {} --instructions {} --output {}",
+                    rope.display(),
+                    format.as_str(),
+                    at_instruction,
+                    rope_fault,
+                    instructions,
+                    output.display()
+                ),
+                vec![
+                    "A rope bit flip is an adversarial deterministic experiment, not a claim that the selected fault has a measured Apollo hardware likelihood.".to_owned(),
+                    "Recovery is classified only at the configured instruction horizon; a later convergence or divergence is outside this artifact.".to_owned(),
+                    "The P63 fixture limitations concerning state vectors and vehicle/sensor dynamics also apply to both campaign arms.".to_owned(),
+                ],
+            )?;
+            provenance.record_input_file("luminary_rope", &rope)?;
+            run_fault_campaign(
+                &rope,
+                format.into(),
+                at_instruction,
+                &rope_fault,
+                instructions,
+                &output,
                 provenance,
             )
         }
@@ -1005,14 +1104,7 @@ fn run_mission(
     let mut controller = MissionController::from_rope(image)?;
     if let Some(specification) = rope_fault {
         let (bank, offset, mask) = parse_octal_triplet(specification)?;
-        controller.schedule_fault(
-            0,
-            Fault::RopeBitFlip {
-                bank: bank as u8,
-                offset,
-                mask,
-            },
-        );
+        controller.schedule_fault(0, Fault::RopeBitFlip { bank, offset, mask });
     }
     let mut scenario = MissionScenario::luminary_p63_landing();
     if let Some(instructions) = instructions {
@@ -1053,6 +1145,72 @@ fn run_mission(
         )?;
     }
     Ok(())
+}
+
+fn run_fault_campaign(
+    rope: &Path,
+    format: RopeFormat,
+    at_instruction: u64,
+    rope_fault: &str,
+    instructions: u64,
+    output: &Path,
+    provenance: Provenance,
+) -> Result<()> {
+    let image = load_file(rope, format)?;
+    let mut baseline = MissionController::from_rope(image.clone())?;
+    let mut faulted = MissionController::from_rope(image)?;
+    let (bank, offset, mask) = parse_octal_triplet(rope_fault)?;
+    faulted.schedule_fault(at_instruction, Fault::RopeBitFlip { bank, offset, mask });
+    let mut scenario = MissionScenario::luminary_p63_landing();
+    scenario.instruction_limit = instructions;
+    let baseline_run = baseline.run(&scenario)?;
+    let faulted_run = faulted.run(&scenario)?;
+    let trace_comparison = compare_missions(&baseline, &faulted);
+    let recovery = compare_recovery(baseline.runtime(), faulted.runtime());
+    let report = serde_json::json!({
+        "scenario": scenario.name,
+        "scheduled_fault": {
+            "instruction": at_instruction,
+            "fault": {
+                "type": "rope-bit-flip",
+                "bank": bank,
+                "offset": offset,
+                "mask": mask,
+            }
+        },
+        "applied_faults": faulted_run.applied_faults,
+        "baseline": mission_acceptance_summary(&baseline_run),
+        "faulted": mission_acceptance_summary(&faulted_run),
+        "trace_comparison": trace_comparison,
+        "recovery": recovery,
+    });
+    write_json(
+        output,
+        &Envelope::new("paired-p63-fault-campaign", provenance, report),
+    )?;
+    println!(
+        "fault campaign: first divergence {:?}, registers recovered={}, report {}",
+        recovery.first_divergence,
+        recovery.registers_recovered,
+        output.display()
+    );
+    Ok(())
+}
+
+fn mission_acceptance_summary(run: &MissionRun) -> serde_json::Value {
+    serde_json::json!({
+        "instructions": run.instructions,
+        "cycles": run.cycles,
+        "faults_applied": run.faults_applied,
+        "keyboard_sequence_verified": run.evidence.keyboard_sequence_verified,
+        "pinball_reconstruction_matches_rope": run.evidence.pinball_reconstruction_matches_rope,
+        "program_63_selected": run.evidence.program_63_selected,
+        "p63lm_entry": run.evidence.p63lm_entry,
+        "p63_initialization_matches_rope": run.evidence.p63_initialization_matches_rope,
+        "landing_guidance_started": run.evidence.landing_guidance_started,
+        "p63spot_entry": run.evidence.p63spot_entry,
+        "p63spot2_entry": run.evidence.p63spot2_entry,
+    })
 }
 
 fn interactive_dsky(rope: &Path, format: RopeFormat, quantum: u64) -> Result<()> {
@@ -1161,16 +1319,24 @@ fn load_program_overlay(
     }
 }
 
-fn parse_octal_triplet(input: &str) -> Result<(u16, u16, u16)> {
+fn parse_octal_triplet(input: &str) -> Result<(u8, u16, u16)> {
     let fields = input.split(':').collect::<Vec<_>>();
     if fields.len() != 3 {
         bail!("rope fault must be BANK:OFFSET:MASK in octal");
     }
-    Ok((
-        u16::from_str_radix(fields[0], 8).context("invalid octal bank")?,
-        u16::from_str_radix(fields[1], 8).context("invalid octal offset")?,
-        u16::from_str_radix(fields[2], 8).context("invalid octal mask")?,
-    ))
+    let bank = u8::from_str_radix(fields[0], 8).context("invalid octal bank")?;
+    let offset = u16::from_str_radix(fields[1], 8).context("invalid octal offset")?;
+    let mask = u16::from_str_radix(fields[2], 8).context("invalid octal mask")?;
+    if bank > 0o43 {
+        bail!("rope fault bank must be in physical range 00..43 octal");
+    }
+    if offset >= 0o2000 {
+        bail!("rope fault offset must be in physical range 0000..1777 octal");
+    }
+    if mask == 0 || mask > 0o77777 {
+        bail!("rope fault mask must be a nonzero 15-bit octal word");
+    }
+    Ok((bank, offset, mask))
 }
 
 fn read_trace(path: &Path) -> Result<TraceLog> {
@@ -1247,5 +1413,16 @@ mod tests {
     fn dsky_digit_command_maps_to_keyboard_code() {
         assert_eq!(parse_key("7").unwrap(), Key::Digit(7));
         assert!(parse_key("launch").is_err());
+    }
+
+    #[test]
+    fn rope_fault_parser_enforces_physical_ranges() {
+        assert_eq!(
+            parse_octal_triplet("32:0776:00001").unwrap(),
+            (0o32, 0o776, 1)
+        );
+        assert!(parse_octal_triplet("44:0000:00001").is_err());
+        assert!(parse_octal_triplet("32:2000:00001").is_err());
+        assert!(parse_octal_triplet("32:0776:00000").is_err());
     }
 }

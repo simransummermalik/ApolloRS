@@ -12,6 +12,7 @@ use agc_word::AgcWord;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
+use std::fmt::Write as _;
 use std::fs;
 use std::io;
 use std::path::{Component, Path, PathBuf};
@@ -103,7 +104,7 @@ pub struct ReferenceAssemblerConfig {
     pub executable: PathBuf,
     /// Immutable tool/version identifier recorded in the build report.
     pub toolchain: String,
-    /// Request yaYUL's force-output mode. Diagnostics remain fatal to ApolloRS.
+    /// Request yaYUL's force-output mode. Diagnostics remain fatal to `ApolloRS`.
     pub force_output: bool,
     /// Minimum populated words accepted as a flight-software image.
     pub minimum_nonzero_words: usize,
@@ -266,7 +267,7 @@ pub enum AssemblyError {
 /// Runs yaYUL in a disposable, writable copy of one historical source tree.
 ///
 /// Historical source is never modified. A compatibility overlay is materialized
-/// only in staging, and ApolloRS rejects nonzero diagnostics, malformed rope
+/// only in staging, and `ApolloRS` rejects nonzero diagnostics, malformed rope
 /// size, and checksum-only output even when yaYUL itself exits successfully.
 pub fn assemble_reference(
     corpus: &HistoricalCorpus,
@@ -275,13 +276,13 @@ pub fn assemble_reference(
     overlay: Option<&Overlay>,
     config: &ReferenceAssemblerConfig,
 ) -> Result<ReferenceAssembly, AssemblyError> {
-    if let Some(overlay) = overlay {
-        if overlay.program != program {
-            return Err(AssemblyError::OverlayProgram {
-                expected: program,
-                actual: overlay.program,
-            });
-        }
+    if let Some(overlay) = overlay
+        && overlay.program != program
+    {
+        return Err(AssemblyError::OverlayProgram {
+            expected: program,
+            actual: overlay.program,
+        });
     }
     let entry_path = validate_reference_entry(entry)?;
     if config.toolchain.trim().is_empty() {
@@ -396,7 +397,7 @@ pub fn assemble_reference(
     Ok(ReferenceAssembly { rope, report })
 }
 
-/// Parses and validates a VirtualAGC `*.binsource` octal rope listing in Rust.
+/// Parses and validates a `VirtualAGC` `*.binsource` octal rope listing in Rust.
 ///
 /// This route exists for historical transcriptions such as Comanche 055 whose
 /// `.agc` cards are not yet cleanly reassemblable. Every physical bank must be
@@ -455,9 +456,11 @@ pub fn assemble_binsource_reference(
                 "rope data precedes the first BANK card at line {line_number}"
             ))
         })?;
-        let words = banks
-            .get_mut(&bank)
-            .expect("current bank was inserted before data");
+        let Some(words) = banks.get_mut(&bank) else {
+            return Err(AssemblyError::Reference(format!(
+                "internal bank-card state lost bank {bank:o} at line {line_number}"
+            )));
+        };
         for token in line.split_whitespace() {
             let word = if token == "@" {
                 unused_words += 1;
@@ -468,7 +471,11 @@ pub fn assemble_binsource_reference(
                         "invalid rope word {token:?} at binsource line {line_number}"
                     )));
                 }
-                let raw = u16::from_str_radix(token, 8).expect("validated octal token");
+                let raw = u16::from_str_radix(token, 8).map_err(|error| {
+                    AssemblyError::Reference(format!(
+                        "invalid octal rope word at binsource line {line_number}: {error}"
+                    ))
+                })?;
                 AgcWord::try_from_raw(raw).map_err(|error| {
                     AssemblyError::Reference(format!(
                         "invalid rope word at binsource line {line_number}: {error}"
@@ -594,7 +601,6 @@ fn parse_reference_summary(output: &str) -> ReferenceSummary {
 
 fn summary_count(line: &str, label: &str) -> Option<usize> {
     line.strip_prefix(label)?
-        .trim()
         .split_whitespace()
         .next()?
         .parse()
@@ -664,13 +670,13 @@ pub fn expand_program(
     entry: &str,
     overlay: Option<&Overlay>,
 ) -> Result<ExpandedProgram, AssemblyError> {
-    if let Some(overlay) = overlay {
-        if overlay.program != program {
-            return Err(AssemblyError::OverlayProgram {
-                expected: program,
-                actual: overlay.program,
-            });
-        }
+    if let Some(overlay) = overlay
+        && overlay.program != program
+    {
+        return Err(AssemblyError::OverlayProgram {
+            expected: program,
+            actual: overlay.program,
+        });
     }
     let mut state = ExpansionState {
         corpus,
@@ -827,7 +833,7 @@ pub fn assemble(expanded: ExpandedProgram) -> Result<ProgramImage, AssemblyError
             if let Some(label) = &record.label {
                 let (_, _, value) = location.current_value();
                 if let Err(error) = symbols.define(label.clone(), value, record.location.clone()) {
-                    symbol_diagnostic(&mut diagnostics, error);
+                    symbol_diagnostic(&mut diagnostics, &error);
                 }
             }
             continue;
@@ -850,11 +856,10 @@ pub fn assemble(expanded: ExpandedProgram) -> Result<ProgramImage, AssemblyError
         let (bank, offset, symbol_value) = location.current_value();
         record.bank = bank;
         record.offset = Some(offset);
-        if let Some(label) = &record.label {
-            if let Err(error) = symbols.define(label.clone(), symbol_value, record.location.clone())
-            {
-                symbol_diagnostic(&mut diagnostics, error);
-            }
+        if let Some(label) = &record.label
+            && let Err(error) = symbols.define(label.clone(), symbol_value, record.location.clone())
+        {
+            symbol_diagnostic(&mut diagnostics, &error);
         }
         if let Err(message) = location.advance(emits as u16) {
             push_error(&mut diagnostics, "AGCA002", &message, record);
@@ -880,7 +885,7 @@ pub fn assemble(expanded: ExpandedProgram) -> Result<ProgramImage, AssemblyError
                     if let Err(error) =
                         symbols.define(label.clone(), semantic, record.location.clone())
                     {
-                        symbol_diagnostic(&mut diagnostics, error);
+                        symbol_diagnostic(&mut diagnostics, &error);
                     }
                     progress = true;
                     false
@@ -907,7 +912,16 @@ pub fn assemble(expanded: ExpandedProgram) -> Result<ProgramImage, AssemblyError
             previous_extend = false;
             continue;
         };
-        let offset = record.offset.expect("assigned bank has offset");
+        let Some(offset) = record.offset else {
+            push_error(
+                &mut diagnostics,
+                "AGCA051",
+                "assigned fixed bank is missing its offset",
+                record,
+            );
+            previous_extend = false;
+            continue;
+        };
         let emitted = emit_record(record, &mut symbols, previous_extend, &mut diagnostics);
         previous_extend = record.operation == "EXTEND";
         for (relative, word) in emitted.into_iter().enumerate() {
@@ -959,7 +973,7 @@ pub fn assemble(expanded: ExpandedProgram) -> Result<ProgramImage, AssemblyError
 
 /// Assembles a standalone parsed unit, useful for instruction-level tests and
 /// generated conformance programs.
-pub fn assemble_unit(unit: SourceUnit) -> Result<ProgramImage, AssemblyError> {
+pub fn assemble_unit(unit: &SourceUnit) -> Result<ProgramImage, AssemblyError> {
     let records = unit
         .statements()
         .map(|(line, statement)| IrRecord {
@@ -1194,7 +1208,7 @@ fn emit_record(
             push_error(
                 diagnostics,
                 "AGCA032",
-                &format!("{} requires a preceding EXTEND", mnemonic),
+                &format!("{mnemonic} requires a preceding EXTEND"),
                 record,
             );
             return Vec::new();
@@ -1209,11 +1223,10 @@ fn emit_record(
     }
     let mut value = || evaluate_and_reference(&record.operand, symbols, &record.location);
     match record.operation.as_str() {
-        "OCT" => single_word(value(), record, diagnostics),
         "DEC" => signed_word(value(), record, diagnostics),
         "2OCT" => double_words(value(), false, record, diagnostics),
         "2DEC" => double_words(value(), true, record, diagnostics),
-        "ADRES" | "REMADR" | "ECADR" | "FCADR" | "CADR" | "GENADR" | "XCADR" | "BBCON"
+        "OCT" | "ADRES" | "REMADR" | "ECADR" | "FCADR" | "CADR" | "GENADR" | "XCADR" | "BBCON"
         | "DNCHAN" | "VN" => single_word(value(), record, diagnostics),
         "2CADR" | "2BCADR" | "1DNADR" => {
             let first = single_word(value(), record, diagnostics);
@@ -1418,8 +1431,8 @@ fn push_error(diagnostics: &mut Vec<Diagnostic>, code: &str, message: &str, reco
     });
 }
 
-fn symbol_diagnostic(diagnostics: &mut Vec<Diagnostic>, error: SymbolError) {
-    let location = match &error {
+fn symbol_diagnostic(diagnostics: &mut Vec<Diagnostic>, error: &SymbolError) {
+    let location = match error {
         SymbolError::Duplicate { second, .. }
         | SymbolError::Unresolved {
             location: second, ..
@@ -1443,7 +1456,11 @@ fn normalize_entry(entry: &str) -> String {
 
 fn hex_sha256(bytes: &[u8]) -> String {
     let digest = Sha256::digest(bytes);
-    digest.iter().map(|byte| format!("{byte:02x}")).collect()
+    let mut output = String::with_capacity(digest.len() * 2);
+    for byte in digest {
+        let _ = write!(output, "{byte:02x}");
+    }
+    output
 }
 
 #[cfg(test)]
@@ -1459,7 +1476,7 @@ mod tests {
             "\tBANK\t2\nSTART\tTC\tEND\n\tOCT\t12345\nEND\tTC\tSTART\n",
         )
         .unit;
-        let image = assemble_unit(unit).unwrap();
+        let image = assemble_unit(&unit).unwrap();
         assert_eq!(image.occupied_words(), 3);
         assert_eq!(image.words[2 * 1024].raw(), 0o4002);
         assert_eq!(image.words[2 * 1024 + 1].raw(), 0o12345);

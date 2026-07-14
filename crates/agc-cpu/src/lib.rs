@@ -108,6 +108,7 @@ pub enum CpuError {
 }
 
 /// Full deterministic CPU and architectural control state.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, Debug)]
 pub struct Cpu {
     memory: Memory,
@@ -210,6 +211,11 @@ impl Cpu {
     }
 
     /// Returns the current program counter.
+    ///
+    /// # Panics
+    ///
+    /// Panics only if the architectural Z register is absent from `Memory`,
+    /// which cannot occur for a constructed `Memory` value.
     pub fn program_counter(&self) -> u16 {
         self.memory
             .central_register(register::Z)
@@ -304,7 +310,8 @@ impl Cpu {
 
         if let Some((interrupt, vector)) = self.accept_interrupt(instruction, pc)? {
             event.kind = MachineEventKind::InterruptEntry;
-            event.mnemonic = "INTERRUPT".to_owned();
+            event.mnemonic.clear();
+            event.mnemonic.push_str("INTERRUPT");
             event.operand = vector;
             event.extended = used_extended;
             event.interrupts.push(InterruptEvent::Entered {
@@ -386,6 +393,7 @@ impl Cpu {
         })
     }
 
+    #[allow(clippy::too_many_lines)]
     fn execute(
         &mut self,
         instruction: DecodedInstruction,
@@ -515,7 +523,7 @@ impl Cpu {
         let value = self.read_register_operand_and_edit(k, event)?;
         let raw = value.raw();
         let magnitude = if raw & 0o100000 == 0 { raw } else { !raw };
-        self.set_a_raw(if magnitude > 1 { magnitude - 1 } else { 0 });
+        self.set_a_raw(magnitude.saturating_sub(1));
 
         if k < register::EB {
             match raw & 0o140000 {
@@ -742,7 +750,7 @@ impl Cpu {
                 if value & 0o100000 == 0 {
                     value = !value;
                 }
-                value & 0o177777
+                value
             }
             register::L => {
                 let mut value = l_raw;
@@ -1402,7 +1410,7 @@ fn normalize_double(a_raw: u16, l_raw: u16) -> (u16, u16, u32) {
     let decent = sp_to_decent(overflow_correct_raw(a_raw).raw(), l_raw);
     let sign = decent & 0o4_000_000_000 != 0;
     let low = (decent as u16 & 0o37777) | if sign { 0o40000 } else { 0 };
-    let high = overflow_correct_raw(((decent >> 14) as u16) & 0o177777).raw();
+    let high = overflow_correct_raw((decent >> 14) as u16).raw();
     (high, low, decent)
 }
 
@@ -1485,7 +1493,7 @@ fn simulate_divide(a_raw: u16, l_raw: u16, mut divisor: u16) -> (u16, u16) {
         }
     }
     a = quotient_sign | (quotient & 0o77777);
-    let a = if dividend_sign != divisor_sign { !a } else { a };
+    let a = if dividend_sign == divisor_sign { a } else { !a };
     let l = if dividend_sign != 0 {
         remainder
     } else {

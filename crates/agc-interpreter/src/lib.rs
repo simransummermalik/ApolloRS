@@ -276,7 +276,7 @@ impl Interpreter {
                     .pop()
                     .ok_or(InterpreterError::StackUnderflow)?;
             }
-            Instruction::Add => {
+            Instruction::Add | Instruction::VectorAdd => {
                 let left = self
                     .state
                     .stack
@@ -284,7 +284,7 @@ impl Interpreter {
                     .ok_or(InterpreterError::StackUnderflow)?;
                 self.state.accumulator = add_values(left, self.state.accumulator.clone())?;
             }
-            Instruction::Subtract => {
+            Instruction::Subtract | Instruction::VectorSubtract => {
                 let left = self
                     .state
                     .stack
@@ -344,22 +344,6 @@ impl Interpreter {
                     ]),
                 };
             }
-            Instruction::VectorAdd => {
-                let left = self
-                    .state
-                    .stack
-                    .pop()
-                    .ok_or(InterpreterError::StackUnderflow)?;
-                self.state.accumulator = add_values(left, self.state.accumulator.clone())?;
-            }
-            Instruction::VectorSubtract => {
-                let left = self
-                    .state
-                    .stack
-                    .pop()
-                    .ok_or(InterpreterError::StackUnderflow)?;
-                self.state.accumulator = subtract_values(left, self.state.accumulator.clone())?;
-            }
             Instruction::Dot => {
                 let left = self
                     .state
@@ -414,7 +398,7 @@ impl Interpreter {
                         "square root of negative value".to_owned(),
                     ));
                 }
-                self.state.accumulator = Value::Scalar(integer_sqrt(value as u64) as i64);
+                self.state.accumulator = Value::Scalar(integer_sqrt(value as u64).cast_signed());
             }
             Instruction::Branch { target } => set_target(&mut self.state.pc, *target, program_len)?,
             Instruction::BranchZero { target } => {
@@ -523,10 +507,10 @@ fn integer_sqrt(value: u64) -> u64 {
         return value;
     }
     let mut current = value;
-    let mut next = (current + value / current) / 2;
+    let mut next = u64::midpoint(current, value / current);
     while next < current {
         current = next;
-        next = (current + value / current) / 2;
+        next = u64::midpoint(current, value / current);
     }
     current
 }

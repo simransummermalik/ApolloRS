@@ -24,8 +24,8 @@ Status meanings:
 | Typed P63 initialization | five source-ordered writes match typed Rust values for `WHICH`, `DVTHRUSH`, `DVCNTR`, `WCHPHASE`, `FLPASS0` | verified |
 | Landing-equation activity | trace-backed writes include TPIP, LAND, TTF/8, VGU, and RGU words | verified |
 | Complete powered descent / landing | no mission-time state vector or coupled vehicle/sensor plant; P63SPOT/P63SPOT2 not reached | unsupported |
-| Deterministic fault injection | register, memory, rope, channel, interrupt, timer, IMU, and radar fault types with applied-fault audit | implemented |
-| Restart/recovery equivalence under faults | no independently matched campaign yet | unsupported |
+| Deterministic fault injection | audited bit flip at P63LM physical F32:0776; paired baseline/faulted traces first diverge at event 145,942 | verified |
+| Restart/recovery equivalence under faults | P63 entry fault does not recover by the 180,000-instruction horizon; no general recovery-equivalence claim | unsupported |
 | Whole-program mechanical Rust generation | standalone, compile-checkable source/word dispatch with provenance | implemented |
 | Whole-program idiomatic Rust rewrite | no such claim; only bounded typed subsystems are reconstructed | unsupported |
 | Artifact provenance | envelope validation plus raw-file sidecars and content hashes | verified |
@@ -37,7 +37,8 @@ The mission is accepted only when all of these are true:
 1. Every requested DSKY key is accepted through KEYRUPT1 and the historical
    Pinball `CHARIN` routine.
 2. The typed V37 state machine and rope `MODREG` both select decimal program 63.
-3. The trace reaches physical `P63LM` at fixed bank 32, offset 2776.
+3. The trace reaches `P63LM` at logical address `2776`, physical fixed bank 32,
+   offset `0776`.
 4. The five P63 initialization writes occur in source order with exact raw
    values and match `P63Initialization::luminary099()`.
 

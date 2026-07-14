@@ -3,6 +3,7 @@
 
 use agc_ir::ProgramIr;
 use agc_symbols::SymbolTable;
+use std::fmt::Write as _;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -80,7 +81,7 @@ pub fn generate(
     let records = ir
         .records
         .iter()
-        .filter(|record| record.bank.is_some() && record.offset.is_some() && record.word.is_some())
+        .filter_map(|record| Some((record, record.bank?, record.offset?, record.word?)))
         .collect::<Vec<_>>();
     if records.is_empty() {
         return Err(TranspileError::Empty);
@@ -114,19 +115,21 @@ pub fn generate(
         verification_text,
         escape_string(&verification_text)
     );
-    for record in &records {
-        source.push_str(&format!(
-            "    SourceRecord {{ bank: 0o{:02o}, offset: 0o{:04o}, word: 0o{:05o}, file: \"{}\", line: {}, label: {} }},\n",
-            record.bank.unwrap(),
-            record.offset.unwrap(),
-            record.word.unwrap().raw(),
+    for (record, bank, offset, word) in &records {
+        let label = record.label.as_ref().map_or_else(
+            || "None".to_owned(),
+            |label| format!("Some(\"{}\")", escape_string(label)),
+        );
+        let _ = writeln!(
+            source,
+            "    SourceRecord {{ bank: 0o{:02o}, offset: 0o{:04o}, word: 0o{:05o}, file: \"{}\", line: {}, label: {} }},",
+            bank,
+            offset,
+            word.raw(),
             escape_string(&record.location.file),
             record.location.line,
-            record
-                .label
-                .as_ref()
-                .map_or_else(|| "None".to_owned(), |label| format!("Some(\"{}\")", escape_string(label)))
-        ));
+            label
+        );
     }
     source.push_str(
         "];\n\n\
@@ -201,8 +204,11 @@ fn emit_structured_helpers(source: &mut String, ir: &ProgramIr, symbols: &Symbol
         else {
             continue;
         };
-        let Some(bank) = record.bank else { continue };
-        source.push_str(&format!(
+        let (Some(bank), Some(offset)) = (record.bank, record.offset) else {
+            continue;
+        };
+        let _ = write!(
+            source,
             "#[doc = \"Original label `{}` at logical address {:04o}.\"]\n\
              pub fn label_{}<M: AgcMachine>(machine: &mut M) -> Result<bool, M::Error> {{\n\
                  dispatch(machine, 0o{:02o}, 0o{:04o})\n\
@@ -211,8 +217,8 @@ fn emit_structured_helpers(source: &mut String, ir: &ProgramIr, symbols: &Symbol
             address,
             rust_identifier(name),
             bank,
-            record.offset.unwrap()
-        ));
+            offset
+        );
     }
 }
 

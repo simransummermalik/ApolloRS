@@ -3,8 +3,8 @@
   "artifact_kind": "binsource-assembly-report",
   "provenance": {
     "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
-    "reference_toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff Comanche055.binsource",
-    "apollors_commit": "e5b520896d2544933273ac54415b79b29b5a7b61-dirty",
+    "reference_toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff; yaYUL 20260713",
+    "apollors_commit": "69519363cdb26e1475e20455752c87fb4bbe1299-dirty",
     "input_hashes": [
       "Comanche055/AGC_BLOCK_TWO_SELF-CHECK.agc=f86f1a02856b29a2cd01186a1a807fe4455b576624f8c4cb5876408677c83868",
       "Comanche055/ALARM_AND_ABORT.agc=ffa2e17087ed8029c2d56018114c4c947d9c3d03e6b15b0b17b11c8fc24a2d0f",
@@ -183,8 +183,8 @@
       "Luminary099/WAITLIST.agc=ca0092971efa3cafcdd8f7dad06a0980f999993f9dbc2e1c68cc764c41f7f0f0",
       "reference_binsource=5a910b1d69cf9ef3b0f1ecc241271e0dd15f27e305d533028061ed2b71ffafcf"
     ],
-    "generation_command": "cargo run -p apollors-cli -- assemble Comanche055 --reference-binsource /tmp/apollors-virtualagc-reference/Comanche055/Comanche055.binsource --output /Users/summermalik/Desktop/Apollo11/./artifacts/generated/comanche055-reference.bin",
-    "generated_at": "2026-07-14T08:03:46Z",
+    "generation_command": "cargo run -p apollors-cli -- assemble comanche055 --reference-binsource /tmp/apollors-virtualagc-reference/Comanche055/Comanche055.binsource --output /Users/summermalik/Desktop/Apollo11/./artifacts/generated/comanche055-reference.bin --report /Users/summermalik/Desktop/Apollo11/./artifacts/generated/comanche055-reference-build.json",
+    "generated_at": "2026-07-14T17:49:32Z",
     "known_limitations": [
       "This rope is imported from an independently proofed octal binsource after Rust-native bank/checksum validation; it is not a native assembly of the historical .agc transcription."
     ]
@@ -194,7 +194,7 @@
     "program": "comanche055",
     "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
     "binsource": "/tmp/apollors-virtualagc-reference/Comanche055/Comanche055.binsource",
-    "toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff Comanche055.binsource",
+    "toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff; yaYUL 20260713",
     "binsource_sha256": "5a910b1d69cf9ef3b0f1ecc241271e0dd15f27e305d533028061ed2b71ffafcf",
     "banks": 36,
     "words": 36864,

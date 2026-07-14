@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "artifact_kind": "reference-rope-image",
+  "artifact_kind": "paired-p63-fault-campaign",
   "provenance": {
     "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
     "reference_toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff; yaYUL 20260713",
@@ -181,23 +181,114 @@
       "Luminary099/TRIM_GIMBAL_CONTROL_SYSTEM.agc=13da16e475f7d0610ee90d73b5676d2ff0704fb8b79f7651c97e0a32e16b256a",
       "Luminary099/UPDATE_PROGRAM.agc=5f54e9c63cf0af039a8a435aa3ba86ad933e3b921366388ee115460da5c9f7f6",
       "Luminary099/WAITLIST.agc=ca0092971efa3cafcdd8f7dad06a0980f999993f9dbc2e1c68cc764c41f7f0f0",
-      "reference_yayul_executable=7461db2ee303d9e12566995d2618334a47236c1e41105b55177f6e0c2b53b84b"
+      "luminary_rope=bf87398818b99446e300aa319c3e177e42131277f7e83822e8fa0db8ba3008b1"
     ],
-    "generation_command": "cargo run -p apollors-cli -- assemble luminary099 --entry MAIN.agc --reference-yayul /tmp/apollors-virtualagc-reference/yaYUL/yaYUL --output /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-reference.bin --report /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-reference-build.json",
-    "generated_at": "2026-07-14T17:49:31Z",
+    "generation_command": "cargo run -p apollors-cli -- fault-campaign --rope /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-reference.bin --format yayul --at-instruction 145715 --rope-fault 32:0776:00001 --instructions 180000 --output /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-p63-rope-fault.json",
+    "generated_at": "2026-07-14T17:48:18Z",
     "known_limitations": [
-      "This is an isolated external-reference build, not evidence that ApolloRS's native assembler emits the same rope."
+      "A rope bit flip is an adversarial deterministic experiment, not a claim that the selected fault has a measured Apollo hardware likelihood.",
+      "Recovery is classified only at the configured instruction horizon; a later convergence or divergence is outside this artifact.",
+      "The P63 fixture limitations concerning state vectors and vehicle/sensor dynamics also apply to both campaign arms."
     ]
   },
   "data": {
-    "bytes": 73728,
-    "details": {
-      "bytes": 73728,
-      "nonzero_words": 36340,
-      "program": "luminary099",
-      "rope_sha256": "bf87398818b99446e300aa319c3e177e42131277f7e83822e8fa0db8ba3008b1"
+    "applied_faults": [
+      {
+        "cycle": 241218,
+        "fault": {
+          "bank": 26,
+          "mask": 1,
+          "offset": 510,
+          "type": "rope-bit-flip"
+        },
+        "instruction": 145715,
+        "resulting_word": 2794
+      }
+    ],
+    "baseline": {
+      "cycles": 306397,
+      "faults_applied": 0,
+      "instructions": 180000,
+      "keyboard_sequence_verified": true,
+      "landing_guidance_started": true,
+      "p63_initialization_matches_rope": true,
+      "p63lm_entry": {
+        "cycle": 241219,
+        "instruction": 145716,
+        "name": "P63LM",
+        "pc": 1534,
+        "physical": "F32:0776",
+        "trace_sequence": 145942
+      },
+      "p63spot2_entry": null,
+      "p63spot_entry": null,
+      "pinball_reconstruction_matches_rope": true,
+      "program_63_selected": {
+        "cycle": 240227,
+        "instruction": 145181,
+        "name": "MODREG=63",
+        "pc": 2764,
+        "physical": "F02:1314",
+        "trace_sequence": 145405
+      }
     },
-    "path": "/Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-reference.bin",
-    "sha256": "bf87398818b99446e300aa319c3e177e42131277f7e83822e8fa0db8ba3008b1"
+    "faulted": {
+      "cycles": 277909,
+      "faults_applied": 1,
+      "instructions": 180000,
+      "keyboard_sequence_verified": true,
+      "landing_guidance_started": false,
+      "p63_initialization_matches_rope": false,
+      "p63lm_entry": {
+        "cycle": 241219,
+        "instruction": 145716,
+        "name": "P63LM",
+        "pc": 1534,
+        "physical": "F32:0776",
+        "trace_sequence": 145942
+      },
+      "p63spot2_entry": null,
+      "p63spot_entry": null,
+      "pinball_reconstruction_matches_rope": true,
+      "program_63_selected": {
+        "cycle": 240227,
+        "instruction": 145181,
+        "name": "MODREG=63",
+        "pc": 2764,
+        "physical": "F02:1314",
+        "trace_sequence": 145405
+      }
+    },
+    "recovery": {
+      "baseline_instructions": 180000,
+      "baseline_pc": 3660,
+      "faulted_instructions": 180000,
+      "faulted_pc": 1009,
+      "first_divergence": 145942,
+      "registers_recovered": false
+    },
+    "scenario": "apollo11-lm5-padload-p63-entry",
+    "scheduled_fault": {
+      "fault": {
+        "bank": 26,
+        "mask": 1,
+        "offset": 510,
+        "type": "rope-bit-flip"
+      },
+      "instruction": 145715
+    },
+    "trace_comparison": {
+      "equivalent": false,
+      "first": {
+        "class": "decode",
+        "event": 145942,
+        "explanation": "raw instruction differs",
+        "field": "instruction",
+        "left": "AgcWord(05353)",
+        "right": "AgcWord(05352)"
+      },
+      "left_events": 180295,
+      "right_events": 180273
+    }
   }
 }

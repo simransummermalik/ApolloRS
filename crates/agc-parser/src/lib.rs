@@ -174,11 +174,10 @@ fn parse_line(raw: &str, base: usize, line: u32, diagnostics: &mut Vec<Diagnosti
 }
 
 fn classify_fields(fields: &[SpannedText], starts_in_column_zero: bool) -> (Option<usize>, usize) {
-    if starts_in_column_zero {
-        (Some(0), 1)
-    } else if fields.len() >= 2
-        && is_relative_label(&fields[0].text)
-        && is_known_operation(&fields[1].text)
+    if starts_in_column_zero
+        || (fields.len() >= 2
+            && is_relative_label(&fields[0].text)
+            && is_known_operation(&fields[1].text))
     {
         (Some(0), 1)
     } else {

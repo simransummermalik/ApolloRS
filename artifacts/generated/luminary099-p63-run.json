@@ -4,7 +4,7 @@
   "provenance": {
     "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
     "reference_toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff; yaYUL 20260713",
-    "apollors_commit": "e5b520896d2544933273ac54415b79b29b5a7b61-dirty",
+    "apollors_commit": "69519363cdb26e1475e20455752c87fb4bbe1299-dirty",
     "input_hashes": [
       "Comanche055/AGC_BLOCK_TWO_SELF-CHECK.agc=f86f1a02856b29a2cd01186a1a807fe4455b576624f8c4cb5876408677c83868",
       "Comanche055/ALARM_AND_ABORT.agc=ffa2e17087ed8029c2d56018114c4c947d9c3d03e6b15b0b17b11c8fc24a2d0f",
@@ -183,8 +183,8 @@
       "Luminary099/WAITLIST.agc=ca0092971efa3cafcdd8f7dad06a0980f999993f9dbc2e1c68cc764c41f7f0f0",
       "luminary_rope=bf87398818b99446e300aa319c3e177e42131277f7e83822e8fa0db8ba3008b1"
     ],
-    "generation_command": "cargo run -p apollors-cli -- mission --rope /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-reference.bin --instructions 300000 --output /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-p63-run.json --trace /tmp/apollors-p63-lm5-padload-trace.jsonl",
-    "generated_at": "2026-07-14T08:03:55Z",
+    "generation_command": "cargo run -p apollors-cli -- mission --rope /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-reference.bin --format yayul --instructions 300000 --output /Users/summermalik/Desktop/Apollo11/./artifacts/generated/luminary099-p63-run.json --trace /tmp/apollors-p63-lm5-padload-trace.jsonl",
+    "generated_at": "2026-07-14T17:44:45Z",
     "known_limitations": [
       "The Apollo 11 LM-5 pad-load document explicitly excludes mission-time computed quantities such as state vectors; this scenario applies a documented P63-relevant subset, not a complete mission erasable load.",
       "REFSMFLG is set as an explicit aligned-flight precondition; ApolloRS does not simulate the preceding platform-alignment procedure.",
@@ -10287,6 +10287,7 @@
     "instructions": 300000,
     "cycles": 504958,
     "faults_applied": 0,
+    "applied_faults": [],
     "evidence": {
       "initialization": [
         {

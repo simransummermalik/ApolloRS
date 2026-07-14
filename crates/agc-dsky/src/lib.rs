@@ -4,6 +4,7 @@
 use agc_trace::TraceEvent;
 use agc_word::AgcWord;
 use serde::{Deserialize, Serialize};
+use std::fmt::Write as _;
 use thiserror::Error;
 
 /// One DSKY keyboard key.
@@ -33,6 +34,7 @@ pub enum Key {
 
 impl Key {
     /// Encodes the five-bit keyboard word used on channel 015.
+    #[allow(clippy::match_same_arms)]
     pub fn code(self) -> Result<u8, DskyError> {
         match self {
             Self::Digit(0) => Ok(0o20),
@@ -182,6 +184,7 @@ pub struct Sign {
 }
 
 /// DSKY annunciator state.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Lamps {
     /// UPLINK ACTY.
@@ -333,19 +336,21 @@ impl DskyState {
                     minus: false,
                 } => ' ',
             };
-            output.push_str(&format!(
-                "| R{}   {}{}                         |\n",
+            let _ = writeln!(
+                output,
+                "| R{}   {}{}                         |",
                 index + 1,
                 sign,
                 format_digits(digits)
-            ));
+            );
         }
-        output.push_str(&format!(
+        let _ = write!(
+            output,
             "| COMP ACTY {:3}  OPR ERR {:3}  PROG {:3} |\n+--------------------------------------\n",
             lamp(self.lamps.computer_activity),
             lamp(self.lamps.operator_error),
             lamp(self.lamps.program_alarm)
-        ));
+        );
         output
     }
 
@@ -418,7 +423,6 @@ impl Lamps {
 
 fn decode_digit(code: u8) -> Option<u8> {
     match code {
-        0 => None,
         0o25 => Some(0),
         0o03 => Some(1),
         0o31 => Some(2),

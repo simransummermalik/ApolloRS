@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 use thiserror::Error;
 
 /// Host-side event delivered at a deterministic machine cycle boundary.
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum RuntimeEvent {
     /// Set an input/output channel before the next instruction.
@@ -298,7 +298,7 @@ impl Runtime {
         let scheduled = ScheduledEvent {
             cycle,
             sequence: self.next_event_sequence,
-            event: event.clone(),
+            event,
         };
         self.events.insert((cycle, self.next_event_sequence), event);
         self.next_event_sequence += 1;
@@ -338,7 +338,7 @@ impl Runtime {
             .map(|(&(cycle, sequence), event)| ScheduledEvent {
                 cycle,
                 sequence,
-                event: event.clone(),
+                event: *event,
             })
             .collect()
     }
