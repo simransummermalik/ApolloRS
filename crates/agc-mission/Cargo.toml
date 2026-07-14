@@ -15,6 +15,7 @@ agc-interpreter = { path = "../agc-interpreter" }
 agc-loader = { path = "../agc-loader" }
 agc-memory = { path = "../agc-memory" }
 agc-runtime = { path = "../agc-runtime" }
+agc-trace = { path = "../agc-trace" }
 agc-validation = { path = "../agc-validation" }
 agc-word = { path = "../agc-word" }
 serde.workspace = true

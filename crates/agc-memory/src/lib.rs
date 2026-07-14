@@ -308,8 +308,9 @@ impl Memory {
             1 => self.write_special(register::L, value),
             2 => self.write_special(register::Q, value),
             0o7 => {
-                self.superbank = value.raw() & 0o100 != 0;
-                self.channels[7] = value;
+                let bank_control = AgcWord::from_raw_truncate(value.raw() & 0o160);
+                self.superbank = bank_control.raw() & 0o100 != 0;
+                self.channels[7] = bank_control;
             }
             _ => self.channels[usize::from(channel.get())] = value,
         }
@@ -720,5 +721,20 @@ mod tests {
             memory.read_channel(ChannelAddress::new(0o31).unwrap()),
             AgcWord::NEGATIVE_ZERO
         );
+    }
+
+    #[test]
+    fn channel_seven_retains_only_fixed_bank_control_bits() {
+        let mut memory = Memory::blank();
+        memory.write_channel(
+            ChannelAddress::new(0o7).unwrap(),
+            AgcWord::try_from_raw(0o60102).unwrap(),
+        );
+
+        assert_eq!(
+            memory.read_channel(ChannelAddress::new(0o7).unwrap()).raw(),
+            0o100
+        );
+        assert!(memory.superbank());
     }
 }

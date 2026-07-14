@@ -135,6 +135,7 @@ dependencies = [
  "agc-loader",
  "agc-memory",
  "agc-runtime",
+ "agc-trace",
  "agc-validation",
  "agc-word",
  "serde",

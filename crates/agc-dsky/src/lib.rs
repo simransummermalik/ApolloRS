@@ -50,6 +50,126 @@ impl Key {
             Self::Proceed => Ok(0o20),
         }
     }
+
+    /// Decodes an ordinary five-bit keyboard word from channel 015.
+    ///
+    /// The PRO key is a separate hardware discrete and is therefore not
+    /// returned by this function; channel code 020 is the numeric zero key.
+    pub fn from_code(code: u8) -> Result<Self, DskyError> {
+        match code {
+            0o20 => Ok(Self::Digit(0)),
+            digit @ 1..=9 => Ok(Self::Digit(digit)),
+            0o21 => Ok(Self::Verb),
+            0o22 => Ok(Self::Reset),
+            0o31 => Ok(Self::KeyRelease),
+            0o32 => Ok(Self::Plus),
+            0o33 => Ok(Self::Minus),
+            0o34 => Ok(Self::Enter),
+            0o36 => Ok(Self::Clear),
+            0o37 => Ok(Self::Noun),
+            _ => Err(DskyError::Code(code)),
+        }
+    }
+}
+
+/// Typed state of the Pinball V37 major-mode entry path.
+///
+/// This is a readable semantic reconstruction of the operator protocol, not
+/// a replacement for executing Pinball in the rope. Mission validation feeds
+/// it the exact keys accepted by rope routine `CHARIN` and compares its result
+/// with Luminary's `MODREG`.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "state", rename_all = "kebab-case")]
+pub enum V37State {
+    /// Waiting for the VERB key.
+    #[default]
+    AwaitVerb,
+    /// Waiting for the tens digit of the verb.
+    VerbTens,
+    /// Waiting for the ones digit of the verb.
+    VerbOnes {
+        /// Entered tens digit.
+        tens: u8,
+    },
+    /// Waiting for ENTER after a complete verb.
+    VerbEnter {
+        /// Two-digit verb value.
+        verb: u8,
+    },
+    /// V37 accepted; waiting for the major-mode tens digit.
+    ProgramTens,
+    /// Waiting for the major-mode ones digit.
+    ProgramOnes {
+        /// Entered tens digit.
+        tens: u8,
+    },
+    /// Waiting for ENTER after a complete major mode.
+    ProgramEnter {
+        /// Two-digit major mode.
+        program: u8,
+    },
+    /// Program selection is complete.
+    Complete {
+        /// Selected major mode.
+        program: u8,
+    },
+}
+
+/// Readable, typed reconstruction of Pinball's `V37E nnE` protocol.
+#[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+pub struct V37ProgramChange {
+    /// Current protocol state.
+    pub state: V37State,
+    /// Number of keys accepted by the reconstruction.
+    pub accepted_keys: usize,
+    /// Last complete verb register value.
+    pub verb_register: Option<u8>,
+    /// Selected major mode after final ENTER.
+    pub program_register: Option<u8>,
+}
+
+impl V37ProgramChange {
+    /// Applies one key that the original rope has accepted through `CHARIN`.
+    pub fn accept(&mut self, key: Key) -> Result<V37State, PinballError> {
+        self.state = match (self.state, key) {
+            (V37State::AwaitVerb, Key::Verb) => V37State::VerbTens,
+            (V37State::VerbTens, Key::Digit(tens)) => V37State::VerbOnes { tens },
+            (V37State::VerbOnes { tens }, Key::Digit(ones)) => V37State::VerbEnter {
+                verb: decimal_pair(tens, ones)?,
+            },
+            (V37State::VerbEnter { verb: 37 }, Key::Enter) => {
+                self.verb_register = Some(37);
+                V37State::ProgramTens
+            }
+            (V37State::VerbEnter { verb }, Key::Enter) => {
+                return Err(PinballError::NotProgramChange(verb));
+            }
+            (V37State::ProgramTens, Key::Digit(tens)) => V37State::ProgramOnes { tens },
+            (V37State::ProgramOnes { tens }, Key::Digit(ones)) => V37State::ProgramEnter {
+                program: decimal_pair(tens, ones)?,
+            },
+            (V37State::ProgramEnter { program }, Key::Enter) => {
+                self.program_register = Some(program);
+                V37State::Complete { program }
+            }
+            (state, key) => return Err(PinballError::Unexpected { state, key }),
+        };
+        self.accepted_keys += 1;
+        Ok(self.state)
+    }
+
+    /// Applies one channel 015 keyboard code.
+    pub fn accept_code(&mut self, code: u8) -> Result<V37State, PinballError> {
+        self.accept(Key::from_code(code)?)
+    }
+}
+
+fn decimal_pair(tens: u8, ones: u8) -> Result<u8, PinballError> {
+    if tens <= 9 && ones <= 9 {
+        Ok(tens * 10 + ones)
+    } else {
+        Err(PinballError::InvalidDigit(tens.max(ones)))
+    }
 }
 
 /// Sign lamps for one five-digit register.
@@ -137,6 +257,31 @@ pub enum DskyError {
     /// Numeric key outside 0..9.
     #[error("invalid DSKY digit {0}")]
     Digit(u8),
+    /// Five-bit code does not name an ordinary keyboard key.
+    #[error("invalid DSKY channel 015 code {0:#o}")]
+    Code(u8),
+}
+
+/// V37 semantic-reconstruction failure.
+#[derive(Clone, Debug, Eq, Error, PartialEq)]
+pub enum PinballError {
+    /// Keyboard decoding failed.
+    #[error(transparent)]
+    Dsky(#[from] DskyError),
+    /// A numeric key was outside 0..9.
+    #[error("invalid V37 digit {0}")]
+    InvalidDigit(u8),
+    /// ENTER completed a verb other than V37.
+    #[error("verb {0:02} is not the V37 program-change protocol")]
+    NotProgramChange(u8),
+    /// Key is not valid at this point in the protocol.
+    #[error("unexpected key {key:?} in V37 state {state:?}")]
+    Unexpected {
+        /// State before the rejected key.
+        state: V37State,
+        /// Rejected key.
+        key: Key,
+    },
 }
 
 impl DskyState {
@@ -325,5 +470,27 @@ mod tests {
             assert!(Key::Digit(digit).code().unwrap() <= 0o37);
         }
         assert!(Key::Digit(10).code().is_err());
+    }
+
+    #[test]
+    fn typed_v37_reconstruction_selects_program_63() {
+        let mut change = V37ProgramChange::default();
+        for code in [0o21, 3, 7, 0o34, 6, 3, 0o34] {
+            change.accept_code(code).unwrap();
+        }
+        assert_eq!(change.verb_register, Some(37));
+        assert_eq!(change.program_register, Some(63));
+        assert_eq!(change.state, V37State::Complete { program: 63 });
+        assert_eq!(change.accepted_keys, 7);
+    }
+
+    #[test]
+    fn typed_v37_reconstruction_rejects_out_of_order_input() {
+        let mut change = V37ProgramChange::default();
+        assert!(matches!(
+            change.accept(Key::Digit(3)),
+            Err(PinballError::Unexpected { .. })
+        ));
+        assert_eq!(change, V37ProgramChange::default());
     }
 }

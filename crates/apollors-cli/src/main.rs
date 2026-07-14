@@ -2,8 +2,8 @@
 //! ApolloRS command-line research, execution, validation, and DSKY interface.
 
 use agc_assembler::{
-    ReferenceAssemblerConfig, assemble, assemble_binsource_reference, assemble_reference,
-    expand_program,
+    AssemblyError, ReferenceAssemblerConfig, assemble, assemble_binsource_reference,
+    assemble_reference, expand_program,
 };
 use agc_cpu::Cpu;
 use agc_dsky::{DskyState, Key};
@@ -12,16 +12,18 @@ use agc_loader::{RopeFormat, load_file};
 use agc_mission::{MissionController, MissionScenario};
 use agc_overlay::Overlay;
 use agc_reports::{
-    Envelope, Provenance, graph_envelope, inventory_corpus, trace_summary, write_json,
+    Envelope, Provenance, file_sha256, graph_envelope, inventory_corpus, memory_map, trace_summary,
+    write_json,
 };
 use agc_runtime::{Runtime, RuntimeEvent};
 use agc_source::{HistoricalCorpus, Program};
 use agc_trace::TraceLog;
 use agc_transpiler::{Style, VerificationStatus, compile_check, generate, write_generated};
-use agc_validation::compare_traces;
-use agc_xref::include_graph;
+use agc_validation::{YaAgcReferenceTrace, compare_traces, compare_yaagc_reference};
+use agc_xref::{call_graph, include_graph};
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand, ValueEnum};
+use std::collections::BTreeMap;
 use std::fs;
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::path::{Path, PathBuf};
@@ -117,12 +119,27 @@ enum Command {
         #[arg(long)]
         trace: Option<PathBuf>,
     },
-    /// Compare two ApolloRS/reference JSON-lines traces.
+    /// Compare two ApolloRS JSON-lines traces under the complete trace schema.
     Validate {
         #[arg(long)]
         left: PathBuf,
         #[arg(long)]
         right: PathBuf,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
+    /// Compare an ApolloRS JSON-lines trace with pinned yaAGC exact-trace TSV.
+    ValidateReference {
+        /// ApolloRS architectural JSON-lines trace.
+        #[arg(long)]
+        apollors: PathBuf,
+        /// Twelve-column exact yaAGC TSV from the documented instrumentation.
+        #[arg(long)]
+        reference: PathBuf,
+        /// Accept either stream as a fully matched but incomplete prefix.
+        #[arg(long)]
+        allow_prefix: bool,
+        /// Optional machine-readable validation report.
         #[arg(long)]
         output: Option<PathBuf>,
     },
@@ -283,7 +300,28 @@ fn run(cli: Cli) -> Result<()> {
                 .count();
             println!("parser/include errors: {parse_errors}");
             if let Some(path) = output {
-                write_pretty_json(&resolve_from(&repository, &path), &expanded.ir)?;
+                let path = resolve_from(&repository, &path);
+                let provenance = capture_provenance(
+                    &repository,
+                    &corpus,
+                    format!(
+                        "cargo run -p apollors-cli -- parse {} --entry {} --output {}",
+                        program.directory(),
+                        entry,
+                        path.display()
+                    ),
+                    vec![
+                        "This artifact is typed, include-expanded source IR; it is not proof that every record can be emitted by the native assembler.".to_owned(),
+                    ],
+                )?;
+                write_json(
+                    &path,
+                    &Envelope::new(
+                        "include-expanded-program-ir",
+                        provenance,
+                        expanded.ir.clone(),
+                    ),
+                )?;
             }
             if parse_errors != 0 {
                 bail!("source expansion contains {parse_errors} error diagnostics");
@@ -317,7 +355,41 @@ fn run(cli: Cli) -> Result<()> {
                 let report = report
                     .map(|path| resolve_from(&repository, &path))
                     .unwrap_or_else(|| output.with_extension("build.json"));
-                write_pretty_json(&report, &assembly.report)?;
+                let mut provenance = capture_provenance(
+                    &repository,
+                    &corpus,
+                    format!(
+                        "cargo run -p apollors-cli -- assemble {} --entry {} --reference-yayul {} --output {}",
+                        program.directory(),
+                        entry,
+                        config.executable.display(),
+                        output.display()
+                    ),
+                    vec![
+                        "This is an isolated external-reference build, not evidence that ApolloRS's native assembler emits the same rope.".to_owned(),
+                    ],
+                )?;
+                provenance.reference_toolchain = config.toolchain.clone();
+                provenance.record_input_file("reference_yayul_executable", &config.executable)?;
+                write_json(
+                    &report,
+                    &Envelope::new(
+                        "reference-assembly-report",
+                        provenance.clone(),
+                        assembly.report.clone(),
+                    ),
+                )?;
+                write_file_sidecar(
+                    &output,
+                    "reference-rope-image",
+                    provenance,
+                    serde_json::json!({
+                        "program": program,
+                        "bytes": assembly.report.rope_bytes,
+                        "nonzero_words": assembly.report.nonzero_words,
+                        "rope_sha256": assembly.report.rope_sha256,
+                    }),
+                )?;
                 println!(
                     "wrote validated {}-byte reference rope ({} nonzero words, SHA-256 {}) to {}",
                     assembly.report.rope_bytes,
@@ -336,7 +408,40 @@ fn run(cli: Cli) -> Result<()> {
                 let report = report
                     .map(|path| resolve_from(&repository, &path))
                     .unwrap_or_else(|| output.with_extension("build.json"));
-                write_pretty_json(&report, &assembly.report)?;
+                let mut provenance = capture_provenance(
+                    &repository,
+                    &corpus,
+                    format!(
+                        "cargo run -p apollors-cli -- assemble {} --reference-binsource {} --output {}",
+                        program.directory(),
+                        binsource.display(),
+                        output.display()
+                    ),
+                    vec![
+                        "This rope is imported from an independently proofed octal binsource after Rust-native bank/checksum validation; it is not a native assembly of the historical .agc transcription.".to_owned(),
+                    ],
+                )?;
+                provenance.reference_toolchain = toolchain;
+                provenance.record_input_file("reference_binsource", &binsource)?;
+                write_json(
+                    &report,
+                    &Envelope::new(
+                        "binsource-assembly-report",
+                        provenance.clone(),
+                        assembly.report.clone(),
+                    ),
+                )?;
+                write_file_sidecar(
+                    &output,
+                    "checksum-validated-rope-image",
+                    provenance,
+                    serde_json::json!({
+                        "program": program,
+                        "bytes": assembly.report.rope_bytes,
+                        "banks": assembly.report.banks,
+                        "rope_sha256": assembly.report.rope_sha256,
+                    }),
+                )?;
                 println!(
                     "wrote checksum-validated {}-bank binsource rope (SHA-256 {}) to {}",
                     assembly.report.banks,
@@ -347,7 +452,33 @@ fn run(cli: Cli) -> Result<()> {
             } else {
                 let expanded = expand_program(&corpus, program, &entry, overlay.as_ref())?;
                 let image = assemble(expanded)?;
-                write_bytes(&output, &image.to_yayul_bytes())?;
+                let rope = image.to_yayul_bytes();
+                write_bytes(&output, &rope)?;
+                let mut provenance = capture_provenance(
+                    &repository,
+                    &corpus,
+                    format!(
+                        "cargo run -p apollors-cli -- assemble {} --entry {} --output {}",
+                        program.directory(),
+                        entry,
+                        output.display()
+                    ),
+                    vec![
+                        "Native assembly support is corpus-driven; equivalence to yaYUL must be established separately for this exact output.".to_owned(),
+                    ],
+                )?;
+                provenance.reference_toolchain = "ApolloRS native assembler".to_owned();
+                write_file_sidecar(
+                    &output,
+                    "native-rope-image",
+                    provenance,
+                    serde_json::json!({
+                        "program": program,
+                        "words": image.words.len(),
+                        "occupied_words": image.occupied_words(),
+                        "rope_sha256": file_sha256(&output)?,
+                    }),
+                )?;
                 println!(
                     "wrote {} words ({} source-occupied) to {}",
                     image.words.len(),
@@ -362,23 +493,86 @@ fn run(cli: Cli) -> Result<()> {
             format,
             instructions,
             trace,
-        } => execute_rope(
-            &resolve_from(&repository, &rope),
-            format.into(),
-            instructions,
-            trace.as_deref().map(|path| resolve_from(&repository, path)),
-        ),
+        } => {
+            let rope = resolve_from(&repository, &rope);
+            let trace = trace.as_deref().map(|path| resolve_from(&repository, path));
+            let provenance = trace
+                .as_ref()
+                .map(|trace| {
+                    let mut provenance = capture_provenance(
+                        &repository,
+                        &corpus,
+                        format!(
+                            "cargo run -p apollors-cli -- execute --rope {} --instructions {} --trace {}",
+                            rope.display(),
+                            instructions,
+                            trace.display()
+                        ),
+                        vec![
+                            "Execution alone is not a claim of behavioral equivalence; use validate-reference with a pinned yaAGC trace.".to_owned(),
+                        ],
+                    )?;
+                    provenance.record_input_file("rope", &rope)?;
+                    Ok::<_, anyhow::Error>(provenance)
+                })
+                .transpose()?;
+            execute_rope(&rope, format.into(), instructions, trace, provenance)
+        }
         Command::Validate {
             left,
             right,
             output,
-        } => validate_traces(
-            &resolve_from(&repository, &left),
-            &resolve_from(&repository, &right),
-            output
+        } => {
+            let left = resolve_from(&repository, &left);
+            let right = resolve_from(&repository, &right);
+            let output = output
                 .as_deref()
-                .map(|path| resolve_from(&repository, path)),
-        ),
+                .map(|path| resolve_from(&repository, path));
+            let mut provenance = capture_provenance(
+                &repository,
+                &corpus,
+                format!(
+                    "cargo run -p apollors-cli -- validate --left {} --right {}",
+                    left.display(),
+                    right.display()
+                ),
+                vec![
+                    "This compares ApolloRS traces under the ApolloRS schema; it is not an independent implementation oracle.".to_owned(),
+                ],
+            )?;
+            provenance.record_input_file("left_trace", &left)?;
+            provenance.record_input_file("right_trace", &right)?;
+            validate_traces(&left, &right, output, provenance)
+        }
+        Command::ValidateReference {
+            apollors,
+            reference,
+            allow_prefix,
+            output,
+        } => {
+            let apollors = resolve_from(&repository, &apollors);
+            let reference = resolve_from(&repository, &reference);
+            let output = output
+                .as_deref()
+                .map(|path| resolve_from(&repository, path));
+            let mut provenance = capture_provenance(
+                &repository,
+                &corpus,
+                format!(
+                    "cargo run -p apollors-cli -- validate-reference --apollors {} --reference {}{}",
+                    apollors.display(),
+                    reference.display(),
+                    if allow_prefix { " --allow-prefix" } else { "" }
+                ),
+                vec![
+                    "The exact yaAGC instrumentation observes instruction/interrupt kind, cycle, PC, instruction, A/L/Q, EB/FB/BB, and interrupt vector/number; it does not compare every peripheral or memory cell.".to_owned(),
+                    "A qualified common-prefix result means every event in the shorter stream matched; it does not claim that the longer stream was exhausted.".to_owned(),
+                ],
+            )?;
+            provenance.record_input_file("apollors_trace", &apollors)?;
+            provenance.record_input_file("yaagc_reference_trace", &reference)?;
+            validate_reference_trace(&apollors, &reference, allow_prefix, output, provenance)
+        }
         Command::Transpile {
             program,
             entry,
@@ -403,6 +597,33 @@ fn run(cli: Cli) -> Result<()> {
                 let library = output.with_extension("rlib");
                 compile_check(rustc, &output, library)?;
             }
+            let mut provenance = capture_provenance(
+                &repository,
+                &corpus,
+                format!(
+                    "cargo run -p apollors-cli -- transpile {} --entry {} --output {}",
+                    program.directory(),
+                    entry,
+                    output.display()
+                ),
+                vec![
+                    "Generated instruction dispatch preserves source/word provenance but remains unverified until paired differential execution is recorded.".to_owned(),
+                    "The readable typed Pinball V37 model is maintained and tested in agc-dsky rather than generated by this whole-program instruction dispatcher.".to_owned(),
+                ],
+            )?;
+            provenance.reference_toolchain =
+                "ApolloRS native parser/assembler/transpiler".to_owned();
+            write_file_sidecar(
+                &output,
+                "generated-rust-source",
+                provenance,
+                serde_json::json!({
+                    "program": program,
+                    "records": generated.records,
+                    "style": format!("{:?}", generated.style).to_ascii_lowercase(),
+                    "verification": format!("{:?}", generated.verification),
+                }),
+            )?;
             println!(
                 "generated {} records at {}",
                 generated.records,
@@ -417,16 +638,39 @@ fn run(cli: Cli) -> Result<()> {
             output,
             trace,
             rope_fault,
-        } => run_mission(
-            &resolve_from(&repository, &rope),
-            format.into(),
-            instructions,
-            output
+        } => {
+            let rope = resolve_from(&repository, &rope);
+            let output = output
                 .as_deref()
-                .map(|path| resolve_from(&repository, path)),
-            trace.as_deref().map(|path| resolve_from(&repository, path)),
-            rope_fault.as_deref(),
-        ),
+                .map(|path| resolve_from(&repository, path));
+            let trace = trace.as_deref().map(|path| resolve_from(&repository, path));
+            let mut provenance = capture_provenance(
+                &repository,
+                &corpus,
+                format!(
+                    "cargo run -p apollors-cli -- mission --rope {}{}{}{}",
+                    rope.display(),
+                    instructions.map_or(String::new(), |value| format!(" --instructions {value}")),
+                    output.as_ref().map_or(String::new(), |path| format!(" --output {}", path.display())),
+                    trace.as_ref().map_or(String::new(), |path| format!(" --trace {}", path.display()))
+                ),
+                vec![
+                    "The Apollo 11 LM-5 pad-load document explicitly excludes mission-time computed quantities such as state vectors; this scenario applies a documented P63-relevant subset, not a complete mission erasable load.".to_owned(),
+                    "REFSMFLG is set as an explicit aligned-flight precondition; ApolloRS does not simulate the preceding platform-alignment procedure.".to_owned(),
+                    "No continuous vehicle, IMU, or landing-radar dynamics are coupled to this run, so P63 entry and initial landing-equation writes are demonstrated, not a complete powered-descent trajectory or landing.".to_owned(),
+                ],
+            )?;
+            provenance.record_input_file("luminary_rope", &rope)?;
+            run_mission(
+                &rope,
+                format.into(),
+                instructions,
+                output,
+                trace,
+                rope_fault.as_deref(),
+                provenance,
+            )
+        }
         Command::Dsky {
             rope,
             format,
@@ -477,16 +721,108 @@ fn run_forensics(repository: &Path, corpus: &HistoricalCorpus, output: &Path) ->
             )),
             &graph.to_dot(program.directory()),
         )?;
-        write_pretty_json(
-            &output.join(format!(
+        let dot_path = output.join(format!(
+            "{}-include-graph.dot",
+            program.directory().to_ascii_lowercase()
+        ));
+        write_file_sidecar(
+            &dot_path,
+            "include-graph-dot",
+            provenance.clone(),
+            serde_json::json!({"nodes": graph.nodes.len(), "edges": graph.edges.len()}),
+        )?;
+        write_json(
+            output.join(format!(
                 "{}-parse-diagnostics.json",
                 program.directory().to_ascii_lowercase()
             )),
-            &expanded.diagnostics,
+            &Envelope::new(
+                "parse-diagnostics",
+                provenance.clone(),
+                expanded.diagnostics.clone(),
+            ),
         )?;
+
+        match assemble(expanded) {
+            Ok(image) => {
+                write_json(
+                    output.join(format!(
+                        "{}-memory-map.json",
+                        program.directory().to_ascii_lowercase()
+                    )),
+                    &Envelope::new("memory-map", provenance.clone(), memory_map(&image.symbols)),
+                )?;
+                let calls = call_graph(&image.ir, &image.symbols);
+                write_json(
+                    output.join(format!(
+                        "{}-call-graph.json",
+                        program.directory().to_ascii_lowercase()
+                    )),
+                    &graph_envelope("call-graph", provenance.clone(), calls),
+                )?;
+            }
+            Err(AssemblyError::Diagnostics { count, diagnostics }) => {
+                let mut by_code = BTreeMap::<String, usize>::new();
+                let mut by_message = BTreeMap::<String, usize>::new();
+                for diagnostic in &diagnostics {
+                    *by_code.entry(diagnostic.code.clone()).or_default() += 1;
+                    *by_message.entry(diagnostic.message.clone()).or_default() += 1;
+                }
+                let mut frequent_messages = by_message.into_iter().collect::<Vec<_>>();
+                frequent_messages
+                    .sort_by(|left, right| right.1.cmp(&left.1).then_with(|| left.0.cmp(&right.0)));
+                frequent_messages.truncate(100);
+                write_json(
+                    output.join(format!(
+                        "{}-native-assembly-status.json",
+                        program.directory().to_ascii_lowercase()
+                    )),
+                    &Envelope::new(
+                        "native-assembly-status",
+                        provenance.clone(),
+                        serde_json::json!({
+                            "success": false,
+                            "errors": count,
+                            "diagnostics_by_code": by_code,
+                            "most_frequent_diagnostics": frequent_messages,
+                            "first_diagnostics": diagnostics.into_iter().take(100).collect::<Vec<_>>(),
+                        }),
+                    ),
+                )?;
+            }
+            Err(error) => {
+                write_json(
+                    output.join(format!(
+                        "{}-native-assembly-status.json",
+                        program.directory().to_ascii_lowercase()
+                    )),
+                    &Envelope::new(
+                        "native-assembly-status",
+                        provenance.clone(),
+                        serde_json::json!({"success": false, "error": error.to_string()}),
+                    ),
+                )?;
+            }
+        }
     }
     println!("generated Rust-native forensics under {}", output.display());
     Ok(())
+}
+
+fn capture_provenance(
+    repository: &Path,
+    corpus: &HistoricalCorpus,
+    generation_command: String,
+    known_limitations: Vec<String>,
+) -> Result<Provenance> {
+    let (manifest, _) = inventory_corpus(corpus)?;
+    Ok(Provenance::capture(
+        repository,
+        &manifest,
+        REFERENCE_TOOLCHAIN,
+        generation_command,
+        known_limitations,
+    ))
 }
 
 fn verify_source(
@@ -547,6 +883,7 @@ fn execute_rope(
     format: RopeFormat,
     instructions: u64,
     trace_path: Option<PathBuf>,
+    provenance: Option<Provenance>,
 ) -> Result<()> {
     let image = load_file(rope, format)?;
     let mut runtime = Runtime::new(Cpu::new(image.into_memory()?));
@@ -555,6 +892,16 @@ fn execute_rope(
         ensure_parent(&path)?;
         let file = fs::File::create(&path).with_context(|| format!("create {}", path.display()))?;
         runtime.trace().write_json_lines(BufWriter::new(file))?;
+        let mut provenance = provenance.context("trace output requires provenance")?;
+        provenance.record_input_file("trace_jsonl", &path)?;
+        write_json(
+            trace_provenance_path(&path),
+            &Envelope::new(
+                "execution-trace-summary",
+                provenance,
+                trace_summary(runtime.trace()),
+            ),
+        )?;
     }
     println!(
         "executed {} instructions / {} cycles; PC={:04o}",
@@ -566,12 +913,20 @@ fn execute_rope(
     Ok(())
 }
 
-fn validate_traces(left: &Path, right: &Path, output: Option<PathBuf>) -> Result<()> {
+fn validate_traces(
+    left: &Path,
+    right: &Path,
+    output: Option<PathBuf>,
+    provenance: Provenance,
+) -> Result<()> {
     let left = read_trace(left)?;
     let right = read_trace(right)?;
     let report = compare_traces(&left, &right);
     if let Some(path) = output {
-        write_pretty_json(&path, &report)?;
+        write_json(
+            &path,
+            &Envelope::new("apollors-trace-validation", provenance, report.clone()),
+        )?;
     }
     if report.equivalent {
         println!("trace-equivalent across {} events", report.left_events);
@@ -591,6 +946,52 @@ fn validate_traces(left: &Path, right: &Path, output: Option<PathBuf>) -> Result
     }
 }
 
+fn validate_reference_trace(
+    apollors: &Path,
+    reference: &Path,
+    allow_prefix: bool,
+    output: Option<PathBuf>,
+    provenance: Provenance,
+) -> Result<()> {
+    let apollors_trace = read_trace(apollors)?;
+    let reference_file = fs::File::open(reference)
+        .with_context(|| format!("open yaAGC reference trace {}", reference.display()))?;
+    let reference_trace = YaAgcReferenceTrace::read_tsv(BufReader::new(reference_file))?;
+    let report = compare_yaagc_reference(&apollors_trace, &reference_trace, allow_prefix);
+    if let Some(path) = output {
+        write_json(
+            &path,
+            &Envelope::new("yaagc-reference-validation", provenance, report.clone()),
+        )?;
+    }
+    if report.equivalent {
+        println!(
+            "ApolloRS matches yaAGC across {} events ({})",
+            report.matched_events,
+            if report.complete {
+                "complete streams"
+            } else {
+                "qualified common prefix"
+            }
+        );
+        Ok(())
+    } else {
+        let divergence = report
+            .first
+            .as_ref()
+            .expect("non-equivalent report has divergence");
+        bail!(
+            "{} divergence at event {} field {}: ApolloRS={}, yaAGC={} ({})",
+            format!("{:?}", divergence.class).to_ascii_lowercase(),
+            divergence.event,
+            divergence.field,
+            divergence.left,
+            divergence.right,
+            divergence.explanation
+        )
+    }
+}
+
 fn run_mission(
     rope: &Path,
     format: RopeFormat,
@@ -598,6 +999,7 @@ fn run_mission(
     output: Option<PathBuf>,
     trace: Option<PathBuf>,
     rope_fault: Option<&str>,
+    provenance: Provenance,
 ) -> Result<()> {
     let image = load_file(rope, format)?;
     let mut controller = MissionController::from_rope(image)?;
@@ -624,6 +1026,16 @@ fn run_mission(
             .runtime()
             .trace()
             .write_json_lines(BufWriter::new(file))?;
+        let mut trace_provenance = provenance.clone();
+        trace_provenance.record_input_file("trace_jsonl", &path)?;
+        write_json(
+            trace_provenance_path(&path),
+            &Envelope::new(
+                "mission-trace-summary",
+                trace_provenance,
+                trace_summary(controller.runtime().trace()),
+            ),
+        )?;
     }
     println!("{}", run.final_dsky.render_text());
     println!(
@@ -635,7 +1047,10 @@ fn run_mission(
         run.faults_applied
     );
     if let Some(path) = output {
-        write_pretty_json(&path, &run)?;
+        write_json(
+            &path,
+            &Envelope::new("apollo11-luminary099-p63-mission", provenance, run),
+        )?;
     }
     Ok(())
 }
@@ -763,10 +1178,27 @@ fn read_trace(path: &Path) -> Result<TraceLog> {
     Ok(TraceLog::read_json_lines(BufReader::new(file))?)
 }
 
-fn write_pretty_json(path: &Path, value: &impl serde::Serialize) -> Result<()> {
-    let mut bytes = serde_json::to_vec_pretty(value)?;
-    bytes.push(b'\n');
-    write_bytes(path, &bytes)
+fn trace_provenance_path(path: &Path) -> PathBuf {
+    PathBuf::from(format!("{}.provenance.json", path.display()))
+}
+
+fn write_file_sidecar(
+    path: &Path,
+    artifact_kind: &str,
+    provenance: Provenance,
+    details: serde_json::Value,
+) -> Result<()> {
+    let payload = serde_json::json!({
+        "path": path.display().to_string(),
+        "bytes": fs::metadata(path)?.len(),
+        "sha256": file_sha256(path)?,
+        "details": details,
+    });
+    write_json(
+        trace_provenance_path(path),
+        &Envelope::new(artifact_kind, provenance, payload),
+    )?;
+    Ok(())
 }
 
 fn write_text(path: &Path, text: &str) -> Result<()> {

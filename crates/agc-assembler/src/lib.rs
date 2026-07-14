@@ -239,8 +239,13 @@ pub enum AssemblyError {
     #[error("include cycle: {0}")]
     IncludeCycle(String),
     /// Semantic errors prevent a reliable image.
-    #[error("assembly produced {0} error diagnostics")]
-    Diagnostics(usize),
+    #[error("assembly produced {count} error diagnostics")]
+    Diagnostics {
+        /// Number of error-severity diagnostics.
+        count: usize,
+        /// Complete diagnostics retained for audit and capability analysis.
+        diagnostics: Vec<Diagnostic>,
+    },
     /// Compatibility overlay staging failed.
     #[error(transparent)]
     Overlay(#[from] OverlayError),
@@ -938,7 +943,10 @@ pub fn assemble(expanded: ExpandedProgram) -> Result<ProgramImage, AssemblyError
         .filter(|diagnostic| diagnostic.severity == Severity::Error)
         .count();
     if errors != 0 {
-        return Err(AssemblyError::Diagnostics(errors));
+        return Err(AssemblyError::Diagnostics {
+            count: errors,
+            diagnostics,
+        });
     }
     Ok(ProgramImage {
         words,

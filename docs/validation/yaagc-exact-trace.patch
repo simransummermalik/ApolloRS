@@ -1,0 +1,124 @@
+diff --git a/yaAGC/agc_engine.c b/yaAGC/agc_engine.c
+index 3a47efdd..aac9f472 100644
+--- a/yaAGC/agc_engine.c
++++ b/yaAGC/agc_engine.c
+@@ -522,6 +522,8 @@ static const int ExtracodeTiming[32] =
+ int DebuggerInterruptMasks[11] =
+   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+ 
++static FILE *ExactTrace;
++
+ //-----------------------------------------------------------------------------
+ // Stuff for doing structural coverage analysis.  Yes, I know it could be done
+ // much more cleverly.
+@@ -1890,6 +1892,60 @@ agc_engine (agc_t * State)
+ 
+   sExtraCode = 0;
+ 
++  /* ApolloRS P63 fixture: documented LM-5 padload subset and aligned-state flag. */
++  if (State->CycleCounter == 0)
++    {
++      static const uint16_t Padload[][3] =
++        {
++          { 0, 0077, 012000 },
++          { 3, 0333, 012704 }, { 3, 0334, 006264 },
++          { 3, 0335, 012562 }, { 3, 0336, 010723 },
++          { 3, 0337, 001112 }, { 3, 0340, 025001 },
++          { 5, 0000, 004247 }, { 5, 0001, 034030 },
++          { 4, 0022, 000301 }, { 4, 0023, 034760 },
++          { 4, 0024, 000125 }, { 4, 0025, 004627 },
++          { 4, 0026, 000002 }, { 4, 0027, 024342 },
++          { 5, 0072, 000416 }, { 5, 0073, 016071 },
++          { 5, 0074, 077731 }, { 5, 0075, 044630 },
++          { 5, 0076, 077125 }, { 5, 0077, 062404 },
++          { 5, 0100, 076607 }, { 5, 0101, 061356 },
++          { 5, 0102, 072634 }, { 5, 0103, 051602 },
++          { 5, 0104, 072775 }, { 5, 0105, 057777 },
++          { 5, 0122, 001027 }, { 5, 0123, 004204 },
++          { 5, 0124, 001022 }, { 5, 0125, 000004 },
++          { 5, 0126, 001414 }, { 5, 0127, 000116 },
++          { 5, 0130, 011463 }, { 5, 0131, 011463 },
++          { 5, 0132, 011463 }, { 5, 0133, 006315 },
++          { 5, 0134, 006315 }, { 5, 0135, 006315 },
++          { 5, 0136, 003146 }, { 5, 0137, 014370 },
++          { 7, 0020, 035610 }, { 7, 0021, 013146 },
++          { 7, 0022, 005050 }, { 7, 0023, 001407 },
++          { 7, 0024, 000226 }, { 7, 0025, 075240 },
++          { 7, 0026, 077743 }, { 7, 0027, 001407 },
++          { 7, 0030, 037777 }, { 7, 0031, 020000 },
++          { 7, 0032, 000000 }
++        };
++      unsigned p;
++      for (p = 0; p < sizeof (Padload) / sizeof (Padload[0]); p++)
++        State->Erasable[Padload[p][0]][Padload[p][1]] = Padload[p][2];
++    }
++
++  /* ApolloRS differential-test stimulus: V37E63E at exact MCT boundaries. */
++  {
++    static const uint64_t KeyCycles[] =
++      { 40000, 72769, 105537, 138305, 171073, 203842, 236610 };
++    static const int KeyCodes[] =
++      { 021, 003, 007, 034, 006, 003, 034 };
++    static unsigned NextKey = 0;
++    if (NextKey < sizeof (KeyCycles) / sizeof (KeyCycles[0]) &&
++        State->CycleCounter == KeyCycles[NextKey])
++      {
++        State->InputChannel[015] = KeyCodes[NextKey];
++        State->InterruptRequests[5] = 1;
++        NextKey++;
++      }
++  }
++
+   // For DOWNRUPT
+   if (State->DownruptTimeValid && State->CycleCounter >= State->DownruptTime)
+     {
+@@ -2524,6 +2580,17 @@ agc_engine (agc_t * State)
+ 
+       if (InterruptRequested)
+         {
++          if (!ExactTrace)
++            ExactTrace = fopen("/tmp/yaagc-exact-trace.tsv", "w");
++          if (ExactTrace)
++            {
++              fprintf(ExactTrace,
++                      "%llu\tR\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t%o\n",
++                      (unsigned long long) State->CycleCounter, ProgramCounter,
++                      Instruction, c(RegA), c(RegL), c(RegQ), c(RegEB), c(RegFB),
++                      c(RegBB), State->NextZ, i);
++              fflush(ExactTrace);
++            }
+           BacktraceAdd (State, i);
+           // Set up the return stuff.
+           c (RegZRUPT)= ProgramCounter + 1;
+@@ -2576,6 +2643,18 @@ agc_engine (agc_t * State)
+   // only the lower 12 bits are read into the adder, so if something sets
+   // any of the 4 most significant bits of Z, they will be lost before
+   // the next instruction sees them.
++  {
++    if (!ExactTrace)
++      ExactTrace = fopen("/tmp/yaagc-exact-trace.tsv", "w");
++    if (ExactTrace)
++      {
++        fprintf(ExactTrace,
++                "%llu\tI\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t0\t0\n",
++                (unsigned long long) State->CycleCounter, ProgramCounter,
++                Instruction, c(RegA), c(RegL), c(RegQ), c(RegEB), c(RegFB), c(RegBB));
++        fflush(ExactTrace);
++      }
++  }
+   State->NextZ = 1 + c(RegZ);
+   // The contents of the Z register are updated before an instruction is
+   // executed (really, it happens at the end of the previous instruction).
+diff --git a/yaAGC/agc_gdbmi.c b/yaAGC/agc_gdbmi.c
+index 276992c9..f1f1c5c9 100644
+--- a/yaAGC/agc_gdbmi.c
++++ b/yaAGC/agc_gdbmi.c
+@@ -520,6 +520,8 @@ GdbmiHandleInfoRegisters (int i)
+     }
+ 
+   /* Print the requested register contents */
++  if (!cli_argc)
++    printf ("CYCLES\t\t%llu\n", (unsigned long long) State->CycleCounter);
+   if (!cli_argc || !strcmp (cli_arg, "A"))
+     printf ("A\t\t0x%04x\t%d\n", 0177777 & State->Erasable[0][RegA],
+ 	    0177777 & State->Erasable[0][RegA]);

@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::fs;
-use std::io;
+use std::io::{self, Read};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use thiserror::Error;
@@ -67,6 +67,22 @@ impl Provenance {
             generated_at: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             known_limitations,
         }
+    }
+
+    /// Adds a content-addressed file input to the provenance record.
+    pub fn record_input_file(
+        &mut self,
+        label: impl AsRef<str>,
+        path: impl AsRef<Path>,
+    ) -> Result<(), ReportError> {
+        self.input_hashes.push(format!(
+            "{}={}",
+            label.as_ref(),
+            file_sha256(path.as_ref())?
+        ));
+        self.input_hashes.sort();
+        self.input_hashes.dedup();
+        Ok(())
     }
 }
 
@@ -215,6 +231,28 @@ pub fn inventory_corpus(
         .map_err(|error| ReportError::Source(error.to_string()))?;
     let inventory = repository_inventory(&manifest);
     Ok((manifest, inventory))
+}
+
+/// Computes a file SHA-256 without retaining the full input in memory.
+pub fn file_sha256(path: impl AsRef<Path>) -> Result<String, ReportError> {
+    let path = path.as_ref();
+    let mut file = fs::File::open(path).map_err(|source| ReportError::Io {
+        path: path.to_path_buf(),
+        source,
+    })?;
+    let mut digest = Sha256::new();
+    let mut buffer = [0_u8; 64 * 1024];
+    loop {
+        let bytes = file.read(&mut buffer).map_err(|source| ReportError::Io {
+            path: path.to_path_buf(),
+            source,
+        })?;
+        if bytes == 0 {
+            break;
+        }
+        digest.update(&buffer[..bytes]);
+    }
+    Ok(hex::encode(digest.finalize()))
 }
 
 /// Flattens the symbol table into deterministic memory-map rows.
@@ -427,5 +465,34 @@ mod tests {
             first_divergence: None,
         };
         assert!(render_evaluation_markdown(&[row]).contains("not run"));
+    }
+
+    #[test]
+    fn file_hashes_are_streamed_and_recorded() {
+        let path =
+            std::env::temp_dir().join(format!("apollors-report-hash-{}.txt", std::process::id()));
+        fs::write(&path, b"ApolloRS\n").unwrap();
+        assert_eq!(
+            file_sha256(&path).unwrap(),
+            "f30bf0eee6eea0186ac80fc8253db29769d5b217b89ad7e30136ef8ca5415497"
+        );
+
+        let manifest = SourceManifest {
+            historical_commit: Some("a".repeat(40)),
+            entries: Vec::new(),
+        };
+        let mut provenance = Provenance::capture(
+            Path::new("."),
+            &manifest,
+            "reference",
+            "command",
+            Vec::new(),
+        );
+        provenance.record_input_file("fixture", &path).unwrap();
+        assert_eq!(
+            provenance.input_hashes,
+            vec![format!("fixture={}", file_sha256(&path).unwrap())]
+        );
+        fs::remove_file(path).unwrap();
     }
 }

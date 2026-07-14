@@ -340,6 +340,11 @@ impl Cpu {
         event.extended = instruction.extended;
         let mut watchpoint = None;
         self.execute(instruction, &mut event, &mut watchpoint)?;
+        // The L register's two sign bits are overflow-corrected whenever it
+        // passes through the memory-cycle path. yaAGC performs the equivalent
+        // normalization at every instruction boundary, which also covers a
+        // direct TS/XCH write to L before the next instruction can observe it.
+        self.set_l_register(self.l_register().overflow_correct().sign_extend());
         self.schedule_completed_downrupt();
         event.cycle_end = self.cycles;
         event.after = self.snapshot();
@@ -1538,6 +1543,17 @@ mod tests {
                 .iter()
                 .any(|access| access.kind == "write" && access.logical == 0o102)
         );
+    }
+
+    #[test]
+    fn instruction_boundary_overflow_corrects_direct_l_write() {
+        let mut cpu = cpu_with_program(&[(Mnemonic::Ts, register::L)]);
+        cpu.set_a_raw(0o040000);
+        let outcome = cpu.step().unwrap();
+        assert_eq!(cpu.l_register().raw(), 0);
+        assert_eq!(outcome.trace.after.l, 0);
+        assert_eq!(cpu.a_raw(), 1);
+        assert_eq!(cpu.program_counter(), 0o4002);
     }
 
     #[test]

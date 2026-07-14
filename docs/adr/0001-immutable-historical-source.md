@@ -48,10 +48,9 @@ assembly/trace baselines.
 
 ## Validation
 
-- Regenerate `artifacts/forensics/source-manifest.sha256` and run inventory
-  `--check` in CI.
+- Regenerate `artifacts/generated/source-manifest.json` with the Rust CLI and
+  run `verify-source` in CI.
 - Refuse reproducible assembly when the checkout is dirty or hashes differ.
 - Test that overlays cannot write under the historical root.
 - For a baseline update, compare source hashes, emitted words, symbols, and
   golden trace digests before accepting the change.
-

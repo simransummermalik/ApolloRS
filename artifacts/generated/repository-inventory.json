@@ -4,7 +4,7 @@
   "provenance": {
     "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
     "reference_toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff; yaYUL 20260713",
-    "apollors_commit": "32d085819b43504fed53b2447b9861e34768fcc6-dirty",
+    "apollors_commit": "e5b520896d2544933273ac54415b79b29b5a7b61-dirty",
     "input_hashes": [
       "Comanche055/AGC_BLOCK_TWO_SELF-CHECK.agc=f86f1a02856b29a2cd01186a1a807fe4455b576624f8c4cb5876408677c83868",
       "Comanche055/ALARM_AND_ABORT.agc=ffa2e17087ed8029c2d56018114c4c947d9c3d03e6b15b0b17b11c8fc24a2d0f",
@@ -183,7 +183,7 @@
       "Luminary099/WAITLIST.agc=ca0092971efa3cafcdd8f7dad06a0980f999993f9dbc2e1c68cc764c41f7f0f0"
     ],
     "generation_command": "cargo run -p apollors-cli -- forensics",
-    "generated_at": "2026-07-14T04:58:16Z",
+    "generated_at": "2026-07-14T07:12:21Z",
     "known_limitations": []
   },
   "data": {
