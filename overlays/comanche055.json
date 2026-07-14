@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "program": "comanche055",
+  "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
+  "reference_toolchain": "VirtualAGC yaYUL 20260713, VirtualAGC commit 0b13e5976dbc3c6c76aeab35195135261d7999ff",
+  "include_aliases": [],
+  "source_edits": []
+}

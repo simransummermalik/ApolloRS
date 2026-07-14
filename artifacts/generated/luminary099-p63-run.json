@@ -1,0 +1,3957 @@
+{
+  "scenario": "luminary099-p63-request",
+  "frames": [
+    {
+      "instruction": 5000,
+      "cycle": 8481,
+      "pc": 0,
+      "a": 65535,
+      "l": 1732,
+      "q": 110,
+      "eb": 512,
+      "fb": 11264,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8192
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 10000,
+      "cycle": 16851,
+      "pc": 1736,
+      "a": 65535,
+      "l": 1732,
+      "q": 2,
+      "eb": 512,
+      "fb": 11264,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8192
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 15000,
+      "cycle": 24702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 20000,
+      "cycle": 29702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 25000,
+      "cycle": 34702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 30000,
+      "cycle": 39702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 35000,
+      "cycle": 44702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 40000,
+      "cycle": 49702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 45000,
+      "cycle": 54702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 50000,
+      "cycle": 59702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 55000,
+      "cycle": 64702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 60000,
+      "cycle": 69702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 65000,
+      "cycle": 74702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 70000,
+      "cycle": 79702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 75000,
+      "cycle": 84702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 80000,
+      "cycle": 89702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 85000,
+      "cycle": 94702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 90000,
+      "cycle": 99702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 95000,
+      "cycle": 104702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 100000,
+      "cycle": 109702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 105000,
+      "cycle": 114702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 110000,
+      "cycle": 119702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 115000,
+      "cycle": 124702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 120000,
+      "cycle": 129702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 125000,
+      "cycle": 134702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 130000,
+      "cycle": 139702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 135000,
+      "cycle": 144702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 140000,
+      "cycle": 149702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 145000,
+      "cycle": 154702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 150000,
+      "cycle": 159702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 155000,
+      "cycle": 164702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 160000,
+      "cycle": 169702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 165000,
+      "cycle": 174702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 170000,
+      "cycle": 179702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 175000,
+      "cycle": 184702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 180000,
+      "cycle": 189702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 185000,
+      "cycle": 194702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 190000,
+      "cycle": 199702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 195000,
+      "cycle": 204702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    },
+    {
+      "instruction": 200000,
+      "cycle": 209702,
+      "pc": 0,
+      "a": 0,
+      "l": 8906,
+      "q": 1,
+      "eb": 1024,
+      "fb": 1024,
+      "dsky": {
+        "program": [
+          null,
+          null
+        ],
+        "verb": [
+          null,
+          null
+        ],
+        "noun": [
+          null,
+          null
+        ],
+        "registers": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "signs": [
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          },
+          {
+            "plus": false,
+            "minus": false
+          }
+        ],
+        "lamps": {
+          "uplink_activity": false,
+          "no_attitude": false,
+          "standby": false,
+          "key_release": false,
+          "operator_error": false,
+          "restart": false,
+          "tracker": false,
+          "altitude": false,
+          "velocity": false,
+          "computer_activity": false,
+          "temperature": false,
+          "gimbal_lock": false,
+          "program_alarm": false
+        },
+        "flash": false,
+        "last_relay_word": 0,
+        "last_lamp_word": 8194
+      },
+      "guidance": {},
+      "executive": [],
+      "waitlist": [],
+      "hardware": {
+        "imu": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "radar": {
+          "range": 0,
+          "rate": 0,
+          "samples": 0
+        },
+        "downlink": [],
+        "pending_downlink_1": null,
+        "pending_downlink_2": null
+      }
+    }
+  ],
+  "final_dsky": {
+    "program": [
+      null,
+      null
+    ],
+    "verb": [
+      null,
+      null
+    ],
+    "noun": [
+      null,
+      null
+    ],
+    "registers": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "signs": [
+      {
+        "plus": false,
+        "minus": false
+      },
+      {
+        "plus": false,
+        "minus": false
+      },
+      {
+        "plus": false,
+        "minus": false
+      }
+    ],
+    "lamps": {
+      "uplink_activity": false,
+      "no_attitude": false,
+      "standby": false,
+      "key_release": false,
+      "operator_error": false,
+      "restart": false,
+      "tracker": false,
+      "altitude": false,
+      "velocity": false,
+      "computer_activity": false,
+      "temperature": false,
+      "gimbal_lock": false,
+      "program_alarm": false
+    },
+    "flash": false,
+    "last_relay_word": 0,
+    "last_lamp_word": 8194
+  },
+  "instructions": 200000,
+  "cycles": 209702,
+  "faults_applied": 0
+}

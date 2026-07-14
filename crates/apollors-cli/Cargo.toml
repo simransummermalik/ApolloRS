@@ -1,0 +1,37 @@
+[package]
+name = "apollors-cli"
+description = "ApolloRS command-line research and execution interface"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "apollors"
+path = "src/main.rs"
+
+[dependencies]
+agc-assembler = { path = "../agc-assembler" }
+agc-cpu = { path = "../agc-cpu" }
+agc-dsky = { path = "../agc-dsky" }
+agc-faults = { path = "../agc-faults" }
+agc-loader = { path = "../agc-loader" }
+agc-mission = { path = "../agc-mission" }
+agc-overlay = { path = "../agc-overlay" }
+agc-parser = { path = "../agc-parser" }
+agc-reports = { path = "../agc-reports" }
+agc-runtime = { path = "../agc-runtime" }
+agc-source = { path = "../agc-source" }
+agc-transpiler = { path = "../agc-transpiler" }
+agc-trace = { path = "../agc-trace" }
+agc-validation = { path = "../agc-validation" }
+agc-word = { path = "../agc-word" }
+agc-xref = { path = "../agc-xref" }
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

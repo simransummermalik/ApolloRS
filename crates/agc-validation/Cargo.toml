@@ -1,0 +1,22 @@
+[package]
+name = "agc-validation"
+description = "Differential AGC trace validation and regression classification"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-cpu = { path = "../agc-cpu" }
+agc-interpreter = { path = "../agc-interpreter" }
+agc-runtime = { path = "../agc-runtime" }
+agc-trace = { path = "../agc-trace" }
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+agc-word = { path = "../agc-word" }
+
+[lints]
+workspace = true

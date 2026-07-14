@@ -1,0 +1,20 @@
+[package]
+name = "agc-transpiler"
+description = "Provenance-preserving AGC IR to Rust generation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-ir = { path = "../agc-ir" }
+agc-symbols = { path = "../agc-symbols" }
+thiserror.workspace = true
+
+[dev-dependencies]
+agc-ast = { path = "../agc-ast" }
+agc-word = { path = "../agc-word" }
+
+[lints]
+workspace = true

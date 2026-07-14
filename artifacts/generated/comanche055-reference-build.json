@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "program": "comanche055",
+  "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
+  "binsource": "/tmp/apollors-virtualagc-reference/Comanche055/Comanche055.binsource",
+  "toolchain": "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff Comanche055.binsource",
+  "binsource_sha256": "5a910b1d69cf9ef3b0f1ecc241271e0dd15f27e305d533028061ed2b71ffafcf",
+  "banks": 36,
+  "words": 36864,
+  "unused_words": 266,
+  "bank_checksums": [
+    {
+      "bank": 0,
+      "sum": 0,
+      "polarity": "positive"
+    },
+    {
+      "bank": 1,
+      "sum": 1,
+      "polarity": "positive"
+    },
+    {
+      "bank": 2,
+      "sum": 2,
+      "polarity": "positive"
+    },
+    {
+      "bank": 3,
+      "sum": 3,
+      "polarity": "positive"
+    },
+    {
+      "bank": 4,
+      "sum": 4,
+      "polarity": "positive"
+    },
+    {
+      "bank": 5,
+      "sum": 5,
+      "polarity": "positive"
+    },
+    {
+      "bank": 6,
+      "sum": 6,
+      "polarity": "positive"
+    },
+    {
+      "bank": 7,
+      "sum": 7,
+      "polarity": "positive"
+    },
+    {
+      "bank": 8,
+      "sum": 8,
+      "polarity": "positive"
+    },
+    {
+      "bank": 9,
+      "sum": 9,
+      "polarity": "positive"
+    },
+    {
+      "bank": 10,
+      "sum": 32757,
+      "polarity": "negative"
+    },
+    {
+      "bank": 11,
+      "sum": 11,
+      "polarity": "positive"
+    },
+    {
+      "bank": 12,
+      "sum": 12,
+      "polarity": "positive"
+    },
+    {
+      "bank": 13,
+      "sum": 13,
+      "polarity": "positive"
+    },
+    {
+      "bank": 14,
+      "sum": 14,
+      "polarity": "positive"
+    },
+    {
+      "bank": 15,
+      "sum": 15,
+      "polarity": "positive"
+    },
+    {
+      "bank": 16,
+      "sum": 16,
+      "polarity": "positive"
+    },
+    {
+      "bank": 17,
+      "sum": 17,
+      "polarity": "positive"
+    },
+    {
+      "bank": 18,
+      "sum": 18,
+      "polarity": "positive"
+    },
+    {
+      "bank": 19,
+      "sum": 19,
+      "polarity": "positive"
+    },
+    {
+      "bank": 20,
+      "sum": 20,
+      "polarity": "positive"
+    },
+    {
+      "bank": 21,
+      "sum": 21,
+      "polarity": "positive"
+    },
+    {
+      "bank": 22,
+      "sum": 22,
+      "polarity": "positive"
+    },
+    {
+      "bank": 23,
+      "sum": 23,
+      "polarity": "positive"
+    },
+    {
+      "bank": 24,
+      "sum": 24,
+      "polarity": "positive"
+    },
+    {
+      "bank": 25,
+      "sum": 25,
+      "polarity": "positive"
+    },
+    {
+      "bank": 26,
+      "sum": 26,
+      "polarity": "positive"
+    },
+    {
+      "bank": 27,
+      "sum": 27,
+      "polarity": "positive"
+    },
+    {
+      "bank": 28,
+      "sum": 28,
+      "polarity": "positive"
+    },
+    {
+      "bank": 29,
+      "sum": 29,
+      "polarity": "positive"
+    },
+    {
+      "bank": 30,
+      "sum": 30,
+      "polarity": "positive"
+    },
+    {
+      "bank": 31,
+      "sum": 31,
+      "polarity": "positive"
+    },
+    {
+      "bank": 32,
+      "sum": 32,
+      "polarity": "positive"
+    },
+    {
+      "bank": 33,
+      "sum": 32734,
+      "polarity": "negative"
+    },
+    {
+      "bank": 34,
+      "sum": 34,
+      "polarity": "positive"
+    },
+    {
+      "bank": 35,
+      "sum": 32732,
+      "polarity": "negative"
+    }
+  ],
+  "rope_bytes": 73728,
+  "nonzero_words": 36229,
+  "rope_sha256": "2ba31de9291cd10fb351a64d261bae8514a1cb75b4651bfa6a135dfa821a2d79"
+}

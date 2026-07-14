@@ -1,0 +1,19 @@
+[package]
+name = "agc-symbols"
+description = "AGC symbol extraction, resolution, and memory-map records"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-ast = { path = "../agc-ast" }
+agc-ir = { path = "../agc-ir" }
+agc-word = { path = "../agc-word" }
+indexmap.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

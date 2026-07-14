@@ -1,0 +1,17 @@
+[package]
+name = "agc-dsky"
+description = "Real AGC DSKY channel decode, keyboard, and display model"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-trace = { path = "../agc-trace" }
+agc-word = { path = "../agc-word" }
+serde.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

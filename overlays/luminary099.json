@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "program": "luminary099",
+  "historical_commit": "247dd7d0d1b0e7f9f270750ec08983e0a72e73e1",
+  "reference_toolchain": "VirtualAGC yaYUL 20260713, VirtualAGC commit 0b13e5976dbc3c6c76aeab35195135261d7999ff",
+  "include_aliases": [
+    {
+      "original": "LAMBERT_AIMPOINT_GUIDANCE.agc",
+      "replacement": "GENERAL_LAMBERT_AIMPOINT_GUIDANCE.agc",
+      "rationale": "The Luminary 099 include spelling names a file absent from the historical tree; the corresponding checked-in source carries the GENERAL_ prefix.",
+      "evidence": [
+        {
+          "observation": "yaYUL reports the original include missing; materializing this exact alias produces zero unresolved symbols and a 36,864-word rope image.",
+          "source": "ApolloRS reproducible VirtualAGC assembly audit"
+        }
+      ]
+    },
+    {
+      "original": "TRIM_GIMBAL_CNTROL_SYSTEM.agc",
+      "replacement": "TRIM_GIMBAL_CONTROL_SYSTEM.agc",
+      "rationale": "The include drops the second O in CONTROL while the existing source uses the correctly spelled filename.",
+      "evidence": [
+        {
+          "observation": "The misspelled include target is absent, the replacement is present, and yaYUL resolves the full program after applying the alias.",
+          "source": "ApolloRS corpus inventory and VirtualAGC assembly audit"
+        }
+      ]
+    }
+  ],
+  "source_edits": []
+}

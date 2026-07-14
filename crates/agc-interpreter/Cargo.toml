@@ -1,0 +1,19 @@
+[package]
+name = "agc-interpreter"
+description = "AGC interpretive-language decode and execution state"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-runtime = { path = "../agc-runtime" }
+agc-trace = { path = "../agc-trace" }
+agc-word = { path = "../agc-word" }
+serde.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
+

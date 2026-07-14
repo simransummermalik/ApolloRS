@@ -1,0 +1,19 @@
+[package]
+name = "agc-loader"
+description = "AGC rope-image and symbol artifact loading"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-assembler = { path = "../agc-assembler" }
+agc-memory = { path = "../agc-memory" }
+agc-trace = { path = "../agc-trace" }
+agc-word = { path = "../agc-word" }
+thiserror.workspace = true
+
+[lints]
+workspace = true
+

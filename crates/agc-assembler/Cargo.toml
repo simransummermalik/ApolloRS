@@ -1,0 +1,26 @@
+[package]
+name = "agc-assembler"
+description = "ApolloRS assembly semantics and pinned yaYUL reference integration"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-ast = { path = "../agc-ast" }
+agc-ir = { path = "../agc-ir" }
+agc-isa = { path = "../agc-isa" }
+agc-overlay = { path = "../agc-overlay" }
+agc-parser = { path = "../agc-parser" }
+agc-source = { path = "../agc-source" }
+agc-symbols = { path = "../agc-symbols" }
+agc-word = { path = "../agc-word" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

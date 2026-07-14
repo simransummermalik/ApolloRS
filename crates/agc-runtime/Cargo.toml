@@ -1,0 +1,22 @@
+[package]
+name = "agc-runtime"
+description = "AGC timers, interrupts, I/O, Executive, Waitlist, alarms, and replay"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-cpu = { path = "../agc-cpu" }
+agc-memory = { path = "../agc-memory" }
+agc-trace = { path = "../agc-trace" }
+agc-word = { path = "../agc-word" }
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+agc-isa = { path = "../agc-isa" }
+
+[lints]
+workspace = true
