@@ -1,5 +1,11 @@
 # Reproducing the exact yaAGC comparison
 
+This procedure reproduces the historical Luminary P63 integration stream. For
+the fixture-free all-mnemonic rope, use
+[`yaagc-conformance.md`](yaagc-conformance.md) and the separate conformance
+patch; keeping the patches separate preserves the provenance of the existing
+P63 artifact.
+
 The independent reference is VirtualAGC commit
 `0b13e5976dbc3c6c76aeab35195135261d7999ff`. The patch beside this document
 adds a twelve-column TSV logger and the same bounded P63 fixture used by

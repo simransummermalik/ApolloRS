@@ -184,12 +184,9 @@ impl TraceLog {
     /// Reads and validates newline-delimited JSON.
     pub fn read_json_lines(reader: impl BufRead) -> Result<Self, TraceError> {
         let mut trace = Self::default();
-        for line in reader.lines() {
-            let line = line?;
-            if line.trim().is_empty() {
-                continue;
-            }
-            trace.push(serde_json::from_str(&line)?)?;
+        let mut reader = TraceJsonReader::new(reader);
+        while let Some(event) = reader.next_event()? {
+            trace.events.push(event);
         }
         Ok(trace)
     }
@@ -211,6 +208,70 @@ impl TraceLog {
             left: self.events.get(shared),
             right: other.events.get(shared),
         })
+    }
+}
+
+/// Streaming reader for validated newline-delimited trace events.
+///
+/// Unlike [`TraceLog::read_json_lines`], this reader retains only one event at
+/// a time. It is intended for coverage, statistics, and other analyses over
+/// long mission traces.
+#[derive(Debug)]
+pub struct TraceJsonReader<R> {
+    reader: R,
+    buffer: String,
+    previous_sequence: Option<u64>,
+    previous_cycle_end: u64,
+    finished: bool,
+}
+
+impl<R: BufRead> TraceJsonReader<R> {
+    /// Creates a streaming reader at the beginning of a JSON-lines trace.
+    pub fn new(reader: R) -> Self {
+        Self {
+            reader,
+            buffer: String::new(),
+            previous_sequence: None,
+            previous_cycle_end: 0,
+            finished: false,
+        }
+    }
+
+    /// Reads and validates the next event, skipping blank lines.
+    pub fn next_event(&mut self) -> Result<Option<TraceEvent>, TraceError> {
+        if self.finished {
+            return Ok(None);
+        }
+        loop {
+            self.buffer.clear();
+            if self.reader.read_line(&mut self.buffer)? == 0 {
+                self.finished = true;
+                return Ok(None);
+            }
+            if self.buffer.trim().is_empty() {
+                continue;
+            }
+            let event: TraceEvent = serde_json::from_str(&self.buffer)?;
+            if event.schema_version != TRACE_SCHEMA_VERSION {
+                return Err(TraceError::Schema(event.schema_version));
+            }
+            let expected_sequence = self
+                .previous_sequence
+                .map_or(0, |sequence| sequence.saturating_add(1));
+            if event.sequence != expected_sequence
+                || self
+                    .previous_sequence
+                    .is_some_and(|_| event.cycle_start < self.previous_cycle_end)
+            {
+                return Err(TraceError::Ordering {
+                    previous_sequence: self.previous_sequence.unwrap_or(0),
+                    sequence: event.sequence,
+                });
+            }
+            self.previous_sequence = Some(event.sequence);
+            self.previous_cycle_end = event.cycle_end;
+            return Ok(Some(event));
+        }
     }
 }
 
@@ -267,5 +328,23 @@ mod tests {
         trace.write_json_lines(&mut bytes).unwrap();
         let decoded = TraceLog::read_json_lines(bytes.as_slice()).unwrap();
         assert_eq!(decoded, trace);
+    }
+
+    #[test]
+    fn streaming_reader_validates_without_building_a_log() {
+        let mut trace = TraceLog::default();
+        trace
+            .push(TraceEvent::new(0, 0, 0o4000, AgcWord::POSITIVE_ZERO))
+            .unwrap();
+        trace
+            .push(TraceEvent::new(1, 2, 0o4001, AgcWord::POSITIVE_ZERO))
+            .unwrap();
+        let mut bytes = Vec::new();
+        trace.write_json_lines(&mut bytes).unwrap();
+
+        let mut reader = TraceJsonReader::new(bytes.as_slice());
+        assert_eq!(reader.next_event().unwrap().unwrap().sequence, 0);
+        assert_eq!(reader.next_event().unwrap().unwrap().sequence, 1);
+        assert!(reader.next_event().unwrap().is_none());
     }
 }

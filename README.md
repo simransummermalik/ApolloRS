@@ -6,8 +6,9 @@
 
 [![Rust 1.97.0](https://img.shields.io/badge/Rust-1.97.0-dea584?logo=rust&logoColor=white)](rust-toolchain.toml)
 [![Unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-7b2d26)](Cargo.toml)
-[![Tests 71 passing](https://img.shields.io/badge/tests-71%20passing-2f855a)](#verification)
+[![Tests 82 passing](https://img.shields.io/badge/tests-82%20passing-2f855a)](#verification)
 [![Trace 300,468 events](https://img.shields.io/badge/yaAGC%20trace-300%2C468%20matched-2563eb)](#the-flagship-experiment)
+[![Block II 39 forms](https://img.shields.io/badge/Block%20II-39%2F39%20forms-6b46c1)](#complete-block-ii-semantic-conformance)
 [![License MIT or Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](#licensing-and-provenance)
 
 **Real Luminary 099 rope · Real Block II execution · Real DSKY path · Exact yaAGC comparison**
@@ -20,6 +21,8 @@
 │ SOFTWARE PATH  KEYRUPT1 ✓  CHARIN ✓  MODREG=63 ✓  P63LM F32:0776 ✓          │
 │ GUIDANCE       WHICH ✓  DVTHRUSH ✓  DVCNTR ✓  WCHPHASE ✓  FLPASS0 ✓         │
 │ ORACLE         300,468 / 300,468 ApolloRS events match pinned yaAGC ✓        │
+│ CONFORMANCE    38 / 38 mnemonics · 39 / 39 decode forms · 252 exact events ✓ │
+│ EXPERIMENTS    11 paired faults · masking · recovery · latency · degradation │
 │ INTEGRITY      175 historical .agc files verified byte-for-byte ✓             │
 └────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -44,18 +47,21 @@ mutating real AGC state.
 
 | Measured property | Current result |
 |---|---:|
-| Rust workspace | 24 crates, `unsafe` forbidden |
+| Rust workspace | 27 crates, `unsafe` forbidden |
 | Historical corpus | 175 `.agc` files |
 | Historical size | 3,150,815 bytes / 130,186 physical lines |
 | Historical revision | `247dd7d0d1b0e7f9f270750ec08983e0a72e73e1` |
 | Luminary mission run | 300,000 instructions / 504,958 machine cycles |
 | ApolloRS architectural events | 300,468 |
 | Exact yaAGC matches | 300,468, with no ApolloRS-stream divergence |
+| P63 dynamic coverage | 37 mnemonic/context forms, 4,261 rope words, 20 fixed banks |
+| Block II conformance | 38/38 mnemonics, 39/39 forms, 46/46 assertions |
+| Conformance oracle | 252/252 ApolloRS events match pinned yaAGC |
 | DSKY acceptance | All seven `V37E63E` keys reached KEYRUPT1 and `CHARIN` |
 | P63 checkpoint | `P63LM` at physical `F32:0776`, cycle 241,219 |
 | Typed reconstructions | Pinball V37 state machine and P63 initialization |
-| Fault experiment | First decode divergence at event 145,942; no bounded recovery |
-| Test suite | 71 tests passing, plus clean Clippy and release build |
+| Fault matrix | 11 paired arms: 2 masked, 2 recovered, 3 degraded |
+| Test suite | 82 tests passing, plus clean Clippy and release build |
 
 The yaAGC reference continues beyond the ApolloRS stream to 795,178 events.
 The result is therefore an **exact qualified common-prefix match**, not a claim
@@ -141,6 +147,62 @@ The complete procedure, normalization rule, pinned revision, and minimal
 instrumentation patch are in
 [`docs/validation/yaagc-reference.md`](docs/validation/yaagc-reference.md).
 
+## What P63 actually executes
+
+ApolloRS now measures the 136 MB mission trace as a validated stream instead of
+loading it into memory. The 300,000-instruction P63 run reaches:
+
+| Dynamic surface | Measured P63 result |
+|---|---:|
+| logical instruction PCs | 2,185 |
+| unique physical rope fetches | 4,261 |
+| installed-rope fetch coverage | 11.55% |
+| mnemonic/basic-extracode forms | 37 |
+| fixed banks fetched | 20 |
+| erasable banks accessed | 8 / 8 |
+| I/O channels observed | 16 |
+| interrupt entries | 468 |
+
+The denominator is all 36,864 installed rope words, including constants and
+unused locations, so 11.55% is dynamic fetch coverage—not a source-line or
+requirements-coverage claim. The trace also reveals 519 instructions fetched
+from erasable memory and 10,928 fetched from registers during AGC substitution
+and indirect-control behavior.
+
+Most importantly, measurement exposes what the flagship mission does **not**
+test: P63 never executes `DIM` or `EDRUPT`, and several other forms are rare.
+That gap drives the separate conformance suite instead of being hidden by a
+large instruction count.
+
+## Complete Block II semantic conformance
+
+ApolloRS generates a standalone synthetic Block II rope designed around
+semantic boundaries rather than one mission path. It exercises every canonical
+mnemonic, both contexts of `INDEX`, both zero encodings, both overflow
+directions, all four `CCS` classes, double-precision arithmetic, edit/exchange
+paths, EB/FB/BB synchronization, superbank 40, every channel Boolean operation,
+reset interrupt/resume, and vector-zero `EDRUPT`.
+
+```text
+ApolloRS local: 250 instructions · 252 events · 461 cycles
+Coverage:       38 / 38 mnemonics · 39 / 39 decode forms
+State checks:   46 / 46 exact erasable/channel/register assertions
+Pinned yaAGC:   252 / 252 ApolloRS events matched · first divergence: none
+```
+
+```sh
+YAAGC=$(sh tools/build-yaagc-conformance.sh /tmp/apollors-virtualagc)
+cargo run --release -p apollors-cli -- --repository . conformance \
+  --output-dir /tmp/apollors-conformance \
+  --yaagc "$YAAGC"
+```
+
+The local assertions are specification-derived and therefore not mislabeled as
+an independent proof. Qualification comes from running the exact generated rope
+bytes through separately compiled pinned yaAGC and comparing the complete
+ApolloRS stream. See
+[`docs/validation/yaagc-conformance.md`](docs/validation/yaagc-conformance.md).
+
 ## System architecture
 
 ```mermaid
@@ -183,10 +245,10 @@ rules are documented in
 |---|---|---|
 | Exact values | `agc-word`, `agc-fixed` | 15-bit one's-complement words, signed zeros, end-around carry, double words, scaled integers |
 | AGC machine | `agc-isa`, `agc-memory`, `agc-cpu` | Basic/extracode decoding, registers, banks, edit behavior, channels, timers, interrupts, instruction transitions |
-| Runtime | `agc-runtime`, `agc-faults`, `agc-dsky`, `agc-mission` | Deterministic events, DSKY relays and keys, IMU/radar inputs, fault audit, mission checkpoints |
+| Runtime | `agc-runtime`, `agc-faults`, `agc-dsky`, `agc-mission`, `agc-experiments` | Deterministic events, DSKY relays and keys, IMU/radar inputs, paired fault matrices, mission checkpoints |
 | Historical source | `agc-source`, `agc-ast`, `agc-parser`, `agc-overlay`, `agc-ir`, `agc-symbols` | Immutable corpus access, exact syntax, includes, explicit edits, typed records, symbols |
 | Build and recovery | `agc-assembler`, `agc-loader`, `agc-xref`, `agc-transpiler` | Focused native assembly, strict reference integration, rope loading, graphs, compile-checked Rust dispatch |
-| Research evidence | `agc-trace`, `agc-validation`, `agc-reports`, `apollors-cli` | Canonical events, divergence classification, yaAGC adapter, provenance envelopes, operator workflows |
+| Research evidence | `agc-trace`, `agc-coverage`, `agc-conformance`, `agc-validation`, `agc-reports`, `apollors-cli` | Streaming coverage, complete semantic rope, divergence classification, yaAGC adapters, provenance envelopes, operator workflows |
 | Bounded models | `agc-interpreter` plus mission/DSKY models | Exact integer experiments and readable Pinball/P63 reconstructions |
 
 ## Launch ApolloRS
@@ -203,12 +265,26 @@ installed, Cargo selects Rust 1.97.0 automatically.
 
 ### 2. Qualify the workspace
 
+The complete clean-output workflow is one command:
+
+```sh
+sh tools/qualify.sh
+```
+
+Its constituent Rust gates are:
+
 ```sh
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
+cargo test --workspace --all-targets
 cargo build --workspace --release
 ```
+
+The workflow also verifies historical hashes, executes conformance, reruns P63,
+streams coverage, runs all 11 paired fault arms, and validates every generated
+artifact. CI repeats it from a recursive clean checkout; the separate oracle
+job builds yaAGC from its pinned revision. Details are in
+[`docs/validation/qualification.md`](docs/validation/qualification.md).
 
 ### 3. Verify the untouched Apollo corpus
 
@@ -254,7 +330,35 @@ The terminal accepts `0`–`9`, `verb`, `noun`, `+`, `-`, `enter`, `clear`,
 `keyrel`, `reset`, `pro`, `step`, `run N`, `status`, and `quit`. Display digits
 and lamps are derived from AGC output-channel traffic.
 
-## Deliberately break P63
+## Fault sensitivity: masking, recovery, latency, and degradation
+
+The tracked matrix declares 11 experiments before execution and resolves each
+injection from baseline evidence such as the first key request, `P63LM` entry,
+or the first write to `LAND.X.HI`.
+
+```sh
+cargo run --release -p apollors-cli -- --repository . fault-matrix \
+  --rope artifacts/generated/luminary099-reference.bin \
+  --format yayul \
+  --spec experiments/p63-fault-matrix.json \
+  --output artifacts/generated/luminary099-p63-fault-matrix.json
+```
+
+| Measured outcome at 180,000 instructions | Cases |
+|---|---:|
+| no trace-visible effect (masked) | 2 |
+| trace diverged, final registers recovered | 2 |
+| persistent state divergence, acceptance unchanged | 3 |
+| mission timing/evidence changed | 1 |
+| mission acceptance degraded | 3 |
+
+The results distinguish effects that a single “did it crash?” metric would
+collapse. A one-bit A-register upset at P63 entry diverged immediately but
+recovered. A `LAND.X.HI` bit flip remained latent for 14,946 instructions. A
+pre-store `MODREG` mutation was masked, while suppressing the channel-7
+superbank selector prevented physical F32 P63 entry.
+
+The original focused rope experiment remains a useful microscope:
 
 The paired campaign runs identical nominal and faulted controllers, flips one
 bit in the `P63LM` rope word immediately before fetch, and compares their full
@@ -280,7 +384,9 @@ cargo run --release -p apollors-cli -- --repository . fault-campaign \
 
 The first difference is trace event 145,942: raw instruction `05353` becomes
 `05352`. This demonstrates deterministic injection, exact detection, and
-bounded non-recovery. It is not a claim about real rope-memory failure rates.
+bounded non-recovery. Neither experiment estimates real component failure
+rates or Apollo mission risk. Full definitions and engineering lessons are in
+[`docs/validation/fault-matrix.md`](docs/validation/fault-matrix.md).
 
 ## Command atlas
 
@@ -292,11 +398,14 @@ bounded non-recovery. It is not a claim about real rope-memory failure rates.
 | `overlay verify` | Validate explicit compatibility evidence against the pinned corpus |
 | `assemble` | Use focused native assembly, pinned yaYUL, or checksum-validated binsource input |
 | `execute` | Run a rope for an exact instruction count and optionally emit JSONL trace |
+| `coverage` | Stream a validated trace into dynamic instruction, bank, memory, I/O, and interrupt coverage |
+| `conformance` | Generate the complete semantic rope, assert local state, and optionally qualify against yaAGC |
 | `validate` | Compare two ApolloRS traces under the complete internal schema |
 | `validate-reference` | Compare ApolloRS with the pinned yaAGC architectural TSV |
 | `transpile` | Emit standalone compile-checkable Rust instruction dispatch with provenance |
 | `mission` | Run the trace-gated Luminary P63 scenario |
 | `fault-campaign` | Run paired nominal/faulted P63 executions and classify divergence/recovery |
+| `fault-matrix` | Run a versioned multiclass matrix from baseline-relative semantic anchors |
 | `dsky` | Open the interactive channel-driven terminal DSKY |
 | `validate-artifact` | Check a report envelope's schema and required provenance |
 
@@ -315,14 +424,20 @@ cargo run --release -p apollors-cli -- --help
 | [`comanche055-reference-build.json`](artifacts/generated/comanche055-reference-build.json) | Rust-parsed binsource and all 36 accepted bank checksums |
 | [`luminary099-p63-run.json`](artifacts/generated/luminary099-p63-run.json) | Inputs, real-state frames, key acceptance, P63 milestones, and guidance writes |
 | [`luminary099-p63-vs-yaagc.json`](artifacts/generated/luminary099-p63-vs-yaagc.json) | Twelve-field, 300,468-event exact common-prefix result |
+| [`luminary099-p63-coverage.json`](artifacts/generated/luminary099-p63-coverage.json) | Streaming dynamic coverage across instructions, banks, memory, I/O, and interrupts |
+| [`block-ii-conformance/report.json`](artifacts/generated/block-ii-conformance/report.json) | All 38 mnemonics/39 forms, 46 state assertions, and 252-event yaAGC match |
 | [`luminary099-p63-rope-fault.json`](artifacts/generated/luminary099-p63-rope-fault.json) | Paired fault audit, first divergence, and bounded recovery classification |
+| [`luminary099-p63-fault-matrix.json`](artifacts/generated/luminary099-p63-fault-matrix.json) | Eleven predeclared paired arms, exact latency, recovery, and acceptance taxonomy |
 | [`luminary099-native-assembly-status.json`](artifacts/generated/luminary099-native-assembly-status.json) | Honest native-assembler gaps rather than a false rope |
 | [`repository-inventory.json`](artifacts/generated/repository-inventory.json) | Computed project and historical-corpus measurements |
 
 Every JSON research result uses a versioned envelope containing historical and
 tool revisions, input hashes, a generation command, timestamp, and known
 limitations. Rope binaries, DOT graphs, generated Rust, and large JSONL traces
-receive adjacent provenance sidecars.
+receive adjacent provenance sidecars. A clean tree records the exact ApolloRS
+commit; a dirty development tree records that commit plus a SHA-256 fingerprint
+of tracked changes and untracked source/configuration files (generated artifact
+outputs are excluded from that fingerprint).
 
 <details>
 <summary><strong>Current immutable hashes</strong></summary>
@@ -349,9 +464,15 @@ ApolloRS uses several deliberately different forms of evidence:
    the first differing field.
 4. **Independent yaAGC comparison** checks the flagship stream against a
    separately compiled implementation.
-5. **Mission acceptance gates** require key handling, program selection,
+5. **Complete semantic conformance** forces all 38 mnemonics and 39 decode
+   forms through boundary-focused state assertions and a 252-event yaAGC run.
+6. **Streaming dynamic coverage** measures the exact machine surfaces the P63
+   path does and does not execute without retaining the full trace in memory.
+7. **Mission acceptance gates** require key handling, program selection,
    physical rope entry, source-ordered writes, and typed-model agreement.
-6. **Artifact validation** rejects missing schema, revision, hash, command, or
+8. **Paired fault matrices** separate activation, divergence latency, final
+   recovery, and mission-evidence regression at a common horizon.
+9. **Artifact validation** rejects missing schema, revision, hash, command, or
    limitation metadata.
 
 The complete claim table is
@@ -370,6 +491,24 @@ ApolloRS keeps four ideas separate:
    oracle, observable set, and finite interval agree.
 
 Only the fourth is called equivalent, and only within its measured boundary.
+
+## What modern systems work can learn here
+
+- **Memory safety and machine fidelity are different obligations.** Rust
+  removes broad classes of host-language defects; it does not automatically
+  reproduce signed zero, overflow, banking, timing, or interrupt semantics.
+- **Integration depth is not semantic breadth.** A 300,000-instruction mission
+  run is compelling, but measured coverage still found two entirely untouched
+  instructions. The synthetic suite closes that named gap.
+- **Final-state tests miss stories that traces retain.** Two matrix arms
+  diverged and later recovered; another remained latent for almost 15,000
+  instructions. Exact event streams reveal both.
+- **Claims need denominators and horizons.** ApolloRS reports 4,261 of 36,864
+  rope words, 252 of 252 compared conformance events, and an explicit
+  180,000-instruction fault horizon instead of using “complete” without scope.
+- **Readable rewrites should stay subordinate to executable evidence.** Typed
+  Pinball and P63 models explain behavior, while the original rope remains the
+  authority and an independent implementation remains the oracle.
 
 ## Honest boundaries
 
@@ -397,14 +536,18 @@ The precise vertical-slice definition is in
 
 ```text
 ApolloRS/
-├── crates/                    24 focused Rust crates
+├── crates/                    27 focused Rust crates
 │   ├── agc-word/              one's-complement words and signed zero
 │   ├── agc-memory/            erasable/fixed banks, registers, channels
 │   ├── agc-cpu/               Block II state transitions and timing
+│   ├── agc-coverage/          streaming dynamic machine-surface analysis
+│   ├── agc-conformance/       complete synthetic Block II semantic rope
 │   ├── agc-dsky/              keyboard encoding, relays, lamps, typed V37
 │   ├── agc-mission/           P63 fixture, checkpoints, typed initialization
+│   ├── agc-experiments/       paired matrix declarations and outcomes
 │   ├── agc-validation/        internal and yaAGC comparators
 │   └── apollors-cli/          reproducible operator interface
+├── experiments/              versioned predeclared experiment matrices
 ├── historical/Apollo-11/     pinned, untouched historical submodule
 ├── overlays/                  explicit compatibility aliases and evidence
 ├── artifacts/generated/      compact reproducible proof artifacts
@@ -420,6 +563,9 @@ ApolloRS/
 - [Verification matrix](docs/validation/verification-matrix.md)
 - [P63 vertical-slice definition](docs/validation/vertical-slice-dod.md)
 - [Exact yaAGC reference procedure](docs/validation/yaagc-reference.md)
+- [Complete semantic yaAGC conformance](docs/validation/yaagc-conformance.md)
+- [P63 multiclass fault matrix](docs/validation/fault-matrix.md)
+- [Clean-machine qualification](docs/validation/qualification.md)
 - [References, licenses, and originality](docs/research/reference-and-originality.md)
 - [Architecture decisions](docs/adr/README.md)
 - [Measured paper](paper/README.md)

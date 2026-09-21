@@ -89,6 +89,48 @@ pub enum Mnemonic {
 }
 
 impl Mnemonic {
+    /// Every canonical Block II instruction mnemonic in stable report order.
+    pub const ALL: [Self; 38] = [
+        Self::Ad,
+        Self::Ads,
+        Self::Aug,
+        Self::Bzf,
+        Self::Bzmf,
+        Self::Ca,
+        Self::Ccs,
+        Self::Cs,
+        Self::Das,
+        Self::Dca,
+        Self::Dcs,
+        Self::Dim,
+        Self::Dv,
+        Self::Dxch,
+        Self::EdrupT,
+        Self::Extend,
+        Self::Incr,
+        Self::Index,
+        Self::Inhint,
+        Self::Lxch,
+        Self::Mask,
+        Self::Mp,
+        Self::Msu,
+        Self::Qxch,
+        Self::Rand,
+        Self::Read,
+        Self::Relint,
+        Self::Resume,
+        Self::Ror,
+        Self::Rxor,
+        Self::Su,
+        Self::Tc,
+        Self::Tcf,
+        Self::Ts,
+        Self::Wand,
+        Self::Wor,
+        Self::Write,
+        Self::Xch,
+    ];
+
     /// Canonical assembler spelling.
     pub const fn as_str(self) -> &'static str {
         match self {

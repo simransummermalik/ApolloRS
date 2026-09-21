@@ -5,10 +5,13 @@ use agc_assembler::{
     AssemblyError, ReferenceAssemblerConfig, assemble, assemble_binsource_reference,
     assemble_reference, expand_program,
 };
+use agc_conformance::{execute_suite, generate_block_ii_suite};
+use agc_coverage::analyze_json_lines;
 use agc_cpu::Cpu;
 use agc_dsky::{DskyState, Key};
+use agc_experiments::{FaultMatrixSpec, run_luminary_p63_fault_matrix};
 use agc_faults::{Fault, compare_recovery};
-use agc_loader::{RopeFormat, load_file};
+use agc_loader::{RopeFormat, encode_yayul, load_file};
 use agc_mission::{MissionController, MissionRun, MissionScenario, compare_missions};
 use agc_overlay::Overlay;
 use agc_reports::{
@@ -27,6 +30,7 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::path::{Path, PathBuf};
+use std::process::Command as ProcessCommand;
 
 const REFERENCE_TOOLCHAIN: &str =
     "VirtualAGC 0b13e5976dbc3c6c76aeab35195135261d7999ff; yaYUL 20260713";
@@ -119,6 +123,24 @@ enum Command {
         #[arg(long)]
         trace: Option<PathBuf>,
     },
+    /// Measure dynamic machine coverage from a validated `ApolloRS` trace.
+    Coverage {
+        /// `ApolloRS` architectural JSON-lines trace.
+        #[arg(long)]
+        trace: PathBuf,
+        /// Provenance-bearing coverage report.
+        #[arg(long)]
+        output: PathBuf,
+    },
+    /// Generate and execute the synthetic Block II semantic conformance rope.
+    Conformance {
+        /// Directory receiving the rope, traces, manifest, logs, and report.
+        #[arg(long, default_value = "artifacts/generated/block-ii-conformance")]
+        output_dir: PathBuf,
+        /// Optional pinned, instrumented yaAGC executable for independent comparison.
+        #[arg(long)]
+        yaagc: Option<PathBuf>,
+    },
     /// Compare two `ApolloRS` JSON-lines traces under the complete trace schema.
     Validate {
         #[arg(long)]
@@ -195,6 +217,24 @@ enum Command {
         instructions: u64,
         /// Provenance-bearing paired campaign report.
         #[arg(long)]
+        output: PathBuf,
+    },
+    /// Run a declared multiclass paired P63 fault matrix.
+    FaultMatrix {
+        /// Reference Luminary rope image.
+        #[arg(long)]
+        rope: PathBuf,
+        /// Rope byte ordering.
+        #[arg(long, value_enum, default_value = "yayul")]
+        format: FormatArg,
+        /// Versioned matrix declaration.
+        #[arg(long, default_value = "experiments/p63-fault-matrix.json")]
+        spec: PathBuf,
+        /// Provenance-bearing matrix report.
+        #[arg(
+            long,
+            default_value = "artifacts/generated/luminary099-p63-fault-matrix.json"
+        )]
         output: PathBuf,
     },
     /// Run an interactive terminal DSKY/debugger against a real rope.
@@ -569,6 +609,55 @@ fn run(cli: Cli) -> Result<()> {
                 .transpose()?;
             execute_rope(&rope, format.into(), instructions, trace, provenance)
         }
+        Command::Coverage { trace, output } => {
+            let trace = resolve_from(&repository, &trace);
+            let output = resolve_from(&repository, &output);
+            let mut provenance = capture_provenance(
+                &repository,
+                &corpus,
+                format!(
+                    "cargo run -p apollors-cli -- coverage --trace {} --output {}",
+                    trace.display(),
+                    output.display()
+                ),
+                vec![
+                    "Dynamic coverage describes only events observed in this exact trace and is not proof of unexecuted instruction or mission behavior.".to_owned(),
+                    "Rope-fetch coverage uses all 36,864 installed fixed-memory words as its denominator, including constants and unused words that are not executable instructions.".to_owned(),
+                    "Physical trace locations are not mapped back to historical source labels in this report.".to_owned(),
+                ],
+            )?;
+            provenance.record_input_file("apollors_trace", &trace)?;
+            write_coverage_report(&trace, &output, provenance)
+        }
+        Command::Conformance { output_dir, yaagc } => {
+            let output_dir = resolve_from(&repository, &output_dir);
+            let yaagc = yaagc.as_deref().map(|path| resolve_from(&repository, path));
+            let mut provenance = capture_provenance(
+                &repository,
+                &corpus,
+                format!(
+                    "cargo run -p apollors-cli -- conformance --output-dir {}{}",
+                    output_dir.display(),
+                    yaagc.as_ref().map_or(String::new(), |path| format!(
+                        " --yaagc {}",
+                        path.display()
+                    ))
+                ),
+                vec![
+                    "This is a synthetic Block II semantic rope, not historical Apollo 11 flight software; it complements rather than replaces the Luminary P63 execution evidence.".to_owned(),
+                    "Local final-state assertions are specification-derived test vectors, not an independent implementation oracle.".to_owned(),
+                    "The yaAGC oracle export compares transition kind, cycle, PC, instruction, A/L/Q, EB/FB/BB, and interrupt vector/number; final memory and channel obligations are checked separately by ApolloRS.".to_owned(),
+                ],
+            )?;
+            if let Some(executable) = &yaagc {
+                provenance.record_input_file("yaagc_executable", executable)?;
+                provenance.record_input_file(
+                    "yaagc_conformance_patch",
+                    repository.join("docs/validation/yaagc-conformance-trace.patch"),
+                )?;
+            }
+            run_conformance(&output_dir, yaagc.as_deref(), provenance)
+        }
         Command::Validate {
             left,
             right,
@@ -769,6 +858,36 @@ fn run(cli: Cli) -> Result<()> {
                 &output,
                 provenance,
             )
+        }
+        Command::FaultMatrix {
+            rope,
+            format,
+            spec,
+            output,
+        } => {
+            let rope = resolve_from(&repository, &rope);
+            let spec = resolve_from(&repository, &spec);
+            let output = resolve_from(&repository, &output);
+            let mut provenance = capture_provenance(
+                &repository,
+                &corpus,
+                format!(
+                    "cargo run -p apollors-cli -- fault-matrix --rope {} --format {} --spec {} --output {}",
+                    rope.display(),
+                    format.as_str(),
+                    spec.display(),
+                    output.display()
+                ),
+                vec![
+                    "Fault cases are deterministic adversarial sensitivity experiments; the matrix does not estimate Apollo component failure probabilities or mission risk.".to_owned(),
+                    "Every arm shares the bounded P63 fixture, including its incomplete pad load and absence of coupled vehicle, IMU, and landing-radar dynamics.".to_owned(),
+                    "Outcome classes describe observations at the declared common instruction horizon; later recovery or divergence is outside the artifact.".to_owned(),
+                    "The baseline is executed once and each fault arm starts from an identical cloned pre-execution controller.".to_owned(),
+                ],
+            )?;
+            provenance.record_input_file("luminary_rope", &rope)?;
+            provenance.record_input_file("fault_matrix_spec", &spec)?;
+            run_fault_matrix(&rope, format.into(), &spec, &output, provenance)
         }
         Command::Dsky {
             rope,
@@ -1012,6 +1131,210 @@ fn execute_rope(
     Ok(())
 }
 
+fn write_coverage_report(trace: &Path, output: &Path, provenance: Provenance) -> Result<()> {
+    let file = fs::File::open(trace).with_context(|| format!("open {}", trace.display()))?;
+    let report = analyze_json_lines(BufReader::new(file))?;
+    let basis_points = report.instructions.rope_fetch_coverage_ppm / 100;
+    println!(
+        concat!(
+            "coverage: {} events, {} instructions, {} mnemonic/context forms, ",
+            "{} unique PCs, {} physical rope words ({}.{:02}% of installed rope), ",
+            "{} fixed banks, {} erasable banks, {} channels, {} interrupt entries"
+        ),
+        report.events.total,
+        report.events.instructions,
+        report.instructions.unique_mnemonic_forms,
+        report.instructions.unique_logical_pcs,
+        report.instructions.unique_rope_fetches,
+        basis_points / 100,
+        basis_points % 100,
+        report.instructions.fixed_banks.len(),
+        report.memory.erasable_banks.len(),
+        report.io.unique_channels,
+        report.interrupts.entries,
+    );
+    write_json(
+        output,
+        &Envelope::new("execution-trace-coverage", provenance, report),
+    )?;
+    println!("coverage report: {}", output.display());
+    Ok(())
+}
+
+fn run_conformance(
+    output_dir: &Path,
+    yaagc: Option<&Path>,
+    mut provenance: Provenance,
+) -> Result<()> {
+    fs::create_dir_all(output_dir).with_context(|| format!("create {}", output_dir.display()))?;
+    let rope_path = output_dir.join("block-ii-conformance.bin");
+    let manifest_path = output_dir.join("manifest.json");
+    let trace_path = output_dir.join("apollors-trace.jsonl");
+    let trace_metadata_path = output_dir.join("apollors-trace.meta.json");
+    let report_path = output_dir.join("report.json");
+
+    let suite = generate_block_ii_suite()?;
+    write_bytes(&rope_path, &encode_yayul(&suite.rope_words)?)?;
+    write_json(
+        &manifest_path,
+        &Envelope::new(
+            "block-ii-conformance-manifest",
+            provenance.clone(),
+            suite.manifest.clone(),
+        ),
+    )?;
+
+    let execution = execute_suite(&suite)?;
+    let trace_file = fs::File::create(&trace_path)
+        .with_context(|| format!("create {}", trace_path.display()))?;
+    execution
+        .trace
+        .write_json_lines(BufWriter::new(trace_file))?;
+    write_json(
+        &trace_metadata_path,
+        &Envelope::new(
+            "block-ii-conformance-trace-summary",
+            provenance.clone(),
+            trace_summary(&execution.trace),
+        ),
+    )?;
+
+    provenance.record_input_file("generated_conformance_rope", &rope_path)?;
+    provenance.record_input_file("apollors_conformance_trace", &trace_path)?;
+    provenance.record_input_file("conformance_manifest", &manifest_path)?;
+
+    let oracle = yaagc
+        .map(|executable| {
+            run_conformance_oracle(
+                executable,
+                output_dir,
+                &rope_path,
+                &execution.trace,
+                execution.report.cycles,
+            )
+        })
+        .transpose()?;
+    if oracle.is_some() {
+        provenance.record_input_file(
+            "yaagc_conformance_trace",
+            output_dir.join("yaagc-trace.tsv"),
+        )?;
+        provenance.record_input_file("yaagc_command_file", output_dir.join("yaagc-command.txt"))?;
+    }
+
+    let oracle_qualified = oracle
+        .as_ref()
+        .and_then(|value| value.get("qualified"))
+        .and_then(serde_json::Value::as_bool)
+        .unwrap_or(false);
+    let overall_passed = execution.report.passed && yaagc.is_none_or(|_| oracle_qualified);
+    let data = serde_json::json!({
+        "suite": suite.manifest,
+        "apollors": execution.report,
+        "independent_oracle_requested": yaagc.is_some(),
+        "independent_oracle_qualified": oracle_qualified,
+        "oracle": oracle,
+        "overall_passed": overall_passed,
+        "files": {
+            "rope": rope_path,
+            "manifest": manifest_path,
+            "apollors_trace": trace_path,
+            "trace_metadata": trace_metadata_path,
+        },
+    });
+    write_json(
+        &report_path,
+        &Envelope::new("block-ii-semantic-conformance", provenance, data),
+    )?;
+
+    println!(
+        concat!(
+            "conformance: local_passed={}, {} instructions / {} events / {} cycles, ",
+            "38 mnemonics / 39 decode forms, oracle_qualified={}, report {}"
+        ),
+        execution.report.passed,
+        execution.report.instructions,
+        execution.report.events,
+        execution.report.cycles,
+        oracle_qualified,
+        report_path.display()
+    );
+    if !overall_passed {
+        bail!(
+            "Block II semantic conformance failed; inspect {}",
+            report_path.display()
+        );
+    }
+    Ok(())
+}
+
+fn run_conformance_oracle(
+    executable: &Path,
+    output_dir: &Path,
+    rope: &Path,
+    apollors_trace: &TraceLog,
+    apollors_cycles: u64,
+) -> Result<serde_json::Value> {
+    let reference_trace_path = output_dir.join("yaagc-trace.tsv");
+    let command_path = output_dir.join("yaagc-command.txt");
+    let stdout_path = output_dir.join("yaagc-stdout.log");
+    let stderr_path = output_dir.join("yaagc-stderr.log");
+    if reference_trace_path.exists() {
+        fs::remove_file(&reference_trace_path)
+            .with_context(|| format!("remove stale {}", reference_trace_path.display()))?;
+    }
+
+    // Run slightly beyond ApolloRS's success breakpoint. The comparator then
+    // requires every ApolloRS event to match the independent reference prefix.
+    let reference_steps = apollors_cycles.saturating_add(64);
+    write_text(
+        &command_path,
+        &format!("step {reference_steps}\ninfo registers\nquit\n"),
+    )?;
+    let mut command = ProcessCommand::new(executable);
+    if let Some(parent) = executable.parent() {
+        command.current_dir(parent);
+    }
+    let output = command
+        .env("APOLLORS_YAAGC_TRACE", &reference_trace_path)
+        .arg("--no-resume")
+        .arg(format!("--command={}", command_path.display()))
+        .arg(rope)
+        .output()
+        .with_context(|| format!("run pinned yaAGC at {}", executable.display()))?;
+    write_bytes(&stdout_path, &output.stdout)?;
+    write_bytes(&stderr_path, &output.stderr)?;
+    if !output.status.success() {
+        bail!(
+            "pinned yaAGC exited with {}; inspect {} and {}",
+            output.status,
+            stdout_path.display(),
+            stderr_path.display()
+        );
+    }
+    let reference_file = fs::File::open(&reference_trace_path)
+        .with_context(|| format!("open {}", reference_trace_path.display()))?;
+    let reference = YaAgcReferenceTrace::read_tsv(BufReader::new(reference_file))?;
+    let comparison = compare_yaagc_reference(apollors_trace, &reference, true);
+    let qualified = comparison.equivalent
+        && comparison.matched_events == apollors_trace.events.len()
+        && reference.events.len() >= apollors_trace.events.len();
+    Ok(serde_json::json!({
+        "oracle": REFERENCE_TOOLCHAIN,
+        "executable": executable,
+        "executable_sha256": file_sha256(executable)?,
+        "instrumentation_patch": "docs/validation/yaagc-conformance-trace.patch",
+        "reference_steps": reference_steps,
+        "reference_trace": reference_trace_path,
+        "reference_trace_sha256": file_sha256(&reference_trace_path)?,
+        "stdout_log": stdout_path,
+        "stderr_log": stderr_path,
+        "qualified": qualified,
+        "qualification_rule": "every ApolloRS event must match a yaAGC event in order; yaAGC may continue beyond the ApolloRS success breakpoint",
+        "comparison": comparison,
+    }))
+}
+
 fn validate_traces(
     left: &Path,
     right: &Path,
@@ -1194,6 +1517,35 @@ fn run_fault_campaign(
         recovery.registers_recovered,
         output.display()
     );
+    Ok(())
+}
+
+fn run_fault_matrix(
+    rope: &Path,
+    format: RopeFormat,
+    spec_path: &Path,
+    output: &Path,
+    provenance: Provenance,
+) -> Result<()> {
+    let specification_bytes = fs::read(spec_path)
+        .with_context(|| format!("read fault matrix {}", spec_path.display()))?;
+    let specification: FaultMatrixSpec = serde_json::from_slice(&specification_bytes)
+        .with_context(|| format!("parse fault matrix {}", spec_path.display()))?;
+    specification.validate()?;
+    let image = load_file(rope, format)?;
+    let report = run_luminary_p63_fault_matrix(image, &specification)?;
+    println!(
+        "fault matrix: {} cases, {} diverged, {} degraded, {} recovered; report {}",
+        report.aggregate.cases,
+        report.aggregate.diverged_cases,
+        report.aggregate.degraded_cases,
+        report.aggregate.recovered_cases,
+        output.display()
+    );
+    write_json(
+        output,
+        &Envelope::new("paired-p63-fault-matrix", provenance, report),
+    )?;
     Ok(())
 }
 

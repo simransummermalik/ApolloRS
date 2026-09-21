@@ -30,6 +30,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "agc-conformance"
+version = "0.1.0"
+dependencies = [
+ "agc-cpu",
+ "agc-isa",
+ "agc-loader",
+ "agc-memory",
+ "agc-trace",
+ "agc-word",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "agc-coverage"
+version = "0.1.0"
+dependencies = [
+ "agc-trace",
+ "agc-word",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "agc-cpu"
 version = "0.1.0"
 dependencies = [
@@ -48,6 +72,20 @@ dependencies = [
  "agc-trace",
  "agc-word",
  "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "agc-experiments"
+version = "0.1.0"
+dependencies = [
+ "agc-faults",
+ "agc-loader",
+ "agc-mission",
+ "agc-trace",
+ "agc-validation",
+ "serde",
+ "serde_json",
  "thiserror",
 ]
 
@@ -341,8 +379,11 @@ name = "apollors-cli"
 version = "0.1.0"
 dependencies = [
  "agc-assembler",
+ "agc-conformance",
+ "agc-coverage",
  "agc-cpu",
  "agc-dsky",
+ "agc-experiments",
  "agc-faults",
  "agc-loader",
  "agc-mission",

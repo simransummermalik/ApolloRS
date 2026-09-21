@@ -30,6 +30,31 @@ events in addition to committed instructions. Every one matches the pinned
 yaAGC stream. The reference stream has 795,178 events, so the report is a
 qualified common-prefix result, not a complete-stream result.
 
+The same trace is analyzed as a stream: 2,185 logical PCs and 4,261 physical
+rope words are fetched across 20 fixed banks; 37 mnemonic/context forms, all
+eight erasable banks, 16 I/O channels, and 468 interrupt entries are observed.
+This is 11.55% of all installed rope words, including constants and unused
+locations in the denominator.
+
+## Complete semantic conformance
+
+A generated fixture-free rope deliberately covers all 38 canonical Block II
+mnemonics and 39 decode-context forms. It passes 46 exact final-state
+assertions in 250 instructions / 252 events / 461 cycles. All 252 ApolloRS
+events match the pinned yaAGC oracle; the reference continues to 337 events.
+This closes the `DIM` and `EDRUPT` gap exposed by P63 dynamic coverage without
+pretending that synthetic conformance replaces historical integration.
+
+## Fault experiment surface
+
+The tracked 11-case P63 matrix covers interrupt removal, bounded channel
+forcing, logical and physical erasable corruption, rope mutation, register
+upset, timer jumps, IMU pulses, and radar input. At the shared 180,000
+instruction horizon it measures two masked cases, two recovered cases, three
+persistent state divergences, one mission-evidence change, and three mission
+degradations. Every report retains fault activation, first divergence,
+instruction latency, final register recovery, and acceptance-field changes.
+
 ## Implemented machine surface
 
 - basic and extended Block II decode across the complete 15-bit word domain;
@@ -61,5 +86,5 @@ designed build path rather than a hidden fallback.
 - no dynamic lunar-module vehicle or sensor plant;
 - no `P63SPOT` or `P63SPOT2` checkpoint in the current run;
 - no complete high-level Rust rewrite of Luminary or Comanche;
-- no whole-emulator formal proof or exhaustive independent instruction matrix;
-- no fault-recovery equivalence claim.
+- no whole-emulator formal proof or proof over every possible initial state;
+- no universal fault-recovery claim beyond the declared cases and horizon.

@@ -12,12 +12,15 @@ Status meanings:
 | Historical source integrity | 175 `.agc` files; exact path, byte count, line count, SHA-256; pinned commit `247dd7d…` | verified |
 | One's-complement word representation | all 32,768 raw words round-trip; both zeros retained; complement and integer-domain properties | verified |
 | Block II decode domain | every 15-bit word decoded in basic and extracode contexts | verified |
-| Bank/register/edit behavior | focused boundary and alias tests, including L overflow correction and channel 7 masks | implemented |
+| Bank/register/edit behavior | focused tests plus exact conformance paths through EB/FB/BB, bank 4, superbank 40, A/L/Q and double exchange | verified |
 | Luminary 099 rope | clean pinned yaYUL build, 73,728 bytes, zero fatal/unresolved symbols, SHA `bf873988…` | verified |
 | Comanche 055 rope import | 36 banks × 1,024 words, every bank checksum accepted, SHA `2ba31de9…` | verified |
 | Native full-flight assembly | current diagnostic reports retain unsupported directive/interpretive families and collisions | unsupported |
 | Original Luminary execution | real rope loaded and executed through timers, interrupts, channels, Pinball, and P63 entry | verified |
 | yaAGC architectural agreement | 300,468-event ApolloRS stream is an exact prefix match on 12 fields; reference has 795,178 events | verified |
+| P63 dynamic execution coverage | streaming analysis of 300,468 events: 2,185 PCs, 4,261 rope words, 37 forms, 20 fixed banks, all 8 erasable banks | verified |
+| Complete Block II mnemonic/context surface | generated rope observes 38/38 mnemonics, 39/39 forms, and 46/46 final-state assertions | verified |
+| Independent semantic conformance | all 252 ApolloRS conformance events match pinned yaAGC; reference continues to 337 events | verified |
 | DSKY V37E63E path | all seven keys have request, KEYRUPT1, and `CHARIN` milestones; `MODREG=63` observed | verified |
 | Typed Pinball reconstruction | typed `V37ProgramChange` accepts only rope-accepted keys and yields the same program 63 | verified |
 | P63 entry | physical `P63LM` fetch at F32:0776 after `MODREG=63` | verified |
@@ -25,10 +28,12 @@ Status meanings:
 | Landing-equation activity | trace-backed writes include TPIP, LAND, TTF/8, VGU, and RGU words | verified |
 | Complete powered descent / landing | no mission-time state vector or coupled vehicle/sensor plant; P63SPOT/P63SPOT2 not reached | unsupported |
 | Deterministic fault injection | audited bit flip at P63LM physical F32:0776; paired baseline/faulted traces first diverge at event 145,942 | verified |
-| Restart/recovery equivalence under faults | P63 entry fault does not recover by the 180,000-instruction horizon; no general recovery-equivalence claim | unsupported |
+| Multiclass fault outcomes | 11 predeclared paired arms at one horizon: 2 masked, 2 recovered, 3 persistent, 1 evidence-changed, 3 degraded | verified |
+| General fault-recovery equivalence | outcomes vary by fault and horizon; no universal recovery claim | unsupported |
 | Whole-program mechanical Rust generation | standalone, compile-checkable source/word dispatch with provenance | implemented |
 | Whole-program idiomatic Rust rewrite | no such claim; only bounded typed subsystems are reconstructed | unsupported |
 | Artifact provenance | envelope validation plus raw-file sidecars and content hashes | verified |
+| Clean-machine qualification | CI and `tools/qualify.sh` run lint/test/build, source integrity, conformance, P63 coverage, fault matrix, and artifact validation | implemented |
 
 ## Exact P63 acceptance
 
@@ -54,3 +59,10 @@ so reference interrupt cycles are normalized by +1. Memory access lists,
 peripheral internals, and every erasable word are not part of this external
 comparison. The mission report supplies separate trace-backed evidence for the
 crew and guidance milestones.
+
+The fixture-free semantic conformance oracle uses the same compared fields and
+timing normalization over a generated rope. It additionally requires all 38
+mnemonics, both `INDEX` contexts, and 46 local final-state obligations. Local
+memory/channel assertions increase observability but are not called an
+independent oracle; that label is reserved for the separately compiled yaAGC
+stream.

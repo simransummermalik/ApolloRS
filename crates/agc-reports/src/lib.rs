@@ -28,7 +28,7 @@ pub struct Provenance {
     pub historical_commit: String,
     /// Pinned external reference identifier.
     pub reference_toolchain: String,
-    /// `ApolloRS` commit or explicit dirty-worktree marker.
+    /// `ApolloRS` commit or commit plus dirty-worktree SHA-256 fingerprint.
     pub apollors_commit: String,
     /// Sorted input `path=sha256` records.
     pub input_hashes: Vec<String>,
@@ -419,21 +419,89 @@ fn repository_revision(root: &Path) -> String {
             || "unversioned".to_owned(),
             |output| String::from_utf8_lossy(&output.stdout).trim().to_owned(),
         );
-    let dirty = Command::new("git")
+    let status = Command::new("git")
         .args([
             "-C",
             root.to_string_lossy().as_ref(),
             "status",
             "--porcelain",
+            "--untracked-files=all",
+            "--",
+            ".",
+            ":(exclude)artifacts/generated",
+        ])
+        .output()
+        .ok();
+    let Some(status) = status.filter(|output| output.status.success()) else {
+        return format!("{revision}-dirty-unfingerprinted");
+    };
+    if status.stdout.is_empty() {
+        return revision;
+    }
+
+    let mut digest = Sha256::new();
+    digest.update(b"git-status-v1\0");
+    digest.update(&status.stdout);
+    if let Some(diff) = Command::new("git")
+        .args([
+            "-C",
+            root.to_string_lossy().as_ref(),
+            "diff",
+            "--binary",
+            "HEAD",
+            "--",
+            ".",
+            ":(exclude)artifacts/generated",
         ])
         .output()
         .ok()
-        .is_some_and(|output| output.status.success() && !output.stdout.is_empty());
-    if dirty {
-        format!("{revision}-dirty")
-    } else {
-        revision
+        .filter(|output| output.status.success())
+    {
+        digest.update(b"\0git-diff-head\0");
+        digest.update(diff.stdout);
     }
+    if let Some(untracked) = Command::new("git")
+        .args([
+            "-C",
+            root.to_string_lossy().as_ref(),
+            "ls-files",
+            "--others",
+            "--exclude-standard",
+            "-z",
+            "--",
+            ".",
+            ":(exclude)artifacts/generated",
+        ])
+        .output()
+        .ok()
+        .filter(|output| output.status.success())
+    {
+        let mut buffer = vec![0_u8; 64 * 1024].into_boxed_slice();
+        for relative in untracked
+            .stdout
+            .split(|byte| *byte == 0)
+            .filter(|path| !path.is_empty())
+        {
+            digest.update(b"\0untracked\0");
+            digest.update(relative);
+            let relative = String::from_utf8_lossy(relative);
+            if let Ok(mut file) = fs::File::open(root.join(relative.as_ref())) {
+                loop {
+                    match file.read(&mut buffer) {
+                        Ok(0) => break,
+                        Ok(bytes) => digest.update(&buffer[..bytes]),
+                        Err(_) => {
+                            digest.update(b"\0unreadable\0");
+                            break;
+                        }
+                    }
+                }
+            } else {
+                digest.update(b"\0unreadable\0");
+            }
+        }
+    }
+    format!("{revision}-dirty-sha256:{}", hex::encode(digest.finalize()))
 }
 
 #[cfg(test)]

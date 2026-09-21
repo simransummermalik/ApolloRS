@@ -1,7 +1,7 @@
 # ApolloRS architecture
 
 This is the implemented architecture, not a proposed scaffold. The workspace
-contains 24 Rust crates and forbids unsafe code throughout.
+contains 27 Rust crates and forbids unsafe code throughout.
 
 ## Execution path
 
@@ -36,10 +36,10 @@ toolchain.
 |---|---|---|
 | Exact values | `agc-word`, `agc-fixed` | 15-bit one's-complement words, signed zeros, double words, scaled integer values |
 | Machine | `agc-isa`, `agc-memory`, `agc-cpu` | complete decode domain, bank/register/channel semantics, instruction/interrupt transitions and MCT timing |
-| Runtime | `agc-runtime`, `agc-faults`, `agc-dsky`, `agc-mission` | deterministic events, physical-input models, DSKY relays/keys, fault audit, synchronized mission evidence |
+| Runtime | `agc-runtime`, `agc-faults`, `agc-dsky`, `agc-mission`, `agc-experiments` | deterministic events, physical-input models, DSKY relays/keys, paired fault matrices, synchronized mission evidence |
 | Historical source | `agc-source`, `agc-ast`, `agc-parser`, `agc-overlay`, `agc-ir`, `agc-symbols` | immutable source access, exact syntax, explicit compatibility edits, typed records and definitions |
 | Build/recovery | `agc-assembler`, `agc-loader`, `agc-xref`, `agc-transpiler` | native focused assembly, strict external assembly, rope validation, graphs, provenance-preserving Rust generation |
-| Research evidence | `agc-trace`, `agc-validation`, `agc-reports`, `apollors-cli` | canonical events, divergence classification, yaAGC adapter, provenance envelopes and operator commands |
+| Research evidence | `agc-trace`, `agc-coverage`, `agc-conformance`, `agc-validation`, `agc-reports`, `apollors-cli` | streaming coverage, complete semantic rope, divergence classification, yaAGC adapters, provenance envelopes and operator commands |
 | Bounded models | `agc-interpreter` plus typed models in `agc-dsky` and `agc-mission` | exact integer experimentation and readable subsystem reconstructions; never hidden replacement of rope execution |
 
 ## Semantic ownership
@@ -55,11 +55,16 @@ toolchain.
 
 ## Validation structure
 
-ApolloRS uses three distinct comparators:
+ApolloRS uses distinct evidence layers:
 
 1. Unit/property checks for finite arithmetic, decode, and mapping domains.
 2. ApolloRS trace comparison for deterministic replay and regression tests.
-3. A separately compiled yaAGC stream for independent architectural events.
+3. Streaming mission-path coverage to state what real P63 execution reaches.
+4. A generated all-mnemonic semantic rope with specification-derived state
+   obligations.
+5. Separately compiled yaAGC streams for independent P63 and semantic events.
+6. Paired fault experiments for activation, latency, recovery, and acceptance
+   effects at a shared horizon.
 
 The P63 mission additionally derives acceptance evidence from the trace:
 KEYRUPT entry, `CHARIN`, `MODREG=63`, the physical `P63LM` fetch, and exact
@@ -72,4 +77,7 @@ JSON research outputs use the `agc-reports::Envelope` schema. Raw JSONL traces,
 rope binaries, DOT files, and generated Rust receive adjacent provenance
 sidecars. Every record includes historical and reference revisions, SHA-256
 inputs, the generation command, time, and known limitations. Large traces stay
-outside Git; compact reports retain their hashes.
+outside Git; compact reports retain their hashes. Clean trees record the exact
+ApolloRS commit. Dirty development trees record that commit plus a SHA-256 over
+tracked changes and untracked source/configuration files while excluding
+generated artifact outputs.

@@ -1,0 +1,71 @@
+name: qualification
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rust-and-mission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out ApolloRS and historical source
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.97.0 --profile minimal --component clippy,rustfmt
+
+      - name: Run complete local qualification
+        env:
+          APOLLORS_QUALIFY_OUTPUT: /tmp/apollors-qualification
+        run: sh tools/qualify.sh
+
+      - name: Retain measured qualification artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: apollors-local-qualification
+          path: /tmp/apollors-qualification
+          if-no-files-found: error
+
+  independent-yaagc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out ApolloRS and historical source
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.97.0 --profile minimal --component clippy,rustfmt
+
+      - name: Build pinned external yaAGC oracle
+        run: sh tools/build-yaagc-conformance.sh /tmp/apollors-virtualagc
+
+      - name: Run exact Block II differential suite
+        run: >-
+          cargo run --quiet --release -p apollors-cli -- --repository .
+          conformance
+          --output-dir /tmp/apollors-oracle-qualification
+          --yaagc /tmp/apollors-virtualagc/yaAGC/yaAGC
+
+      - name: Validate oracle-qualified report
+        run: >-
+          cargo run --quiet --release -p apollors-cli -- --repository .
+          validate-artifact
+          --artifact /tmp/apollors-oracle-qualification/report.json
+
+      - name: Retain independent-oracle artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: apollors-yaagc-qualification
+          path: /tmp/apollors-oracle-qualification
+          if-no-files-found: error

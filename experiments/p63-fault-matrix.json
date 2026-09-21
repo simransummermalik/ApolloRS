@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "name": "luminary099-p63-multiclass-fault-matrix-v1",
+  "instruction_limit": 180000,
+  "cases": [
+    {
+      "id": "drop-reset-downrupt",
+      "injection": {
+        "kind": "instruction",
+        "instruction": 0
+      },
+      "fault": {
+        "type": "drop-interrupt",
+        "interrupt": "Downrupt"
+      },
+      "research_question": "Does removing the reset-time DOWNRUPT alter later V37/P63 acceptance at the common horizon?",
+      "limitation": "This deliberately removes a pending simulator reset interrupt; it is not a measured Apollo hardware failure rate."
+    },
+    {
+      "id": "stuck-first-key-channel",
+      "injection": {
+        "kind": "anchor",
+        "anchor": "first-key-request",
+        "offset": 0
+      },
+      "fault": {
+        "type": "stuck-channel",
+        "channel": 13,
+        "value": 0,
+        "instructions": 300
+      },
+      "research_question": "Does forcing channel 015 low while Pinball consumes the first key prevent the full V37E63E sequence from being verified?",
+      "limitation": "The duration is an adversarial instruction-window stimulus, not an electrical switch model."
+    },
+    {
+      "id": "modreg-overwrite-control",
+      "injection": {
+        "kind": "anchor",
+        "anchor": "program63-selected",
+        "offset": -1
+      },
+      "fault": {
+        "type": "physical-erasable-bit-flip",
+        "bank": 2,
+        "offset": 9,
+        "mask": 1
+      },
+      "research_question": "Is a one-bit MODREG corruption immediately before the rope stores major mode 63 masked by that store?",
+      "limitation": "This is a positive-control masking case tied to the observed baseline write order."
+    },
+    {
+      "id": "stuck-superbank-before-p63",
+      "injection": {
+        "kind": "anchor",
+        "anchor": "p63-entry",
+        "offset": -200
+      },
+      "fault": {
+        "type": "stuck-channel",
+        "channel": 7,
+        "value": 0,
+        "instructions": 400
+      },
+      "research_question": "Does suppressing the channel-7 superbank selector around the P63 transfer prevent the physical F32 entry path?",
+      "limitation": "The forced window approximates a control-interface fault and does not model relay timing."
+    },
+    {
+      "id": "p63-entry-rope-lsb",
+      "injection": {
+        "kind": "anchor",
+        "anchor": "p63-entry",
+        "offset": -1
+      },
+      "fault": {
+        "type": "rope-bit-flip",
+        "bank": 26,
+        "offset": 510,
+        "mask": 1
+      },
+      "research_question": "How quickly does a one-bit mutation of the first P63LM word become architecturally visible, and does mission evidence recover?",
+      "limitation": "Core rope was read-only in flight; this adversarial mutation measures software sensitivity, not a realistic in-flight write mechanism."
+    },
+    {
+      "id": "accumulator-lsb-at-p63",
+      "injection": {
+        "kind": "anchor",
+        "anchor": "p63-entry",
+        "offset": 0
+      },
+      "fault": {
+        "type": "register",
+        "index": 0,
+        "mask": 1
+      },
+      "research_question": "Is a one-bit accumulator upset at P63LM entry overwritten, propagated, or reflected in acceptance evidence?",
+      "limitation": "The fault is instantaneous at an instruction boundary and omits analog upset duration."
+    },
+    {
+      "id": "dvcounter-bit-after-write",
+      "injection": {
+        "kind": "guidance-write",
+        "variable": "DVCNTR",
+        "offset": 1
+      },
+      "fault": {
+        "type": "physical-erasable-bit-flip",
+        "bank": 7,
+        "offset": 63,
+        "mask": 1
+      },
+      "research_question": "Does a post-write bit flip in the P63 descent-velocity counter persist or get repaired by subsequent rope logic?",
+      "limitation": "The selected bit and boundary are deterministic sensitivity probes, not a radiation cross-section model."
+    },
+    {
+      "id": "landing-x-bit-after-write",
+      "injection": {
+        "kind": "guidance-write",
+        "variable": "LAND.X.HI",
+        "offset": 1
+      },
+      "fault": {
+        "type": "physical-erasable-bit-flip",
+        "bank": 7,
+        "offset": 156,
+        "mask": 1
+      },
+      "research_question": "Does a low-bit perturbation of the freshly written landing target X component alter later guidance state by the horizon?",
+      "limitation": "No vehicle dynamics are coupled, so the outcome concerns software state propagation only."
+    },
+    {
+      "id": "time1-jump-after-p63",
+      "injection": {
+        "kind": "anchor",
+        "anchor": "p63-entry",
+        "offset": 50
+      },
+      "fault": {
+        "type": "timer-jump",
+        "address": 21,
+        "delta": 100
+      },
+      "research_question": "Does a +100 one’s-complement TIME1 jump after P63 entry change scheduling or mission evidence at the shared horizon?",
+      "limitation": "The instantaneous timer discontinuity is a software robustness stimulus, not an oscillator model."
+    },
+    {
+      "id": "imu-pulse-bias-after-p63",
+      "injection": {
+        "kind": "anchor",
+        "anchor": "p63-entry",
+        "offset": 20
+      },
+      "fault": {
+        "type": "imu-bias",
+        "x": 1,
+        "y": -1,
+        "z": 1
+      },
+      "research_question": "Are single opposing IMU pulses after P63 entry visible in the software trace and retained guidance state?",
+      "limitation": "This injects discrete counter pulses and does not simulate platform mechanics or sensor noise spectra."
+    },
+    {
+      "id": "radar-sample-after-range-write",
+      "injection": {
+        "kind": "guidance-write",
+        "variable": "RANGEDSP.HI",
+        "offset": 1
+      },
+      "fault": {
+        "type": "radar-sample",
+        "range": 5349,
+        "rate": 4012
+      },
+      "research_question": "Does an explicit radar sample and RADAR interrupt after range-display computation alter subsequent software state before the horizon?",
+      "limitation": "The sample is synthetic and uncoupled from a lunar trajectory or radar measurement model."
+    }
+  ]
+}

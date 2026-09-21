@@ -33,9 +33,12 @@ error model, event schema, and state-transition code. Behavior learned from
 manuals and reference execution is re-expressed independently and tested by
 trace comparison.
 
-`docs/validation/yaagc-exact-trace.patch` is intentionally separate reference
-instrumentation. When applied to VirtualAGC it is governed by VirtualAGC's GPL
-terms; it is not part of the dual-licensed Rust crates.
+`docs/validation/yaagc-exact-trace.patch` and
+`docs/validation/yaagc-conformance-trace.patch` are intentionally separate
+reference instrumentation. The first carries the bounded P63 fixture; the
+second is fixture-free and logs the generated semantic rope to a configurable
+path. When applied to VirtualAGC they are governed by VirtualAGC's GPL terms;
+neither is part of the dual-licensed Rust crates.
 
 ## ragc
 

@@ -13,8 +13,11 @@ path = "src/main.rs"
 
 [dependencies]
 agc-assembler = { path = "../agc-assembler" }
+agc-conformance = { path = "../agc-conformance" }
 agc-cpu = { path = "../agc-cpu" }
+agc-coverage = { path = "../agc-coverage" }
 agc-dsky = { path = "../agc-dsky" }
+agc-experiments = { path = "../agc-experiments" }
 agc-faults = { path = "../agc-faults" }
 agc-loader = { path = "../agc-loader" }
 agc-mission = { path = "../agc-mission" }

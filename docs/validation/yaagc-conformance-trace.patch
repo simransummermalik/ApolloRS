@@ -1,0 +1,73 @@
+diff --git a/yaAGC/agc_engine.c b/yaAGC/agc_engine.c
+index 3a47efdd5..4e9fd3e5c 100644
+--- a/yaAGC/agc_engine.c
++++ b/yaAGC/agc_engine.c
+@@ -438,7 +438,7 @@
+ 
+ #define AGC_ENGINE_C
+ //#include <errno.h>
+-//#include <stdlib.h>
++#include <stdlib.h>
+ #include <stdio.h>
+ #ifdef WIN32
+ typedef unsigned short uint16_t;
+@@ -522,6 +522,20 @@ static const int ExtracodeTiming[32] =
+ int DebuggerInterruptMasks[11] =
+   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+ 
++static FILE *ExactTrace;
++
++static void
++ExactTraceOpen (void)
++{
++  const char *Path;
++  if (ExactTrace)
++    return;
++  Path = getenv ("APOLLORS_YAAGC_TRACE");
++  if (!Path || !*Path)
++    Path = "/tmp/yaagc-conformance-trace.tsv";
++  ExactTrace = fopen (Path, "w");
++}
++
+ //-----------------------------------------------------------------------------
+ // Stuff for doing structural coverage analysis.  Yes, I know it could be done
+ // much more cleverly.
+@@ -2524,6 +2538,17 @@ agc_engine (agc_t * State)
+ 
+       if (InterruptRequested)
+         {
++          ExactTraceOpen ();
++          if (ExactTrace)
++            {
++              fprintf (ExactTrace,
++                      "%llu\tR\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t%o\n",
++                      (unsigned long long) State->CycleCounter, ProgramCounter,
++                      Instruction, c(RegA), c(RegL), c(RegQ), c(RegEB), c(RegFB),
++                      c(RegBB), State->NextZ,
++                      (ExtendedOpcode == 0107 && State->NextZ == 0) ? 0 : i);
++              fflush (ExactTrace);
++            }
+           BacktraceAdd (State, i);
+           // Set up the return stuff.
+           c (RegZRUPT)= ProgramCounter + 1;
+@@ -2576,6 +2601,15 @@ agc_engine (agc_t * State)
+   // only the lower 12 bits are read into the adder, so if something sets
+   // any of the 4 most significant bits of Z, they will be lost before
+   // the next instruction sees them.
++  ExactTraceOpen ();
++  if (ExactTrace)
++    {
++      fprintf (ExactTrace,
++              "%llu\tI\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t%o\t0\t0\n",
++              (unsigned long long) State->CycleCounter, ProgramCounter,
++              Instruction, c(RegA), c(RegL), c(RegQ), c(RegEB), c(RegFB), c(RegBB));
++      fflush (ExactTrace);
++    }
+   State->NextZ = 1 + c(RegZ);
+   // The contents of the Z register are updated before an instruction is
+   // executed (really, it happens at the end of the previous instruction).
+@@ -3516,4 +3550,3 @@ agc_engine (agc_t * State)
+     }
+   return (0);
+ }
+-

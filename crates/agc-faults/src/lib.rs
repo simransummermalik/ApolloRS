@@ -20,6 +20,15 @@ pub enum Fault {
         /// Fifteen-bit XOR mask.
         mask: u16,
     },
+    /// Flip bits in one exact physical erasable word, independent of EBANK.
+    PhysicalErasableBitFlip {
+        /// Physical erasable bank.
+        bank: u8,
+        /// Offset within the 256-word bank.
+        offset: u16,
+        /// Fifteen-bit XOR mask.
+        mask: u16,
+    },
     /// Flip bits in physical fixed rope.
     RopeBitFlip {
         /// Physical bank.
@@ -117,6 +126,14 @@ pub enum FaultError {
     /// Delta cannot be represented in one word.
     #[error("fault delta {0} is outside one AGC word")]
     Delta(i32),
+    /// Physical erasable location is not installed.
+    #[error("physical erasable bank {bank:o} offset {offset:04o} is outside installed memory")]
+    PhysicalErasable {
+        /// Physical erasable bank.
+        bank: u8,
+        /// Physical erasable offset.
+        offset: u16,
+    },
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -205,6 +222,26 @@ impl FaultEngine {
                         .value
                         .raw(),
                 )
+            }
+            Fault::PhysicalErasableBitFlip { bank, offset, mask } => {
+                let current = runtime
+                    .cpu()
+                    .memory()
+                    .read_erasable_physical(*bank, *offset)
+                    .ok_or(FaultError::PhysicalErasable {
+                        bank: *bank,
+                        offset: *offset,
+                    })?;
+                let next = AgcWord::from_raw_truncate(current.raw() ^ mask);
+                runtime
+                    .cpu_mut()
+                    .memory_mut()
+                    .write_erasable_physical(*bank, *offset, next)
+                    .map_err(|_| FaultError::PhysicalErasable {
+                        bank: *bank,
+                        offset: *offset,
+                    })?;
+                Some(next.raw())
             }
             Fault::RopeBitFlip { bank, offset, mask } => Some(
                 runtime
@@ -377,5 +414,34 @@ mod tests {
             4
         );
         assert_eq!(faults.applied.len(), 1);
+    }
+
+    #[test]
+    fn physical_erasable_flip_does_not_depend_on_selected_ebank() {
+        let mut runtime = looping_runtime();
+        runtime
+            .cpu_mut()
+            .memory_mut()
+            .write_erasable_physical(7, 0o234, AgcWord::from_raw_truncate(0o12000))
+            .unwrap();
+        let mut faults = FaultEngine::default();
+        faults.schedule(
+            0,
+            Fault::PhysicalErasableBitFlip {
+                bank: 7,
+                offset: 0o234,
+                mask: 0o1,
+            },
+        );
+        faults.step(&mut runtime).unwrap();
+        assert_eq!(
+            runtime
+                .cpu()
+                .memory()
+                .read_erasable_physical(7, 0o234)
+                .unwrap()
+                .raw(),
+            0o12001
+        );
     }
 }

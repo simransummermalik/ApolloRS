@@ -1,0 +1,22 @@
+[package]
+name = "agc-experiments"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+agc-faults = { path = "../agc-faults" }
+agc-loader = { path = "../agc-loader" }
+agc-mission = { path = "../agc-mission" }
+agc-trace = { path = "../agc-trace" }
+agc-validation = { path = "../agc-validation" }
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+
+[lints]
+workspace = true

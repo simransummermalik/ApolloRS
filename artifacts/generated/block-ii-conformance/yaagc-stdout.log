@@ -1,0 +1,30 @@
+Apollo Guidance Computer simulation, ver. , built Aug 28 2026 13:32:53
+Copyright (C) 2003-2009 Ronald S. Burkey, Onno Hommes.
+yaAGC is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Refer to http://www.ibiblio.org/apollo/index.html for additional information.
+Cannot open symbol table file: /Users/summermalik/Desktop/Apollo11/./artifacts/generated/block-ii-conformance/block-ii-conformance.symtab
+   04000 14100  TCF	4100
+   05701 15701  TCF	5701
+A		0xcb2c	52012
+L		0x0001	1
+Q		0x0003	3
+EB		0x0600	1536
+FB		0x6000	24576
+Z		0x0bc1	3009
+BB		0x6006	24582
+ARUPT		0x0000	0
+LRUPT		0x0000	0
+QRUPT		0x0000	0
+ZRUPT		0x0939	2361
+BBRUPT		0x0000	0
+BRUPT		0x0e00	3584
+CHAN07		0x0040	64
+CYR		0x0000	0
+SR		0x0000	0
+CYL		0x0000	0
+EDOP		0x0000	0
+INDEX		0x0000	0
+EXTEND		0x0000	0
+IRQMSK		0x0000	0
+ISR		0x0001	1

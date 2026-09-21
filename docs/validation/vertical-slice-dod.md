@@ -32,6 +32,12 @@ trajectory claim.
 
 All gates pass in the current artifacts.
 
+The mission trace additionally has a streaming dynamic-coverage report. It
+observes 37 mnemonic/context forms and 4,261 physical rope words across 20
+fixed banks. Because P63 does not execute `DIM` or `EDRUPT`, those semantics are
+qualified separately by the complete generated conformance rope. This keeps
+mission integration and instruction breadth as distinct claims.
+
 ## Deliberate exclusions
 
 - mission-time LM state vector and navigation history;
